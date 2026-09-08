@@ -42,7 +42,7 @@ Open `Nosh.xcodeproj` with Xcode 27 and run the Nosh scheme. If the on-device mo
 2. Evaluate real meals and non-food inputs. Establish quality thresholds with Rogério before claiming recognition accuracy.
 3. Revisit the minimum OS if a later public Xcode ships the same `Attachment` API without remaining on the 27.0 beta toolchain.
 
-TODO: add a licensed bundled nutrition database later. It is not required for the initial model-based estimator.
+TODO: add a licensed bundled nutrition database later. It is not required for the initial model-based estimator. See `docs/nutrition-catalog.md` for the dataset and matching exploration.
 
 ## Verification on 8 September 2026
 

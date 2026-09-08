@@ -114,7 +114,7 @@ For the initial release, the on-device model proposes food identities, portions,
 
 ### TODO: bundled nutrition database
 
-This is deferred work. Do not block the initial model-based implementation on dataset selection.
+This is deferred work. Do not block the initial model-based implementation on dataset selection. The exploration lives in `docs/nutrition-catalog.md`.
 
 - Select an authoritative, versioned, redistributable food dataset and verify licensing and attribution before bundling it.
 - Keep source record IDs, preparation states, kcal per 100 g, documented serving weights, source URLs, and dataset versions.
