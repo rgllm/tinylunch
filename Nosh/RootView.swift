@@ -169,6 +169,7 @@ struct CaptureView: View {
                 } label: {
                     Label("Photo analysis unavailable", systemImage: "info.circle")
                         .font(.subheadline.weight(.medium)).foregroundStyle(.primary)
+                        .accessibilityIdentifier("photoAnalysisUnavailable")
                 }.padding(16).background(NoshStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
             }
             if typeSize.isAccessibilitySize && model.image == nil && !model.savedNotice { EmojiPlate() }

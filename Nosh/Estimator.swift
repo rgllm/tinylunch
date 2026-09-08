@@ -243,17 +243,8 @@ actor AppleEstimator: FoodEstimating {
                 return EstimateError.unavailable("The meal could not be estimated. Your photo is still here so you can retry.")
             }
         }
-        if let generation = error as? LanguageModelSession.GenerationError {
-            switch generation {
-            case .refusal, .guardrailViolation:
-                return EstimateError.refused
-            case .assetsUnavailable:
-                return EstimateError.unavailable("Apple’s on-device model is not ready. Allow its system download to finish, then retry.")
-            case .exceededContextWindowSize:
-                return EstimateError.unavailable("This photo is too complex to estimate in one pass. Try a closer photo of the meal.")
-            default:
-                return EstimateError.unavailable("The meal could not be estimated. Your photo is still here so you can retry.")
-            }
+        if case .assetsUnavailable = error as? SystemLanguageModel.Error {
+            return EstimateError.unavailable("Apple’s on-device model is not ready. Allow its system download to finish, then retry.")
         }
         return EstimateError.unavailable("The meal could not be estimated. Your photo is still here so you can retry.")
     }

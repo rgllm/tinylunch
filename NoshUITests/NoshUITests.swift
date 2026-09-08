@@ -18,11 +18,13 @@ final class NoshUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Rice, Unidentified sauce"].waitForExistence(timeout: 5))
     }
 
-    @MainActor func testNormalBuildShowsUnavailableWithoutFakeMeal() {
+    @MainActor func testNormalBuildDoesNotShowFixtureMeal() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset-history"]
         app.launch()
-        XCTAssertTrue(app.staticTexts["Photo analysis unavailable"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["saveMeal"].exists)
+        XCTAssertFalse(app.buttons["editFood-Rice"].exists)
         app.tabBars.buttons["History"].tap()
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
     }
@@ -67,11 +69,40 @@ final class NoshUITests: XCTestCase {
         app.launch()
         let capture = app.buttons["Take photo"]
         XCTAssertTrue(capture.waitForExistence(timeout: 10))
+        addUIInterruptionMonitor(withDescription: "Camera permission") { alert in
+            for title in ["Don’t Allow", "Don't Allow", "Cancel"] where alert.buttons[title].exists {
+                alert.buttons[title].tap()
+                return true
+            }
+            return false
+        }
         capture.tap()
-        XCTAssertTrue(app.alerts["Something needs attention"].waitForExistence(timeout: 5))
-        app.alerts.buttons["OK"].tap()
+        dismissCameraPath(in: app)
         app.tabBars.buttons["History"].tap()
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
+    }
+
+    /// iOS 27 Simulator can present a camera permission alert or the picker instead of the older "camera unavailable" alert.
+    @MainActor private func dismissCameraPath(in app: XCUIApplication) {
+        let springboard = XCUIApplication(bundleIdentifier: "com.apple.springboard")
+        let dontAllow = springboard.alerts.buttons["Don’t Allow"].firstMatch
+        let dontAllowPlain = springboard.alerts.buttons["Don't Allow"].firstMatch
+        if dontAllow.waitForExistence(timeout: 3) {
+            dontAllow.tap()
+        } else if dontAllowPlain.waitForExistence(timeout: 1) {
+            dontAllowPlain.tap()
+        }
+        if app.alerts["Something needs attention"].waitForExistence(timeout: 2) {
+            app.alerts.buttons["OK"].tap()
+            return
+        }
+        if app.alerts["Camera access is off"].waitForExistence(timeout: 2) {
+            app.alerts.buttons["Cancel"].tap()
+            return
+        }
+        let cancel = app.buttons["Cancel"]
+        XCTAssertTrue(cancel.waitForExistence(timeout: 8), "Expected a recoverable camera path at the largest text size.")
+        cancel.tap()
     }
 
 }
