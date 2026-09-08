@@ -1,0 +1,538 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		03687F1522802C5CBC14395E /* NoshApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE3AD7043D08EEEF3056D02 /* NoshApp.swift */; };
+		0A13B357D9F674A453298F07 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A89D2C8F9CD299377515FBE /* RootView.swift */; };
+		249296B94C14F361C58142A5 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE79D7CDC4E31129181D5A8 /* HistoryView.swift */; };
+		62777521AA0B8440B7B33059 /* MealViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CDC03E8D486EA285ECA109 /* MealViews.swift */; };
+		637C2F8632641BA5C42E8ED1 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6942B5AD23C996F4B380EBE8 /* CameraView.swift */; };
+		781E3A675545D6E52E7F13EA /* NoshUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12ECFEA8408406D5568598E5 /* NoshUITests.swift */; };
+		8620AB729C67905A4806C93F /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0028B0F0F75B9F48D7F0406A /* AppModel.swift */; };
+		B6E7E1A02B366D0F002D3A61 /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A30485BC95ADA6FEA4E65AA /* Design.swift */; };
+		BC09BA5508DAC7EF416DCC78 /* Meal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F19CE115ABD7E303397614 /* Meal.swift */; };
+		CC9D93BD3D54E1E5B31772FA /* NoshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27677461C66D726501315DB /* NoshTests.swift */; };
+		CCFD76167C13649621BF7223 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D00A4784F5109497BBB86D06 /* Localizable.xcstrings */; };
+		CDBC8F0F71198FDE14AD4F69 /* Estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C63FEDCA672763CBB4FAB3C /* Estimator.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		89B2278AC20F999C84BD82B2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BED8C1E84B818D5E268E62DE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07F5E873BC9ADA1726A32F22;
+			remoteInfo = Nosh;
+		};
+		A0695A5D7149F067094EF610 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BED8C1E84B818D5E268E62DE /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 07F5E873BC9ADA1726A32F22;
+			remoteInfo = Nosh;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0028B0F0F75B9F48D7F0406A /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		0A30485BC95ADA6FEA4E65AA /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		12ECFEA8408406D5568598E5 /* NoshUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoshUITests.swift; sourceTree = "<group>"; };
+		1A0BDD76964165AD001C86B8 /* Nosh.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Nosh.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2FE3AD7043D08EEEF3056D02 /* NoshApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoshApp.swift; sourceTree = "<group>"; };
+		3A89D2C8F9CD299377515FBE /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		59AFD11AD39DCBA6A36706A5 /* NoshTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoshTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5C63FEDCA672763CBB4FAB3C /* Estimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Estimator.swift; sourceTree = "<group>"; };
+		61F19CE115ABD7E303397614 /* Meal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meal.swift; sourceTree = "<group>"; };
+		6942B5AD23C996F4B380EBE8 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		D00A4784F5109497BBB86D06 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		DCE79D7CDC4E31129181D5A8 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		E27677461C66D726501315DB /* NoshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoshTests.swift; sourceTree = "<group>"; };
+		E7B8E04E5551A268A8B88D4A /* NoshUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoshUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2CDC03E8D486EA285ECA109 /* MealViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViews.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0D972E87A068AE1708F5300E /* NoshUITests */ = {
+			isa = PBXGroup;
+			children = (
+				12ECFEA8408406D5568598E5 /* NoshUITests.swift */,
+			);
+			path = NoshUITests;
+			sourceTree = "<group>";
+		};
+		2BB7D29A45AC8D46594F6A39 /* Nosh */ = {
+			isa = PBXGroup;
+			children = (
+				0028B0F0F75B9F48D7F0406A /* AppModel.swift */,
+				6942B5AD23C996F4B380EBE8 /* CameraView.swift */,
+				0A30485BC95ADA6FEA4E65AA /* Design.swift */,
+				5C63FEDCA672763CBB4FAB3C /* Estimator.swift */,
+				DCE79D7CDC4E31129181D5A8 /* HistoryView.swift */,
+				D00A4784F5109497BBB86D06 /* Localizable.xcstrings */,
+				61F19CE115ABD7E303397614 /* Meal.swift */,
+				F2CDC03E8D486EA285ECA109 /* MealViews.swift */,
+				2FE3AD7043D08EEEF3056D02 /* NoshApp.swift */,
+				3A89D2C8F9CD299377515FBE /* RootView.swift */,
+			);
+			path = Nosh;
+			sourceTree = "<group>";
+		};
+		7FA03DE25C879A5E87CE13EA = {
+			isa = PBXGroup;
+			children = (
+				2BB7D29A45AC8D46594F6A39 /* Nosh */,
+				8ACCA8E878AB342D53FF8F3D /* NoshTests */,
+				0D972E87A068AE1708F5300E /* NoshUITests */,
+				8B0DF26FE5940E0C49D8A40C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		8ACCA8E878AB342D53FF8F3D /* NoshTests */ = {
+			isa = PBXGroup;
+			children = (
+				E27677461C66D726501315DB /* NoshTests.swift */,
+			);
+			path = NoshTests;
+			sourceTree = "<group>";
+		};
+		8B0DF26FE5940E0C49D8A40C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				1A0BDD76964165AD001C86B8 /* Nosh.app */,
+				59AFD11AD39DCBA6A36706A5 /* NoshTests.xctest */,
+				E7B8E04E5551A268A8B88D4A /* NoshUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		07F5E873BC9ADA1726A32F22 /* Nosh */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 18ECE432CCEB28F3B9642284 /* Build configuration list for PBXNativeTarget "Nosh" */;
+			buildPhases = (
+				AE981910101FBA71CB142BBA /* Sources */,
+				8FFFECBE74D5D78D4903FAB8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Nosh;
+			packageProductDependencies = (
+			);
+			productName = Nosh;
+			productReference = 1A0BDD76964165AD001C86B8 /* Nosh.app */;
+			productType = "com.apple.product-type.application";
+		};
+		32A71C00F53DBABFA135E1C3 /* NoshTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6D050396F014FB2A0CC3B7DE /* Build configuration list for PBXNativeTarget "NoshTests" */;
+			buildPhases = (
+				95987C5B2F1CE05EB3C27638 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				1B737469303253FF53CC66B8 /* PBXTargetDependency */,
+			);
+			name = NoshTests;
+			packageProductDependencies = (
+			);
+			productName = NoshTests;
+			productReference = 59AFD11AD39DCBA6A36706A5 /* NoshTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		FB40231CA708A9447FB874D2 /* NoshUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B90ACA19906F3FE1EEB4F74B /* Build configuration list for PBXNativeTarget "NoshUITests" */;
+			buildPhases = (
+				8989BAB33001C45254CF53E6 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5EE8BC3F3E21C69F05449FAF /* PBXTargetDependency */,
+			);
+			name = NoshUITests;
+			packageProductDependencies = (
+			);
+			productName = NoshUITests;
+			productReference = E7B8E04E5551A268A8B88D4A /* NoshUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BED8C1E84B818D5E268E62DE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					FB40231CA708A9447FB874D2 = {
+						TestTargetID = 07F5E873BC9ADA1726A32F22;
+					};
+				};
+			};
+			buildConfigurationList = B36A0DDAE1DC2202B9C07BDD /* Build configuration list for PBXProject "Nosh" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 7FA03DE25C879A5E87CE13EA;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 8B0DF26FE5940E0C49D8A40C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				07F5E873BC9ADA1726A32F22 /* Nosh */,
+				32A71C00F53DBABFA135E1C3 /* NoshTests */,
+				FB40231CA708A9447FB874D2 /* NoshUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8FFFECBE74D5D78D4903FAB8 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCFD76167C13649621BF7223 /* Localizable.xcstrings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8989BAB33001C45254CF53E6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				781E3A675545D6E52E7F13EA /* NoshUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		95987C5B2F1CE05EB3C27638 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC9D93BD3D54E1E5B31772FA /* NoshTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AE981910101FBA71CB142BBA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8620AB729C67905A4806C93F /* AppModel.swift in Sources */,
+				637C2F8632641BA5C42E8ED1 /* CameraView.swift in Sources */,
+				B6E7E1A02B366D0F002D3A61 /* Design.swift in Sources */,
+				CDBC8F0F71198FDE14AD4F69 /* Estimator.swift in Sources */,
+				249296B94C14F361C58142A5 /* HistoryView.swift in Sources */,
+				BC09BA5508DAC7EF416DCC78 /* Meal.swift in Sources */,
+				62777521AA0B8440B7B33059 /* MealViews.swift in Sources */,
+				03687F1522802C5CBC14395E /* NoshApp.swift in Sources */,
+				0A13B357D9F674A453298F07 /* RootView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1B737469303253FF53CC66B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07F5E873BC9ADA1726A32F22 /* Nosh */;
+			targetProxy = 89B2278AC20F999C84BD82B2 /* PBXContainerItemProxy */;
+		};
+		5EE8BC3F3E21C69F05449FAF /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 07F5E873BC9ADA1726A32F22 /* Nosh */;
+			targetProxy = A0695A5D7149F067094EF610 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2F9D312992CE4BAFF5E859FD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		4C89AA6B71E1FC0EB647F658 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Nosh;
+			};
+			name = Release;
+		};
+		B7A4625D4F4966ED5A2AAE75 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		B9E962A3B504DCDD14271102 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Nosh;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take a food photo to estimate its calories on your iPhone.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		C634CEC06C06BFD1BD0CD1E1 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshUITests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Nosh;
+			};
+			name = Debug;
+		};
+		D7E1CCEB4B5FEEE9BEFF1C8D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nosh.app/Nosh";
+			};
+			name = Release;
+		};
+		D94FB19D9DDA6C0D89FB7285 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nosh.app/Nosh";
+			};
+			name = Debug;
+		};
+		D977D06B806FC29A5AA54DAD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Nosh;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take a food photo to estimate its calories on your iPhone.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.app;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		18ECE432CCEB28F3B9642284 /* Build configuration list for PBXNativeTarget "Nosh" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D977D06B806FC29A5AA54DAD /* Debug */,
+				B9E962A3B504DCDD14271102 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6D050396F014FB2A0CC3B7DE /* Build configuration list for PBXNativeTarget "NoshTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D94FB19D9DDA6C0D89FB7285 /* Debug */,
+				D7E1CCEB4B5FEEE9BEFF1C8D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B36A0DDAE1DC2202B9C07BDD /* Build configuration list for PBXProject "Nosh" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7A4625D4F4966ED5A2AAE75 /* Debug */,
+				2F9D312992CE4BAFF5E859FD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B90ACA19906F3FE1EEB4F74B /* Build configuration list for PBXNativeTarget "NoshUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C634CEC06C06BFD1BD0CD1E1 /* Debug */,
+				4C89AA6B71E1FC0EB647F658 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BED8C1E84B818D5E268E62DE /* Project object */;
+}

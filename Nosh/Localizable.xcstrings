@@ -1,0 +1,355 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ g · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ g · %2$@"
+          }
+        }
+      }
+    },
+    "%@ kcal" : {
+
+    },
+    "%lld items" : {
+
+    },
+    "🌿" : {
+
+    },
+    "🍅" : {
+
+    },
+    "🍞" : {
+
+    },
+    "🍽️" : {
+
+    },
+    "🥞" : {
+
+    },
+    "🥡" : {
+
+    },
+    "🧑‍🍳" : {
+
+    },
+    "A little insight.\nEvery bite." : {
+
+    },
+    "A little toast" : {
+
+    },
+    "A little toast." : {
+
+    },
+    "A place for meals worth remembering.\nTap Save after an estimate to keep it here." : {
+
+    },
+    "A starting point, with room to adjust." : {
+
+    },
+    "About privacy" : {
+
+    },
+    "Add food" : {
+
+    },
+    "Allow camera access in Settings, or choose a photo instead." : {
+
+    },
+    "An estimate based on portions and preparation. Adjust either to make it more useful." : {
+
+    },
+    "Analyze meal" : {
+
+    },
+    "Apple may need to download its model first. Choosing an iCloud photo may also need a connection." : {
+
+    },
+    "Apply" : {
+
+    },
+    "Calories are estimates, with editable portions and preparation before saving." : {
+
+    },
+    "Camera access is off" : {
+
+    },
+    "Cancel" : {
+
+    },
+    "Changing grams adjusts the current estimate. A different food or preparation needs a new estimate." : {
+
+    },
+    "Check again" : {
+
+    },
+    "Choose photo" : {
+
+    },
+    "Compliments to the chef" : {
+
+    },
+    "Correct food" : {
+
+    },
+    "Delete" : {
+
+    },
+    "Delete meal" : {
+
+    },
+    "Delete this meal?" : {
+
+    },
+    "Discard" : {
+
+    },
+    "Discard this unsaved meal?" : {
+
+    },
+    "Discover the chef’s table" : {
+
+    },
+    "Done" : {
+
+    },
+    "Double" : {
+
+    },
+    "Edit this food and its portion." : {
+
+    },
+    "Estimated meal total" : {
+
+    },
+    "Estimating on your iPhone…" : {
+
+    },
+    "Food" : {
+
+    },
+    "Food name" : {
+
+    },
+    "Foods, portions, and estimates" : {
+
+    },
+    "g" : {
+
+    },
+    "Good food,\nremembered." : {
+
+    },
+    "Grams" : {
+
+    },
+    "Half" : {
+
+    },
+    "History" : {
+
+    },
+    "History stays on this iPhone and is excluded from backups. Deleting the app removes it. You can delete individual meals in History." : {
+
+    },
+    "History unavailable" : {
+
+    },
+    "Importing photo…" : {
+
+    },
+    "Incomplete estimate" : {
+
+    },
+    "Just meal details. No photos." : {
+
+    },
+    "Keep the whole meal in view. You can adjust the estimate next." : {
+
+    },
+    "Known foods subtotal" : {
+
+    },
+    "Let’s take a look." : {
+
+    },
+    "Looking good." : {
+
+    },
+    "Made to stay local" : {
+
+    },
+    "Make it your portion" : {
+
+    },
+    "Meal saved" : {
+
+    },
+    "New meal" : {
+
+    },
+    "No saved meals" : {
+
+    },
+    "No saved photos" : {
+
+    },
+    "nosh" : {
+
+    },
+    "Nosh" : {
+
+    },
+    "Nosh is built for on-device estimates. Your food photos and meal details aren’t sent to a server." : {
+
+    },
+    "Not estimated" : {
+
+    },
+    "Nothing on the plate yet. Add a food to continue." : {
+
+    },
+    "OK" : {
+
+    },
+    "On the house." : {
+
+    },
+    "On your iPhone. Just for you." : {
+
+    },
+    "On your plate" : {
+
+    },
+    "One imaginary pancake. No need to log this one." : {
+
+    },
+    "Only meals you choose to save" : {
+
+    },
+    "Only the details. Never the photo." : {
+
+    },
+    "Open Settings" : {
+
+    },
+    "Options for %@" : {
+
+    },
+    "Original" : {
+
+    },
+    "Photo analysis unavailable" : {
+
+    },
+    "Portion" : {
+
+    },
+    "Portion in grams" : {
+
+    },
+    "Preparation and assumptions" : {
+
+    },
+    "Remove food" : {
+
+    },
+    "Replace photo" : {
+
+    },
+    "Retake photo" : {
+
+    },
+    "Retry" : {
+
+    },
+    "Save meal" : {
+
+    },
+    "Saved as estimated. Your original details stay unchanged." : {
+
+    },
+    "Saved meal" : {
+
+    },
+    "Saved on this iPhone. Swipe left to delete a meal." : {
+
+    },
+    "Saving…" : {
+
+    },
+    "Selected food photo" : {
+
+    },
+    "Small adjustments count." : {
+
+    },
+    "Some food couldn’t be estimated and isn’t included in this subtotal." : {
+
+    },
+    "Something needs attention" : {
+
+    },
+    "Start a meal" : {
+
+    },
+    "Start over" : {
+
+    },
+    "Surprise me" : {
+
+    },
+    "Take photo" : {
+
+    },
+    "Tap a food to correct it. Portions are suggestions until you confirm them." : {
+
+    },
+    "Tap to change the food on the plate." : {
+
+    },
+    "The chef’s table" : {
+
+    },
+    "The Nosh plate" : {
+
+    },
+    "To good food, good company, and remembering to eat before it gets cold." : {
+
+    },
+    "Tucked away in History.\nJust the details, never the photo." : {
+
+    },
+    "Updating estimate…" : {
+
+    },
+    "What stays" : {
+
+    },
+    "You found our tiny kitchen. There’s always a seat for the curious." : {
+
+    },
+    "Your meals are still on this iPhone. Try loading them again." : {
+
+    },
+    "Your next meal." : {
+
+    },
+    "Your plate, with a little perspective." : {
+
+    },
+    "Your plate. Your business." : {
+
+    },
+    "Your saved meals, just as you left them." : {
+
+    }
+  },
+  "version" : "1.0"
+}
