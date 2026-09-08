@@ -48,6 +48,6 @@ TODO: add a licensed bundled nutrition database later. It is not required for th
 
 Inspected Xcode 27.0 (27A5252f) iOS 27.0 SDK `FoundationModels.swiftinterface`: `Attachment` and `LanguageModelCapabilities.Capability.vision` are annotated `@available(iOS 27.0, ...)`. Xcode 26.6 (17F113) / iOS 26.5 still has no image `Attachment` API.
 
-`AppleEstimator.analyze` now sends a `CGImage` through `Attachment` to an explicit on-device `SystemLanguageModel(useCase: .general)` and maps guided `PhotoMealEstimate` output through `MealEstimateMapping`. Invalid or unknown items stay unknown. Simulator tests still use injected services; they do not exercise the system model.
+`xcodebuild -project Nosh.xcodeproj -scheme Nosh -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build test` with Xcode 27.0 (27A5252f) passed on the iPhone 17 simulator running iOS 27.0: four unit tests and five UI tests. The iOS 27 simulator may report the on-device model as available; tests no longer require a permanent unavailable banner. Simulator success is not proof of device inference.
 
 Not yet verified on a physical device: real image inference, real text-model estimates, airplane-mode inference, camera permission handling, VoiceOver interaction, and thermal/performance behavior. UI fixtures are developer test data, not proof of food recognition.
