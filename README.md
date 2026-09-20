@@ -27,14 +27,14 @@ Open `TinyLunch.xcodeproj` with Xcode 27 and run the TinyLunch scheme. If the on
 
 ## App Store
 
-Listing copy, review notes, and privacy answers: `docs/app-store.md`. Host `docs/privacy-policy.md` on HTTPS and paste that URL in App Store Connect.
+Listing copy, review notes, privacy answers, and remaining submission steps: `docs/app-store.md`. Privacy and support are published at https://engino.pt/privacidade.
 
 ```sh
 ./scripts/capture-screenshots.sh   # 6.9-inch PNG set in docs/screenshots/
 ./scripts/archive.sh               # Release archive + IPA in .build/
 ```
 
-Upload from Xcode Organizer (Distribute App → App Store Connect). Command-line export needs an Apple Distribution certificate; this machine currently has only `Apple Development: Rogerio Moreira`. First store version is 1.0.0 (build 1).
+Upload from Xcode Organizer (Distribute App → App Store Connect). Command-line export needs an Apple Distribution certificate; this machine currently has only `Apple Development: Rogerio Moreira`. Prepared store version is 1.0.0 (build 24), following the existing uploaded build 23.
 
 ## Data and privacy
 
@@ -57,7 +57,7 @@ Upload from Xcode Organizer (Distribute App → App Store Connect). Command-line
 
 `xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -configuration Release -destination 'generic/platform=iOS' -archivePath .build/TinyLunch-release.xcarchive -allowProvisioningUpdates archive` succeeded. Export with `Config/ExportOptions.plist` failed with `No Accounts` and no matching distribution signing certificate. The archive is not an uploaded build.
 
-App Store Connect already contains TinyLunch (`6811014228`) with build 23, version 1.0.0. Its correspondence to this checkout has not been verified. Physical-device inference remains unverified.
+App Store Connect contains TinyLunch (`6811014228`) with build 23, version 1.0.0, uploaded on 12 September. Apple rejects that build for review because it uses a beta SDK; it also includes iPad support. A fresh iPhone-only build 24 archive succeeded at `.build/TinyLunch-build24.xcarchive` using Xcode 27.0 (27A266a). Upload is pending Xcode account and distribution signing setup. Physical-device inference remains unverified.
 
 TODO: add a licensed bundled nutrition database later. It is not required for the initial model-based estimator. See `docs/nutrition-catalog.md` for the dataset and matching exploration.
 

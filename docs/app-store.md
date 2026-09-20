@@ -1,6 +1,6 @@
 # TinyLunch App Store listing
 
-Paste these fields into App Store Connect. Screenshots belong in `docs/screenshots/` after `scripts/capture-screenshots.sh`. Host `docs/privacy-policy.md` on HTTPS and put that URL in both Privacy Policy and the app record.
+Listing preparation was performed in App Store Connect on 20 September 2026. Screenshots are in `docs/screenshots/`. The privacy policy and support page are live at https://engino.pt/privacidade. The app has not been submitted for review.
 
 ## Identity
 
@@ -34,7 +34,7 @@ Calories are estimates, not lab measurements or medical advice. TinyLunch is not
 
 ## Keywords
 
-calorie,calories,food,meal,photo,nutrition,kcal,estimate,diet,camera,privacy,portion,local,offline,history
+food,meal,photo,nutrition,kcal,estimate,camera,privacy,portion,offline,history
 
 ## What's New
 
@@ -44,8 +44,8 @@ First release. Photograph a meal, correct the estimate, and save it on your iPho
 
 | Field | Suggested value |
 | --- | --- |
-| Privacy policy | Public HTTPS URL for `docs/privacy-policy.md` |
-| Support | Public HTTPS support page required. The GitHub repository is private. |
+| Privacy policy | https://engino.pt/privacidade |
+| Support | https://engino.pt/privacidade#support |
 | Marketing | Optional |
 
 App Review expects a privacy-policy URL even when the privacy answers are “Data Not Collected”.
@@ -89,7 +89,7 @@ Do not add App Tracking Transparency.
 
 ## Age rating
 
-Aim for 4+. In the questionnaire:
+Apple calculated 9+ on 20 September 2026, with regional exceptions. The questionnaire declares Health or Wellness Topics, but no medical or treatment information. Other answers:
 
 - No unrestricted web access
 - No gambling, contests, or user-generated public content
@@ -100,14 +100,18 @@ Aim for 4+. In the questionnaire:
 
 `ITSAppUsesNonExemptEncryption` is `false`. TinyLunch does not use custom encryption; standard iOS HTTPS/system crypto does not apply because the app has no network client.
 
-## Remaining Connect steps
+## Connect preparation status
 
 These cannot be done from the repo:
 
-1. Create the iOS app record for `com.rgllm.tinylunch` on team `F86KMMECSR`.
-2. Publish the privacy policy on HTTPS and paste the URL.
-3. Upload 6.9-inch screenshots from `docs/screenshots/`.
-4. In Xcode: Window → Organizer → the TinyLunch archive → Distribute App → App Store Connect. Command-line export needs an Apple Distribution certificate, which is created the first time you distribute while signed into Xcode with the F86KMMECSR team.
-5. Submit 1.0.0 for review.
+1. App record exists: TinyLunch, Apple ID `6811014228`, bundle `com.rgllm.tinylunch`.
+2. Privacy and support are live at https://engino.pt/privacidade. App Privacy publication requires the publisher agreement.
+3. Four 6.9-inch screenshots are uploaded in home, review, history, dark-mode order.
+4. Sign into Xcode with team `F86KMMECSR`, export and upload `.build/TinyLunch-build24.xcarchive`, and select build 24. Existing build 23 was uploaded on 12 September using a beta SDK and declares iPhone and iPad support. Apple rejected it during Add for Review validation. Build 24 uses Xcode 27.0 (27A266a) and targets iPhone only.
+5. Fill all App Review contact fields together, including the phone number supplied by the publisher. The contact fields were not persisted while the phone number was absent.
+6. Publish the Data Not Collected privacy answers after the publisher accepts Apple's declaration.
+7. Re-run Add for Review validation after replacing the build. Leave the final Submit for Review action to Rogério.
+
+Saved configuration: Food & Drink category, English (US), on-device calorie estimates subtitle, four screenshots, listing description, keywords, review notes, public support URL, and age rating 9+ with regional exceptions. Content rights are set to no third-party content. Price is free; all 175 countries or regions are available on release. Mac and Apple Vision Pro distribution are disabled. The existing automatic-release-after-approval setting was preserved.
 
 Photo analysis has not been signed off on a physical iPhone yet. If Review’s device lacks Apple Intelligence, they can still open History and the privacy sheet; mention that in the notes.
