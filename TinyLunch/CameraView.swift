@@ -1,5 +1,6 @@
 import SwiftUI
 import UIKit
+import UniformTypeIdentifiers
 
 struct CameraView: UIViewControllerRepresentable {
     var receive: (UIImage) -> Void
@@ -8,7 +9,9 @@ struct CameraView: UIViewControllerRepresentable {
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
         picker.sourceType = .camera
+        picker.mediaTypes = [UTType.image.identifier]
         picker.cameraCaptureMode = .photo
+        picker.allowsEditing = false
         picker.delegate = context.coordinator
         return picker
     }

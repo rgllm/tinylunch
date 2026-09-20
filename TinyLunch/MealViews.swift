@@ -14,7 +14,7 @@ struct MealSummary: View {
             }.foregroundStyle(.secondary)
             Text(meal.calorieLabel)
                 .font(.system(size: amountSize, weight: .semibold, design: .rounded))
-                .tracking(-2).foregroundStyle(NoshStyle.accent)
+                .tracking(-2).foregroundStyle(TinyLunchStyle.accent)
                 .contentTransition(.numericText()).animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: meal.calories)
                 .minimumScaleFactor(0.65).accessibilityIdentifier("mealCalories")
             Divider()
@@ -24,7 +24,7 @@ struct MealSummary: View {
             }
             Text(meal.isIncomplete ? "Some food couldn’t be estimated and isn’t included in this subtotal." : "An estimate based on portions and preparation. Adjust either to make it more useful.")
                 .font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
-        }.noshCard()
+        }.tinyLunchCard()
     }
 }
 
@@ -37,7 +37,7 @@ struct FoodRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(item.name).font(.headline).foregroundStyle(.primary)
                 Text(item.calories.map { "\($0.formatted(.number.precision(.fractionLength(0)))) kcal" } ?? "Not estimated")
-                    .font(.subheadline.weight(.medium)).foregroundStyle(NoshStyle.accent)
+                    .font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
                 if let grams = item.grams {
                     Text("\(grams.formatted()) g · \(item.portionConfirmed ? "Confirmed portion" : "Suggested portion")")
                         .font(.caption).foregroundStyle(.secondary)
@@ -87,11 +87,11 @@ struct FoodEditor: View {
                             Text("Small adjustments count.").font(.subheadline).foregroundStyle(.secondary)
                         }
                     }.padding(.vertical, 6)
-                }.listRowBackground(NoshStyle.card)
+                }.listRowBackground(TinyLunchStyle.card)
                 Section("Food") {
                     TextField("Food name", text: $name).accessibilityIdentifier("foodName")
                     TextField("Preparation and assumptions", text: $preparation, axis: .vertical)
-                }.listRowBackground(NoshStyle.card)
+                }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     HStack {
                         TextField("Grams", value: $grams, format: .number)
@@ -110,12 +110,12 @@ struct FoodEditor: View {
                     }
                 } header: { Text("Portion") } footer: {
                     Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
-                }.listRowBackground(NoshStyle.card)
+                }.listRowBackground(TinyLunchStyle.card)
                 if busy {
                     Section { ProgressView("Updating estimate…") }
                 }
             }
-            .scrollContentBackground(.hidden).background(NoshStyle.paper)
+            .scrollContentBackground(.hidden).background(TinyLunchStyle.paper)
             .disabled(busy)
             .navigationTitle("Correct food").navigationBarTitleDisplayMode(.inline)
             .toolbar {

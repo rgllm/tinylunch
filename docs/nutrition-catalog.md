@@ -6,7 +6,7 @@ Status: exploration, not scheduled implementation. The on-device model remains t
 
 A bundled catalog is **worth building after** live photo analysis is evaluated. It is **not worth bundling now**.
 
-Nosh already separates identity, grams, and kcal per 100 g. Swift, not the model, computes `grams * kcalPer100g / 100`. A catalog would replace only the energy-density number, and only after a food is mapped to a real record. It does not solve visual portion error, mixed-dish double counting, or model unavailability.
+TinyLunch already separates identity, grams, and kcal per 100 g. Swift, not the model, computes `grams * kcalPer100g / 100`. A catalog would replace only the energy-density number, and only after a food is mapped to a real record. It does not solve visual portion error, mixed-dish double counting, or model unavailability.
 
 The hard part is matching a photo-derived name and preparation to one catalog row. Storage size is not the hard part.
 
@@ -34,7 +34,7 @@ Do it after all of these are true:
 
 Until then, keep calling results estimates and do not attribute them to a database.
 
-## How it should work in Nosh
+## How it should work in TinyLunch
 
 Keep the model as a **recognizer**, not as the nutrition table.
 
@@ -58,14 +58,14 @@ SQLite already ships on iOS. A kcal-only table of several thousand foods is a sm
 
 ## Dataset comparison
 
-Use a **generic composition table**, not a supermarket barcode dump. Nosh estimates a plate, not a packaged SKU.
+Use a **generic composition table**, not a supermarket barcode dump. TinyLunch estimates a plate, not a packaged SKU.
 
 | Source | Why it fits | Why it does not | License |
 | --- | --- | --- | --- |
 | USDA FoodData Central SR Legacy (7,793 foods, final 2018) plus Foundation Foods | English descriptions, kcal per 100 g, stable IDs, small enough to slim down and bundle. Full branded dump is gigabytes and is the wrong product. | US foods and cooking. Weak on Portuguese dishes. | Public domain, CC0 1.0. Attribution requested, not required. |
 | ANSES CIQUAL 2025 (3,484 foods) | European cooking, 74 components, Excel/XML of a few megabytes. | French-first names. Extra mapping work for an English UI. | Etalab 2.0 (open, attribution). |
 | INSA PortFIR TCA | Best coverage of foods eaten in Portugal; Excel download; values per 100 g edible portion. | Download dialog is copyright / citation, not a clear open license. Bundling in the App Store needs an explicit OK from INSA. Portuguese names vs English UI. | Cite INSA; confirm redistribution before shipping. |
-| Open Food Facts | Useful later for barcodes, which Nosh does not do. | ~0.9 GB gzip / ~9 GB CSV, ODbL share-alike, packaged products, crowd quality. | ODbL |
+| Open Food Facts | Useful later for barcodes, which TinyLunch does not do. | ~0.9 GB gzip / ~9 GB CSV, ODbL share-alike, packaged products, crowd quality. | ODbL |
 
 **Preferred first catalog, if this work starts:** USDA SR Legacy + Foundation Foods, energy and identity only, built at development time into a versioned SQLite or JSON resource. Keep PortFIR as a possible second table after written redistribution terms. Do not bundle Open Food Facts for plated-meal estimates.
 
@@ -84,7 +84,7 @@ Links:
 1. Download the chosen release (not the live API).
 2. Keep source ID, English name, preparation/state, kcal per 100 g, documented serving weight if present, dataset version, and source URL.
 3. Drop branded products, refuse non-finite energy, keep raw vs cooked as separate rows.
-4. Emit `Nosh/Resources/NutritionCatalog/<version>/` and a human-readable attribution file.
+4. Emit `TinyLunch/Resources/NutritionCatalog/<version>/` and a human-readable attribution file.
 5. Unit-test search, ambiguous matches, missing energy, and that saved meals do not change when the catalog file is replaced.
 
 ## Fallback policy (draft)

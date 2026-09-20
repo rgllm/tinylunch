@@ -11,13 +11,13 @@ struct HistoryView: View {
                     ScrollView {
                         VStack(spacing: 22) {
                             ZStack {
-                                RoundedRectangle(cornerRadius: 28).fill(NoshStyle.soft)
+                                RoundedRectangle(cornerRadius: 28).fill(TinyLunchStyle.soft)
                                     .frame(width: 154, height: 174).rotationEffect(.degrees(-10)).offset(x: -12, y: 3)
                                 VStack(spacing: 16) {
                                     Text("🥡").font(.system(size: 60))
-                                    Capsule().fill(NoshStyle.soft).frame(width: 70, height: 6)
-                                    Capsule().fill(NoshStyle.soft.opacity(0.65)).frame(width: 44, height: 6)
-                                }.frame(width: 154, height: 174).background(NoshStyle.card, in: RoundedRectangle(cornerRadius: 28))
+                                    Capsule().fill(TinyLunchStyle.soft).frame(width: 70, height: 6)
+                                    Capsule().fill(TinyLunchStyle.soft.opacity(0.65)).frame(width: 44, height: 6)
+                                }.frame(width: 154, height: 174).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 28))
                                     .rotationEffect(.degrees(6)).offset(x: 12)
                             }.frame(height: 214).accessibilityHidden(true)
                             Text(model.historyLoaded ? "No saved meals" : "History unavailable")
@@ -48,7 +48,7 @@ struct HistoryView: View {
                                         FoodBadge(name: meal.items.first?.name ?? "", size: 52)
                                         VStack(alignment: .leading, spacing: 6) {
                                             Text(meal.title).font(.headline)
-                                            Text(meal.calorieLabel).font(.subheadline.weight(.medium)).foregroundStyle(NoshStyle.accent)
+                                            Text(meal.calorieLabel).font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
                                             if meal.isIncomplete { Text("Incomplete estimate").font(.caption).foregroundStyle(.secondary) }
                                             Text(meal.savedAt, format: .dateTime.day().month().hour().minute())
                                                 .font(.caption).foregroundStyle(.secondary)
@@ -58,13 +58,13 @@ struct HistoryView: View {
                                 .swipeActions { Button("Delete", role: .destructive) { pendingDelete = meal }.disabled(model.saving) }
                                 .contextMenu { Button("Delete meal", systemImage: "trash", role: .destructive) { pendingDelete = meal }.disabled(model.saving) }
                                 .accessibilityAction(named: "Delete meal") { pendingDelete = meal }
-                                .listRowBackground(NoshStyle.card)
+                                .listRowBackground(TinyLunchStyle.card)
                             }
                         } footer: { Text("Saved on this iPhone. Swipe left to delete a meal.") }
                     }.scrollContentBackground(.hidden)
                 }
             }
-            .background(NoshStyle.paper)
+            .background(TinyLunchStyle.paper)
             .navigationTitle("History")
             .confirmationDialog("Delete this meal?", isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }), titleVisibility: .visible) {
                 Button("Delete meal", role: .destructive) {
@@ -93,12 +93,12 @@ private struct SavedMealView: View {
                         FoodRow(item: item)
                         if item.id != meal.items.last?.id { Divider() }
                     }
-                }.noshCard()
+                }.tinyLunchCard()
                 Label("Saved as estimated. Your original details stay unchanged.", systemImage: "lock")
                     .font(.footnote).foregroundStyle(.secondary)
             }.padding(24)
         }
-        .background(NoshStyle.paper)
+        .background(TinyLunchStyle.paper)
         .navigationTitle("Saved meal").navigationBarTitleDisplayMode(.inline)
     }
 }

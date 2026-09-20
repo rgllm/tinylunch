@@ -27,6 +27,15 @@ final class AppModel {
     func refresh() async {
         unavailable = await estimator.availability()
         do {
+            #if DEBUG
+            if ProcessInfo.processInfo.arguments.contains("--marketing-history") {
+                let existing = try await store.load()
+                if existing.isEmpty {
+                    await seedMarketingHistory()
+                    return
+                }
+            }
+            #endif
             meals = try await store.load()
             historyLoaded = true
         } catch {
@@ -177,6 +186,42 @@ final class AppModel {
     func loadExample() {
         draft = Meal(items: [FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked; example data"),
                              FoodItem(name: "Unidentified sauce", grams: nil, kcalPer100g: nil, preparation: "Unknown; example data")], estimatorVersion: "ui-test-fixture")
+    }
+
+    func loadMarketingDraft() {
+        draft = Meal(items: Self.marketingLunchItems, estimatorVersion: MealEstimateMapping.promptVersion)
+    }
+
+    func seedMarketingHistory() async {
+        for meal in Self.marketingSavedMeals {
+            _ = try? await store.save(meal)
+        }
+        meals = (try? await store.load()) ?? []
+        historyLoaded = true
+    }
+
+    private static let marketingLunchItems = [
+        FoodItem(name: "Grilled salmon", grams: 180, kcalPer100g: 180, preparation: "Grilled; skin off; visual portion", portionConfirmed: true),
+        FoodItem(name: "Jasmine rice", grams: 150, kcalPer100g: 130, preparation: "Cooked; packed cup", portionConfirmed: true),
+        FoodItem(name: "Broccoli", grams: 80, kcalPer100g: 35, preparation: "Steamed", portionConfirmed: true)
+    ]
+
+    private static var marketingSavedMeals: [Meal] {
+        [
+            Meal(
+                savedAt: Date().addingTimeInterval(-3600),
+                items: marketingLunchItems,
+                estimatorVersion: MealEstimateMapping.promptVersion
+            ),
+            Meal(
+                savedAt: Date().addingTimeInterval(-86400),
+                items: [
+                    FoodItem(name: "Overnight oats", grams: 250, kcalPer100g: 90, preparation: "Rolled oats with milk", portionConfirmed: true),
+                    FoodItem(name: "Banana", grams: 120, kcalPer100g: 89, preparation: "Fresh", portionConfirmed: true)
+                ],
+                estimatorVersion: MealEstimateMapping.promptVersion
+            )
+        ]
     }
     #endif
     private enum ImportError: Error { case invalid }

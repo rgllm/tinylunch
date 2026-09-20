@@ -1,4 +1,4 @@
-# Nosh
+# TinyLunch
 
 Native SwiftUI iPhone app for local food calorie estimates. English only. Meal data is saved explicitly on-device, without photos; history supports viewing and deletion.
 
@@ -8,30 +8,39 @@ The Swift app shell, photo import and camera integration, editable estimate revi
 
 Photo analysis uses Apple's on-device `SystemLanguageModel(useCase: .general)` with the iOS 27 `Attachment` API. There is no Private Cloud Compute path and no remote nutrition lookup.
 
-**Tooling is currently beta.** Building this tree requires Xcode 27.0 (this machine has `/Users/rgllm/Desktop/Xcode-beta.app`, build 27A5252f) and the iOS 27.0 SDK. The shipping Xcode 26.6 / iOS 26.5 SDK still lacks `Attachment`. The minimum OS is iOS 27.0, taken from that availability annotation.
+**Tooling.** Building this tree requires Xcode 27 and the iOS 27.0 SDK (`/Applications/Xcode.app`, build 27A266a). The minimum OS is iOS 27.0, taken from the `Attachment` availability annotation. Photo analysis needs Apple Intelligence with on-device vision.
 
-The physical iPhone (`iPhone de Rogério`) reports iOS 27.0 but was offline during this change, so live inference, airplane-mode inference, and camera permission behavior are not yet verified on hardware. Simulator tests do not prove on-device vision.
-
-The `local.nosh.app` bundle identifier is a local development placeholder; distribution requires the final identifier and signing team.
+The bundle identifier is `com.rgllm.tinylunch` on team `F86KMMECSR`. Automatic signing is on. Confirm the Apple Distribution certificate in Xcode before the first App Store upload.
 
 ## Build and test
 
 Requires Xcode 27 and XcodeGen. No third-party runtime packages.
 
 ```sh
-export DEVELOPER_DIR=/Users/rgllm/Desktop/Xcode-beta.app/Contents/Developer
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 xcodegen generate
-xcodebuild -project Nosh.xcodeproj -scheme Nosh -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build build
-xcodebuild -project Nosh.xcodeproj -scheme Nosh -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build test
+xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build build
+xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build test
 ```
 
-Open `Nosh.xcodeproj` with Xcode 27 and run the Nosh scheme. If the on-device model or its vision capability is unavailable, the app explains that and keeps History usable. In Debug only, the `--example-meal` launch argument opens a draft labeled as example data for review testing. UI tests use a separate temporary store through `--ui-testing`; `--reset-history` resets only that test store.
+Open `TinyLunch.xcodeproj` with Xcode 27 and run the TinyLunch scheme. If the on-device model or its vision capability is unavailable, the app explains that and keeps History usable. In Debug only, the `--example-meal` launch argument opens a draft labeled as example data for review testing. UI tests use a separate temporary store through `--ui-testing`; `--reset-history` resets only that test store.
+
+## App Store
+
+Listing copy, review notes, and privacy answers: `docs/app-store.md`. Host `docs/privacy-policy.md` on HTTPS and paste that URL in App Store Connect.
+
+```sh
+./scripts/capture-screenshots.sh   # 6.9-inch PNG set in docs/screenshots/
+./scripts/archive.sh               # Release archive + IPA in .build/
+```
+
+Upload from Xcode Organizer (Distribute App → App Store Connect). Command-line export needs an Apple Distribution certificate; this machine currently has only `Apple Development: Rogerio Moreira`. First store version is 1.0.0 (build 1).
 
 ## Data and privacy
 
 - Food energy is a model estimate. Swift calculates `grams * kcalPer100g / 100` and the known-item subtotal. Unknown values remain unknown.
 - Portion sanity bounds are greater than zero through 10,000 g; energy bounds are zero through 1,000 kcal per 100 g. These prevent invalid arithmetic, not inaccurate model judgments.
-- `MealStore` writes a versioned JSON archive atomically in Application Support/Nosh, using complete file protection and excluding its directory from backups. There is no CloudKit, backend, analytics, or network client.
+- `MealStore` writes a versioned JSON archive atomically in Application Support/TinyLunch, using complete file protection and excluding its directory from backups. There is no CloudKit, backend, analytics, or network client.
 - The archive contains meal IDs, timestamps, food data, assumptions, and estimator version. It contains no images or photo identifiers. Deleting a saved meal removes it from the archive. Device-only history is lost when the app is removed and is not backed up.
 - Photo selection uses PhotosPicker; camera access is requested only on capture. Images remain in memory and are released after successful analysis or discard. An iCloud library image may need a system download to import.
 - Model downloads are managed by Apple. Real offline inference, memory/thermal behavior, and camera permissions require device verification.
@@ -40,7 +49,15 @@ Open `Nosh.xcodeproj` with Xcode 27 and run the Nosh scheme. If the on-device mo
 
 1. Run photo analysis on the physical iPhone after it is connected. Repeat in airplane mode after Apple's model assets are installed. Record device, OS, model availability, and whether vision is present.
 2. Evaluate real meals and non-food inputs. Establish quality thresholds with Rogério before claiming recognition accuracy.
-3. Revisit the minimum OS if a later public Xcode ships the same `Attachment` API without remaining on the 27.0 beta toolchain.
+3. Verify the uploaded build against the release source. Apple opened iOS 27 App Store submissions on 9 September 2026; this checkout now builds with Xcode 27.0 (27A266a).
+
+## Verification on 20 September 2026
+
+`xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -destination 'platform=iOS Simulator,id=D55EFB4A-5EDE-4609-8350-81974DE9AB65' -derivedDataPath .build test` passed four unit tests and five UI tests on iPhone 17 Pro Max, iOS 27.0. Four screenshot-generation tests were intentionally skipped because capture mode was not enabled.
+
+`xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -configuration Release -destination 'generic/platform=iOS' -archivePath .build/TinyLunch-release.xcarchive -allowProvisioningUpdates archive` succeeded. Export with `Config/ExportOptions.plist` failed with `No Accounts` and no matching distribution signing certificate. The archive is not an uploaded build.
+
+App Store Connect already contains TinyLunch (`6811014228`) with build 23, version 1.0.0. Its correspondence to this checkout has not been verified. Physical-device inference remains unverified.
 
 TODO: add a licensed bundled nutrition database later. It is not required for the initial model-based estimator. See `docs/nutrition-catalog.md` for the dataset and matching exploration.
 
@@ -48,6 +65,6 @@ TODO: add a licensed bundled nutrition database later. It is not required for th
 
 Inspected Xcode 27.0 (27A5252f) iOS 27.0 SDK `FoundationModels.swiftinterface`: `Attachment` and `LanguageModelCapabilities.Capability.vision` are annotated `@available(iOS 27.0, ...)`. Xcode 26.6 (17F113) / iOS 26.5 still has no image `Attachment` API.
 
-`xcodebuild -project Nosh.xcodeproj -scheme Nosh -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build test` with Xcode 27.0 (27A5252f) passed on the iPhone 17 simulator running iOS 27.0: four unit tests and five UI tests. The iOS 27 simulator may report the on-device model as available; tests no longer require a permanent unavailable banner. Simulator success is not proof of device inference.
+`xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -destination 'platform=iOS Simulator,name=iPhone 17,OS=27.0' -derivedDataPath .build test` with Xcode 27.0 (27A5252f) passed on the iPhone 17 simulator running iOS 27.0: four unit tests and five UI tests. The iOS 27 simulator may report the on-device model as available; tests no longer require a permanent unavailable banner. Simulator success is not proof of device inference.
 
 Not yet verified on a physical device: real image inference, real text-model estimates, airplane-mode inference, camera permission handling, VoiceOver interaction, and thermal/performance behavior. UI fixtures are developer test data, not proof of food recognition.

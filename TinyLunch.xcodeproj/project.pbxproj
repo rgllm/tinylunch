@@ -7,262 +7,320 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		03687F1522802C5CBC14395E /* NoshApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FE3AD7043D08EEEF3056D02 /* NoshApp.swift */; };
-		0A13B357D9F674A453298F07 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A89D2C8F9CD299377515FBE /* RootView.swift */; };
-		249296B94C14F361C58142A5 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCE79D7CDC4E31129181D5A8 /* HistoryView.swift */; };
-		62777521AA0B8440B7B33059 /* MealViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2CDC03E8D486EA285ECA109 /* MealViews.swift */; };
-		637C2F8632641BA5C42E8ED1 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6942B5AD23C996F4B380EBE8 /* CameraView.swift */; };
-		781E3A675545D6E52E7F13EA /* NoshUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12ECFEA8408406D5568598E5 /* NoshUITests.swift */; };
-		8620AB729C67905A4806C93F /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0028B0F0F75B9F48D7F0406A /* AppModel.swift */; };
-		B6E7E1A02B366D0F002D3A61 /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A30485BC95ADA6FEA4E65AA /* Design.swift */; };
-		BC09BA5508DAC7EF416DCC78 /* Meal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61F19CE115ABD7E303397614 /* Meal.swift */; };
-		CC9D93BD3D54E1E5B31772FA /* NoshTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27677461C66D726501315DB /* NoshTests.swift */; };
-		CCFD76167C13649621BF7223 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = D00A4784F5109497BBB86D06 /* Localizable.xcstrings */; };
-		CDBC8F0F71198FDE14AD4F69 /* Estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C63FEDCA672763CBB4FAB3C /* Estimator.swift */; };
+		0D94D56A81CDB6BCBFD05186 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0B06FCD67527770037D776F8 /* Localizable.xcstrings */; };
+		2B79A803082FDFBABD9723EF /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EBEAD6E04AA36278BFAB289 /* HistoryView.swift */; };
+		31B4C722B761A6DCEA59BD7D /* MealViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9A18A489D99436E2441631 /* MealViews.swift */; };
+		343E04F6EBAF9A4542AA5BB3 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362409DD09B5B3CD093931E7 /* AppModel.swift */; };
+		428C3623DB7ABD45B69EB808 /* Design.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99108ACA6791B99AB75F75D2 /* Design.swift */; };
+		6518A1F9CB7B2CC1C0D3C9C0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 190A89FE6EB7B9E0090D53C8 /* Assets.xcassets */; };
+		8C37A116AA1E311B371635D6 /* TinyLunchUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55FEA06112DE3A794669ADAF /* TinyLunchUITests.swift */; };
+		90C014E7BACD5D588D758EE6 /* TinyLunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650350A2620F6983B1CBE47E /* TinyLunchTests.swift */; };
+		A21D86756F425C301B125599 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE78469864BF30B2B0F388E1 /* CameraView.swift */; };
+		AC8A74BF6B54467B87FCA857 /* Meal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76F8CD3B0C9EFF9278C36A05 /* Meal.swift */; };
+		B7A96A7859E57FE0CE187FC7 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 7445260193BA15EA6F9D1881 /* PrivacyInfo.xcprivacy */; };
+		BE308A4E9C2E7F44D02B3BF2 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E59D0D1083096D1E5C01C65 /* RootView.swift */; };
+		BF4BBBD44035648FC0636DCA /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCB47565D9881595F2FD272 /* ScreenshotTests.swift */; };
+		D156DF1ACED889B1AB5EDE46 /* Estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0727B9B884BB2C5F8293A67D /* Estimator.swift */; };
+		F67C9B74FCECDB0503E5951D /* TinyLunchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C5A08800B165E3194CBE27 /* TinyLunchApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		89B2278AC20F999C84BD82B2 /* PBXContainerItemProxy */ = {
+		1448B8EDB12E482556AFC12A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = BED8C1E84B818D5E268E62DE /* Project object */;
+			containerPortal = 715E95F4B18BBE4706A61F36 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 07F5E873BC9ADA1726A32F22;
-			remoteInfo = Nosh;
+			remoteGlobalIDString = 57EF4955EC6F91E884D16A5F;
+			remoteInfo = TinyLunch;
 		};
-		A0695A5D7149F067094EF610 /* PBXContainerItemProxy */ = {
+		CC8168F610E3AF83349D7147 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = BED8C1E84B818D5E268E62DE /* Project object */;
+			containerPortal = 715E95F4B18BBE4706A61F36 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 07F5E873BC9ADA1726A32F22;
-			remoteInfo = Nosh;
+			remoteGlobalIDString = 57EF4955EC6F91E884D16A5F;
+			remoteInfo = TinyLunch;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		0028B0F0F75B9F48D7F0406A /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
-		0A30485BC95ADA6FEA4E65AA /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
-		12ECFEA8408406D5568598E5 /* NoshUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoshUITests.swift; sourceTree = "<group>"; };
-		1A0BDD76964165AD001C86B8 /* Nosh.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Nosh.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		2FE3AD7043D08EEEF3056D02 /* NoshApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoshApp.swift; sourceTree = "<group>"; };
-		3A89D2C8F9CD299377515FBE /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		59AFD11AD39DCBA6A36706A5 /* NoshTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoshTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		5C63FEDCA672763CBB4FAB3C /* Estimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Estimator.swift; sourceTree = "<group>"; };
-		61F19CE115ABD7E303397614 /* Meal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meal.swift; sourceTree = "<group>"; };
-		6942B5AD23C996F4B380EBE8 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
-		D00A4784F5109497BBB86D06 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
-		DCE79D7CDC4E31129181D5A8 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
-		E27677461C66D726501315DB /* NoshTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoshTests.swift; sourceTree = "<group>"; };
-		E7B8E04E5551A268A8B88D4A /* NoshUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = NoshUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		F2CDC03E8D486EA285ECA109 /* MealViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViews.swift; sourceTree = "<group>"; };
+		0727B9B884BB2C5F8293A67D /* Estimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Estimator.swift; sourceTree = "<group>"; };
+		0B06FCD67527770037D776F8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		190A89FE6EB7B9E0090D53C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		21280533A6D0AE90A7D88856 /* TinyLunchTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TinyLunchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		29C5A08800B165E3194CBE27 /* TinyLunchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyLunchApp.swift; sourceTree = "<group>"; };
+		362409DD09B5B3CD093931E7 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		42D239C2FACA4D02A9F0C21C /* TinyLunch.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = TinyLunch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		55FEA06112DE3A794669ADAF /* TinyLunchUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyLunchUITests.swift; sourceTree = "<group>"; };
+		56E24760B588EEC1B33C12DD /* TinyLunchUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TinyLunchUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5EBEAD6E04AA36278BFAB289 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		650350A2620F6983B1CBE47E /* TinyLunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TinyLunchTests.swift; sourceTree = "<group>"; };
+		6CCB47565D9881595F2FD272 /* ScreenshotTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotTests.swift; sourceTree = "<group>"; };
+		7445260193BA15EA6F9D1881 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		76F8CD3B0C9EFF9278C36A05 /* Meal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meal.swift; sourceTree = "<group>"; };
+		99108ACA6791B99AB75F75D2 /* Design.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Design.swift; sourceTree = "<group>"; };
+		9E59D0D1083096D1E5C01C65 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		BB9A18A489D99436E2441631 /* MealViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViews.swift; sourceTree = "<group>"; };
+		EE78469864BF30B2B0F388E1 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
-		0D972E87A068AE1708F5300E /* NoshUITests */ = {
+		12E1A4F3494EBC4979A72939 /* TinyLunchTests */ = {
 			isa = PBXGroup;
 			children = (
-				12ECFEA8408406D5568598E5 /* NoshUITests.swift */,
+				650350A2620F6983B1CBE47E /* TinyLunchTests.swift */,
 			);
-			path = NoshUITests;
+			path = TinyLunchTests;
 			sourceTree = "<group>";
 		};
-		2BB7D29A45AC8D46594F6A39 /* Nosh */ = {
+		137C52DB28403AE4CAAAF853 = {
 			isa = PBXGroup;
 			children = (
-				0028B0F0F75B9F48D7F0406A /* AppModel.swift */,
-				6942B5AD23C996F4B380EBE8 /* CameraView.swift */,
-				0A30485BC95ADA6FEA4E65AA /* Design.swift */,
-				5C63FEDCA672763CBB4FAB3C /* Estimator.swift */,
-				DCE79D7CDC4E31129181D5A8 /* HistoryView.swift */,
-				D00A4784F5109497BBB86D06 /* Localizable.xcstrings */,
-				61F19CE115ABD7E303397614 /* Meal.swift */,
-				F2CDC03E8D486EA285ECA109 /* MealViews.swift */,
-				2FE3AD7043D08EEEF3056D02 /* NoshApp.swift */,
-				3A89D2C8F9CD299377515FBE /* RootView.swift */,
-			);
-			path = Nosh;
-			sourceTree = "<group>";
-		};
-		7FA03DE25C879A5E87CE13EA = {
-			isa = PBXGroup;
-			children = (
-				2BB7D29A45AC8D46594F6A39 /* Nosh */,
-				8ACCA8E878AB342D53FF8F3D /* NoshTests */,
-				0D972E87A068AE1708F5300E /* NoshUITests */,
-				8B0DF26FE5940E0C49D8A40C /* Products */,
+				B3EDFC037618EEE4BCD7D2AC /* TinyLunch */,
+				12E1A4F3494EBC4979A72939 /* TinyLunchTests */,
+				C28A981932AABF16606A03FE /* TinyLunchUITests */,
+				14719FD2A51FEF74911D5D5E /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		8ACCA8E878AB342D53FF8F3D /* NoshTests */ = {
+		14719FD2A51FEF74911D5D5E /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				E27677461C66D726501315DB /* NoshTests.swift */,
-			);
-			path = NoshTests;
-			sourceTree = "<group>";
-		};
-		8B0DF26FE5940E0C49D8A40C /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				1A0BDD76964165AD001C86B8 /* Nosh.app */,
-				59AFD11AD39DCBA6A36706A5 /* NoshTests.xctest */,
-				E7B8E04E5551A268A8B88D4A /* NoshUITests.xctest */,
+				42D239C2FACA4D02A9F0C21C /* TinyLunch.app */,
+				21280533A6D0AE90A7D88856 /* TinyLunchTests.xctest */,
+				56E24760B588EEC1B33C12DD /* TinyLunchUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B3EDFC037618EEE4BCD7D2AC /* TinyLunch */ = {
+			isa = PBXGroup;
+			children = (
+				362409DD09B5B3CD093931E7 /* AppModel.swift */,
+				190A89FE6EB7B9E0090D53C8 /* Assets.xcassets */,
+				EE78469864BF30B2B0F388E1 /* CameraView.swift */,
+				99108ACA6791B99AB75F75D2 /* Design.swift */,
+				0727B9B884BB2C5F8293A67D /* Estimator.swift */,
+				5EBEAD6E04AA36278BFAB289 /* HistoryView.swift */,
+				0B06FCD67527770037D776F8 /* Localizable.xcstrings */,
+				76F8CD3B0C9EFF9278C36A05 /* Meal.swift */,
+				BB9A18A489D99436E2441631 /* MealViews.swift */,
+				7445260193BA15EA6F9D1881 /* PrivacyInfo.xcprivacy */,
+				9E59D0D1083096D1E5C01C65 /* RootView.swift */,
+				29C5A08800B165E3194CBE27 /* TinyLunchApp.swift */,
+			);
+			path = TinyLunch;
+			sourceTree = "<group>";
+		};
+		C28A981932AABF16606A03FE /* TinyLunchUITests */ = {
+			isa = PBXGroup;
+			children = (
+				6CCB47565D9881595F2FD272 /* ScreenshotTests.swift */,
+				55FEA06112DE3A794669ADAF /* TinyLunchUITests.swift */,
+			);
+			path = TinyLunchUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		07F5E873BC9ADA1726A32F22 /* Nosh */ = {
+		57EF4955EC6F91E884D16A5F /* TinyLunch */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 18ECE432CCEB28F3B9642284 /* Build configuration list for PBXNativeTarget "Nosh" */;
+			buildConfigurationList = 6ED2E1C0B78C0EA1AC6EF9F6 /* Build configuration list for PBXNativeTarget "TinyLunch" */;
 			buildPhases = (
-				AE981910101FBA71CB142BBA /* Sources */,
-				8FFFECBE74D5D78D4903FAB8 /* Resources */,
+				76E78FF9174395E33CAE29F3 /* Sources */,
+				7C3088695B7898F65E255666 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
-			name = Nosh;
+			name = TinyLunch;
 			packageProductDependencies = (
 			);
-			productName = Nosh;
-			productReference = 1A0BDD76964165AD001C86B8 /* Nosh.app */;
+			productName = TinyLunch;
+			productReference = 42D239C2FACA4D02A9F0C21C /* TinyLunch.app */;
 			productType = "com.apple.product-type.application";
 		};
-		32A71C00F53DBABFA135E1C3 /* NoshTests */ = {
+		D3C745D0A793B61788CF7FCC /* TinyLunchUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 6D050396F014FB2A0CC3B7DE /* Build configuration list for PBXNativeTarget "NoshTests" */;
+			buildConfigurationList = 2869F30F7654DB8B55AEEA87 /* Build configuration list for PBXNativeTarget "TinyLunchUITests" */;
 			buildPhases = (
-				95987C5B2F1CE05EB3C27638 /* Sources */,
+				59237656A72DFB38CCADD0F1 /* Sources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				1B737469303253FF53CC66B8 /* PBXTargetDependency */,
+				702DC768F095A89A8B42E01B /* PBXTargetDependency */,
 			);
-			name = NoshTests;
+			name = TinyLunchUITests;
 			packageProductDependencies = (
 			);
-			productName = NoshTests;
-			productReference = 59AFD11AD39DCBA6A36706A5 /* NoshTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		FB40231CA708A9447FB874D2 /* NoshUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B90ACA19906F3FE1EEB4F74B /* Build configuration list for PBXNativeTarget "NoshUITests" */;
-			buildPhases = (
-				8989BAB33001C45254CF53E6 /* Sources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				5EE8BC3F3E21C69F05449FAF /* PBXTargetDependency */,
-			);
-			name = NoshUITests;
-			packageProductDependencies = (
-			);
-			productName = NoshUITests;
-			productReference = E7B8E04E5551A268A8B88D4A /* NoshUITests.xctest */;
+			productName = TinyLunchUITests;
+			productReference = 56E24760B588EEC1B33C12DD /* TinyLunchUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		E89E9692B8EA3BD8D55BBBDC /* TinyLunchTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 28AC4E1EB88CA89C65932709 /* Build configuration list for PBXNativeTarget "TinyLunchTests" */;
+			buildPhases = (
+				E8526851D29ED133AD570AD4 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AE30767DEA7F821DF8CBD6C7 /* PBXTargetDependency */,
+			);
+			name = TinyLunchTests;
+			packageProductDependencies = (
+			);
+			productName = TinyLunchTests;
+			productReference = 21280533A6D0AE90A7D88856 /* TinyLunchTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		BED8C1E84B818D5E268E62DE /* Project object */ = {
+		715E95F4B18BBE4706A61F36 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1430;
+				LastUpgradeCheck = 2700;
 				TargetAttributes = {
-					FB40231CA708A9447FB874D2 = {
-						TestTargetID = 07F5E873BC9ADA1726A32F22;
+					57EF4955EC6F91E884D16A5F = {
+						DevelopmentTeam = F86KMMECSR;
+						ProvisioningStyle = Automatic;
+					};
+					D3C745D0A793B61788CF7FCC = {
+						DevelopmentTeam = F86KMMECSR;
+						ProvisioningStyle = Automatic;
+						TestTargetID = 57EF4955EC6F91E884D16A5F;
+					};
+					E89E9692B8EA3BD8D55BBBDC = {
+						DevelopmentTeam = F86KMMECSR;
+						ProvisioningStyle = Automatic;
 					};
 				};
 			};
-			buildConfigurationList = B36A0DDAE1DC2202B9C07BDD /* Build configuration list for PBXProject "Nosh" */;
+			buildConfigurationList = 1C31AE88BEA7447A08EFFB72 /* Build configuration list for PBXProject "TinyLunch" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
 				en,
 			);
-			mainGroup = 7FA03DE25C879A5E87CE13EA;
+			mainGroup = 137C52DB28403AE4CAAAF853;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 8B0DF26FE5940E0C49D8A40C /* Products */;
+			productRefGroup = 14719FD2A51FEF74911D5D5E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				07F5E873BC9ADA1726A32F22 /* Nosh */,
-				32A71C00F53DBABFA135E1C3 /* NoshTests */,
-				FB40231CA708A9447FB874D2 /* NoshUITests */,
+				57EF4955EC6F91E884D16A5F /* TinyLunch */,
+				E89E9692B8EA3BD8D55BBBDC /* TinyLunchTests */,
+				D3C745D0A793B61788CF7FCC /* TinyLunchUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		8FFFECBE74D5D78D4903FAB8 /* Resources */ = {
+		7C3088695B7898F65E255666 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CCFD76167C13649621BF7223 /* Localizable.xcstrings in Resources */,
+				6518A1F9CB7B2CC1C0D3C9C0 /* Assets.xcassets in Resources */,
+				0D94D56A81CDB6BCBFD05186 /* Localizable.xcstrings in Resources */,
+				B7A96A7859E57FE0CE187FC7 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		8989BAB33001C45254CF53E6 /* Sources */ = {
+		59237656A72DFB38CCADD0F1 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				781E3A675545D6E52E7F13EA /* NoshUITests.swift in Sources */,
+				BF4BBBD44035648FC0636DCA /* ScreenshotTests.swift in Sources */,
+				8C37A116AA1E311B371635D6 /* TinyLunchUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		95987C5B2F1CE05EB3C27638 /* Sources */ = {
+		76E78FF9174395E33CAE29F3 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CC9D93BD3D54E1E5B31772FA /* NoshTests.swift in Sources */,
+				343E04F6EBAF9A4542AA5BB3 /* AppModel.swift in Sources */,
+				A21D86756F425C301B125599 /* CameraView.swift in Sources */,
+				428C3623DB7ABD45B69EB808 /* Design.swift in Sources */,
+				D156DF1ACED889B1AB5EDE46 /* Estimator.swift in Sources */,
+				2B79A803082FDFBABD9723EF /* HistoryView.swift in Sources */,
+				AC8A74BF6B54467B87FCA857 /* Meal.swift in Sources */,
+				31B4C722B761A6DCEA59BD7D /* MealViews.swift in Sources */,
+				BE308A4E9C2E7F44D02B3BF2 /* RootView.swift in Sources */,
+				F67C9B74FCECDB0503E5951D /* TinyLunchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		AE981910101FBA71CB142BBA /* Sources */ = {
+		E8526851D29ED133AD570AD4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8620AB729C67905A4806C93F /* AppModel.swift in Sources */,
-				637C2F8632641BA5C42E8ED1 /* CameraView.swift in Sources */,
-				B6E7E1A02B366D0F002D3A61 /* Design.swift in Sources */,
-				CDBC8F0F71198FDE14AD4F69 /* Estimator.swift in Sources */,
-				249296B94C14F361C58142A5 /* HistoryView.swift in Sources */,
-				BC09BA5508DAC7EF416DCC78 /* Meal.swift in Sources */,
-				62777521AA0B8440B7B33059 /* MealViews.swift in Sources */,
-				03687F1522802C5CBC14395E /* NoshApp.swift in Sources */,
-				0A13B357D9F674A453298F07 /* RootView.swift in Sources */,
+				90C014E7BACD5D588D758EE6 /* TinyLunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		1B737469303253FF53CC66B8 /* PBXTargetDependency */ = {
+		702DC768F095A89A8B42E01B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 07F5E873BC9ADA1726A32F22 /* Nosh */;
-			targetProxy = 89B2278AC20F999C84BD82B2 /* PBXContainerItemProxy */;
+			target = 57EF4955EC6F91E884D16A5F /* TinyLunch */;
+			targetProxy = 1448B8EDB12E482556AFC12A /* PBXContainerItemProxy */;
 		};
-		5EE8BC3F3E21C69F05449FAF /* PBXTargetDependency */ = {
+		AE30767DEA7F821DF8CBD6C7 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 07F5E873BC9ADA1726A32F22 /* Nosh */;
-			targetProxy = A0695A5D7149F067094EF610 /* PBXContainerItemProxy */;
+			target = 57EF4955EC6F91E884D16A5F /* TinyLunch */;
+			targetProxy = CC8168F610E3AF83349D7147 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		2F9D312992CE4BAFF5E859FD /* Release */ = {
+		4C28EAED0CF2AFEAF712FAB7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rgllm.tinylunch.uitests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = TinyLunch;
+			};
+			name = Debug;
+		};
+		69DFB9E4471019B446978E73 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rgllm.tinylunch.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TinyLunch.app/TinyLunch";
+			};
+			name = Release;
+		};
+		7325F8E0109D02DC60667021 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -295,8 +353,12 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = F86KMMECSR;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -308,36 +370,126 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = 1;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
-		4C89AA6B71E1FC0EB647F658 /* Release */ = {
+		8541512BFB37F361FBB5ABEF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TinyLunch;
+				INFOPLIST_KEY_CFBundleName = TinyLunch;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take a food photo to estimate its calories on your iPhone.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Rogério Moreira. All rights reserved.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rgllm.tinylunch;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		A5E110AEAC5240E2464D89D8 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rgllm.tinylunch.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Nosh;
+				TEST_TARGET_NAME = TinyLunch;
 			};
 			name = Release;
 		};
-		B7A4625D4F4966ED5A2AAE75 /* Debug */ = {
+		C0A8E544C86A929AA781F046 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.rgllm.tinylunch.tests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TinyLunch.app/TinyLunch";
+			};
+			name = Debug;
+		};
+		C5F0C9EDDA7AD2351BE1FA07 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TinyLunch;
+				INFOPLIST_KEY_CFBundleName = TinyLunch;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.food-and-drink";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Take a food photo to estimate its calories on your iPhone.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2026 Rogério Moreira. All rights reserved.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.rgllm.tinylunch;
+				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		FD2037DE1A4FA8E89917DDE4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -370,8 +522,12 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = F86KMMECSR;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -389,11 +545,15 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				MARKETING_VERSION = 1.0.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -402,137 +562,46 @@
 			};
 			name = Debug;
 		};
-		B9E962A3B504DCDD14271102 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Nosh;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Take a food photo to estimate its calories on your iPhone.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.app;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
-		C634CEC06C06BFD1BD0CD1E1 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshUITests;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = Nosh;
-			};
-			name = Debug;
-		};
-		D7E1CCEB4B5FEEE9BEFF1C8D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshTests;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nosh.app/Nosh";
-			};
-			name = Release;
-		};
-		D94FB19D9DDA6C0D89FB7285 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.NoshTests;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Nosh.app/Nosh";
-			};
-			name = Debug;
-		};
-		D977D06B806FC29A5AA54DAD /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = Nosh;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Take a food photo to estimate its calories on your iPhone.";
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = local.nosh.app;
-				SDKROOT = iphoneos;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		18ECE432CCEB28F3B9642284 /* Build configuration list for PBXNativeTarget "Nosh" */ = {
+		1C31AE88BEA7447A08EFFB72 /* Build configuration list for PBXProject "TinyLunch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D977D06B806FC29A5AA54DAD /* Debug */,
-				B9E962A3B504DCDD14271102 /* Release */,
+				FD2037DE1A4FA8E89917DDE4 /* Debug */,
+				7325F8E0109D02DC60667021 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		6D050396F014FB2A0CC3B7DE /* Build configuration list for PBXNativeTarget "NoshTests" */ = {
+		2869F30F7654DB8B55AEEA87 /* Build configuration list for PBXNativeTarget "TinyLunchUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				D94FB19D9DDA6C0D89FB7285 /* Debug */,
-				D7E1CCEB4B5FEEE9BEFF1C8D /* Release */,
+				4C28EAED0CF2AFEAF712FAB7 /* Debug */,
+				A5E110AEAC5240E2464D89D8 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		B36A0DDAE1DC2202B9C07BDD /* Build configuration list for PBXProject "Nosh" */ = {
+		28AC4E1EB88CA89C65932709 /* Build configuration list for PBXNativeTarget "TinyLunchTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B7A4625D4F4966ED5A2AAE75 /* Debug */,
-				2F9D312992CE4BAFF5E859FD /* Release */,
+				C0A8E544C86A929AA781F046 /* Debug */,
+				69DFB9E4471019B446978E73 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		B90ACA19906F3FE1EEB4F74B /* Build configuration list for PBXNativeTarget "NoshUITests" */ = {
+		6ED2E1C0B78C0EA1AC6EF9F6 /* Build configuration list for PBXNativeTarget "TinyLunch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				C634CEC06C06BFD1BD0CD1E1 /* Debug */,
-				4C89AA6B71E1FC0EB647F658 /* Release */,
+				8541512BFB37F361FBB5ABEF /* Debug */,
+				C5F0C9EDDA7AD2351BE1FA07 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = BED8C1E84B818D5E268E62DE /* Project object */;
+	rootObject = 715E95F4B18BBE4706A61F36 /* Project object */;
 }

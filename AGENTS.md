@@ -1,4 +1,4 @@
-# Nosh
+# TinyLunch
 
 ## Product intent
 
@@ -30,7 +30,7 @@ These are reversible implementation choices, not additional requirements approve
 
 - Use Swift, SwiftUI, structured concurrency, and Apple frameworks. Use UIKit where needed for camera integration.
 - Start with iPhone only. Set the minimum OS after verifying the image-input API and supported hardware described below. Do not inherit deployment targets from other projects.
-- Use Nosh as the working display name. Confirm the bundle identifier and signing team before device distribution.
+- Use TinyLunch as the working display name. Confirm the bundle identifier and signing team before device distribution.
 - Write code and developer documentation in English. Use English for all initial UI copy and permission explanations. Keep strings in String Catalogs.
 - Display food energy in kcal and portions in grams. Format numbers using the user's locale.
 - Keep the unsaved draft in memory. Use protected local persistence for explicitly saved meal data. Macronutrient breakdown is outside the initial scope.
@@ -40,7 +40,7 @@ These are reversible implementation choices, not additional requirements approve
 
 Do this before building the full interface or committing to a deployment target.
 
-On 8 September 2026, Xcode 27.0 (build 27A5252f) on this machine ships the iOS 27.0 SDK. Its FoundationModels Swift interface exposes `Attachment` and `LanguageModelCapabilities.Capability.vision`, both annotated for iOS 27.0. Xcode 26.6, build 17F113, and the iOS 26.5 SDK still do not. Online documentation alone does not establish that the API works on a given phone. Building Nosh currently requires this beta Xcode; tell Rogério before treating that as a release constraint he has accepted.
+On 8 September 2026, Xcode 27.0 (build 27A5252f) on this machine ships the iOS 27.0 SDK. Its FoundationModels Swift interface exposes `Attachment` and `LanguageModelCapabilities.Capability.vision`, both annotated for iOS 27.0. Xcode 26.6, build 17F113, and the iOS 26.5 SDK still do not. Online documentation alone does not establish that the API works on a given phone. Building TinyLunch currently requires this beta Xcode; tell Rogério before treating that as a release constraint he has accepted.
 
 1. Inspect the selected Xcode SDK, the availability annotations for the image-input APIs, release status, and Apple's current documentation.
 2. Build a small proof of concept that sends a real food image to the explicit on-device `SystemLanguageModel` and obtains structured food candidates.
@@ -50,7 +50,7 @@ On 8 September 2026, Xcode 27.0 (build 27A5252f) on this machine ships the iOS 2
 
 The preferred implementation uses Apple's on-device multimodal model directly. A bundled food-recognition Core ML model with Vision and Foundation Models for text processing is a possible alternative, but requires Rogério's agreement because it adds another model and licensing, size, and evaluation work. Manual food entry can support recovery, but does not fulfill the required photo-analysis journey.
 
-Do not substitute Private Cloud Compute or a third-party model provider. Some Foundation Models examples recommend a cloud model for harder tasks; that conflicts with Nosh's local-only requirement.
+Do not substitute Private Cloud Compute or a third-party model provider. Some Foundation Models examples recommend a cloud model for harder tasks; that conflicts with TinyLunch's local-only requirement.
 
 ## Runtime availability
 
@@ -143,7 +143,7 @@ This is deferred work. Do not block the initial model-based implementation on da
 - Keep images and results in memory where practical. Any temporary files belong in app-private storage with appropriate file protection and must be deleted on replacement, cancellation, completion when no longer needed, and subsequent launch cleanup.
 - Exclude temporary images and analysis files from backups. Do not enable CloudKit or iCloud document synchronization.
 - Persist only explicitly saved meal data under the history rules above. Provide deletion controls and document retention and backup behavior.
-- Privacy copy must distinguish Nosh's processing from system-managed Apple model downloads and photo-library retrieval.
+- Privacy copy must distinguish TinyLunch's processing from system-managed Apple model downloads and photo-library retrieval.
 
 ## Architecture
 
@@ -152,7 +152,7 @@ Keep business rules independent of SwiftUI and framework-specific model response
 Suggested layout, to create only when implementation starts:
 
 ```text
-Nosh/
+TinyLunch/
   App/
   Features/
     Capture/
@@ -166,8 +166,8 @@ Nosh/
     CalorieEstimation/
     MealStore/
   Resources/
-NoshTests/
-NoshUITests/
+TinyLunchTests/
+TinyLunchUITests/
 docs/
 ```
 
@@ -222,7 +222,7 @@ The app shell, local history, and on-device image analysis path exist. Live infe
 - Exact minimum iOS version and compatible devices based on the capability prototype. A newer minimum is approved; disclose any beta tooling or release constraints.
 - Whether an additional bundled vision model is acceptable if Apple's available on-device model cannot analyze images.
 - Model evaluation thresholds. Nutrition dataset and redistribution rights are deferred to the database TODO.
-- Final branding, bundle identifier, and signing team.
+- Signing team for device distribution. The bundle identifier is `com.rgllm.tinylunch`.
 
 Ask one focused question at a time when the answer materially changes implementation. Explain why it matters and allow skipping where a safe working default exists. Continue independent authorized work while waiting.
 

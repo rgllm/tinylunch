@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1430"
+   LastUpgradeVersion = "2700"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -15,10 +15,10 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "07F5E873BC9ADA1726A32F22"
-               BuildableName = "Nosh.app"
-               BlueprintName = "Nosh"
-               ReferencedContainer = "container:Nosh.xcodeproj">
+               BlueprintIdentifier = "57EF4955EC6F91E884D16A5F"
+               BuildableName = "TinyLunch.app"
+               BlueprintName = "TinyLunch"
+               ReferencedContainer = "container:TinyLunch.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -32,10 +32,10 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "07F5E873BC9ADA1726A32F22"
-            BuildableName = "Nosh.app"
-            BlueprintName = "Nosh"
-            ReferencedContainer = "container:Nosh.xcodeproj">
+            BlueprintIdentifier = "57EF4955EC6F91E884D16A5F"
+            BuildableName = "TinyLunch.app"
+            BlueprintName = "TinyLunch"
+            ReferencedContainer = "container:TinyLunch.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
       <Testables>
@@ -44,10 +44,10 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "32A71C00F53DBABFA135E1C3"
-               BuildableName = "NoshTests.xctest"
-               BlueprintName = "NoshTests"
-               ReferencedContainer = "container:Nosh.xcodeproj">
+               BlueprintIdentifier = "E89E9692B8EA3BD8D55BBBDC"
+               BuildableName = "TinyLunchTests.xctest"
+               BlueprintName = "TinyLunchTests"
+               ReferencedContainer = "container:TinyLunch.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -55,10 +55,10 @@
             parallelizable = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "FB40231CA708A9447FB874D2"
-               BuildableName = "NoshUITests.xctest"
-               BlueprintName = "NoshUITests"
-               ReferencedContainer = "container:Nosh.xcodeproj">
+               BlueprintIdentifier = "D3C745D0A793B61788CF7FCC"
+               BuildableName = "TinyLunchUITests.xctest"
+               BlueprintName = "TinyLunchUITests"
+               ReferencedContainer = "container:TinyLunch.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -79,12 +79,14 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "07F5E873BC9ADA1726A32F22"
-            BuildableName = "Nosh.app"
-            BlueprintName = "Nosh"
-            ReferencedContainer = "container:Nosh.xcodeproj">
+            BlueprintIdentifier = "57EF4955EC6F91E884D16A5F"
+            BuildableName = "TinyLunch.app"
+            BlueprintName = "TinyLunch"
+            ReferencedContainer = "container:TinyLunch.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -96,12 +98,14 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "07F5E873BC9ADA1726A32F22"
-            BuildableName = "Nosh.app"
-            BlueprintName = "Nosh"
-            ReferencedContainer = "container:Nosh.xcodeproj">
+            BlueprintIdentifier = "57EF4955EC6F91E884D16A5F"
+            BuildableName = "TinyLunch.app"
+            BlueprintName = "TinyLunch"
+            ReferencedContainer = "container:TinyLunch.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </ProfileAction>
    <AnalyzeAction
       buildConfiguration = "Debug">

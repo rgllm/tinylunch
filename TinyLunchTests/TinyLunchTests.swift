@@ -1,7 +1,7 @@
 import XCTest
-@testable import Nosh
+@testable import TinyLunch
 
-final class NoshTests: XCTestCase {
+final class TinyLunchTests: XCTestCase {
     func testPartialTotalAndPortionScaling() {
         var rice = FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked")
         let unknown = FoodItem(name: "Sauce", grams: nil, kcalPer100g: nil, preparation: "")

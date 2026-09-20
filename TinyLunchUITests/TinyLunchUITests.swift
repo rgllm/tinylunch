@@ -1,6 +1,6 @@
 import XCTest
 
-final class NoshUITests: XCTestCase {
+final class TinyLunchUITests: XCTestCase {
     @MainActor func testExplicitSavePartialHistoryAndRelaunch() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
@@ -56,7 +56,7 @@ final class NoshUITests: XCTestCase {
         app.buttons["Surprise me"].tap()
         XCTAssertTrue(app.staticTexts["On the house."].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
-        app.staticTexts["noshWordmark"].press(forDuration: 1.2)
+        app.staticTexts["tinyLunchWordmark"].press(forDuration: 1.2)
         XCTAssertTrue(app.staticTexts["A little toast."].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
         XCTAssertTrue(plate.exists)

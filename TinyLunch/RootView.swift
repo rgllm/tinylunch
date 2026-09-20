@@ -11,7 +11,7 @@ struct RootView: View {
             Tab("New meal", systemImage: "camera", value: 0) { CaptureView(model: model) }
             Tab("History", systemImage: "clock", value: 1) { HistoryView(model: model, startMeal: { tab = 0 }) }
         }
-        .tint(NoshStyle.accent)
+        .tint(TinyLunchStyle.accent)
         .task { await model.refresh() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await model.refresh() } }
@@ -19,6 +19,9 @@ struct RootView: View {
         .alert("Something needs attention", isPresented: Binding(get: { model.error != nil }, set: { if !$0 { model.error = nil } })) {
             Button("OK") { model.error = nil }
         } message: { Text(model.error ?? "") }
+        #if DEBUG
+        .preferredColorScheme(ProcessInfo.processInfo.arguments.contains("--marketing-dark") ? .dark : nil)
+        #endif
     }
 }
 
@@ -52,21 +55,21 @@ struct CaptureView: View {
                                 .font(.subheadline)
                             Spacer(minLength: 0)
                             Button("Cancel") { model.cancel() }.font(.subheadline.weight(.semibold))
-                        }.noshCard()
+                        }.tinyLunchCard()
                     }
                 }
                 .padding(.horizontal, 24).padding(.top, 18).padding(.bottom, 28)
             }
-            .background(NoshStyle.paper)
+            .background(TinyLunchStyle.paper)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Text("nosh").font(.system(.title, design: .rounded, weight: .bold)).tracking(-1.5)
-                        .foregroundStyle(NoshStyle.accent).padding(.vertical, 6).fixedSize()
+                    Text("TinyLunch").font(.system(.title, design: .rounded, weight: .bold)).tracking(-1.5)
+                        .foregroundStyle(TinyLunchStyle.accent).padding(.vertical, 6).fixedSize()
                         .contentShape(Rectangle())
                         .onLongPressGesture(minimumDuration: 1) { toast = true }
-                        .accessibilityLabel("Nosh")
-                        .accessibilityIdentifier("noshWordmark")
+                        .accessibilityLabel("TinyLunch")
+                        .accessibilityIdentifier("tinyLunchWordmark")
                         .accessibilityAction(named: "A little toast") { toast = true }
                 }.sharedBackgroundVisibility(.hidden)
                 ToolbarItem(placement: .topBarTrailing) {
@@ -151,7 +154,7 @@ struct CaptureView: View {
                 PhotosPicker(selection: $selection, matching: .images) {
                     Label(hasImage ? "Replace photo" : "Choose photo", systemImage: "photo.on.rectangle")
                         .font(.headline).frame(maxWidth: .infinity, minHeight: 52)
-                        .background(NoshStyle.card, in: RoundedRectangle(cornerRadius: 22))
+                        .background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 22))
                 }.disabled(model.busy || model.importing)
                 if model.image != nil {
                     Button("Retake photo") { Task { await openCamera() } }
@@ -170,7 +173,7 @@ struct CaptureView: View {
                     Label("Photo analysis unavailable", systemImage: "info.circle")
                         .font(.subheadline.weight(.medium)).foregroundStyle(.primary)
                         .accessibilityIdentifier("photoAnalysisUnavailable")
-                }.padding(16).background(NoshStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
+                }.padding(16).background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
             }
             if typeSize.isAccessibilitySize && model.image == nil && !model.savedNotice { EmojiPlate() }
             Button { privacy = true } label: {
@@ -219,7 +222,7 @@ struct CaptureView: View {
                     editing = FoodItem(name: "", grams: nil, kcalPer100g: nil, preparation: "")
                 }.font(.headline).frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
                     .disabled(model.busy || model.saving || model.unavailable != nil)
-            }.padding(.horizontal, 18).background(NoshStyle.card, in: RoundedRectangle(cornerRadius: 26))
+            }.padding(.horizontal, 18).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 26))
             Label("Tap a food to correct it. Portions are suggestions until you confirm them.", systemImage: "hand.tap")
                 .font(.footnote).foregroundStyle(.secondary)
         }
