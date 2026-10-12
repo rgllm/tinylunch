@@ -1,0 +1,147 @@
+:root {
+  color-scheme: light dark;
+  --paper: #f8f5ef;
+  --ink: #1c1915;
+  --muted: #5c534a;
+  --line: #e4d9cb;
+  --card: #fffdf9;
+  --accent: #7a2e12;
+  --accent-soft: #f3e4d8;
+  --focus: #1c1915;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #141512;
+    --ink: #f4efe6;
+    --muted: #c4b8a8;
+    --line: #3a342c;
+    --card: #211f1b;
+    --accent: #ffad7a;
+    --accent-soft: #3a2a20;
+    --focus: #ffad7a;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: ui-rounded, "Segoe UI", system-ui, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 0.18em;
+}
+
+a:hover { text-decoration-thickness: 2px; }
+
+a:focus-visible,
+.skip:focus {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: 0.5rem;
+  transform: translateY(-150%);
+  background: var(--card);
+  color: var(--ink);
+  padding: 0.5rem 0.8rem;
+  border-radius: 0.5rem;
+}
+
+.skip:focus { transform: none; }
+
+.wrap {
+  width: min(42rem, calc(100% - 2rem));
+  margin: 0 auto;
+}
+
+header.site {
+  border-bottom: 1px solid var(--line);
+}
+
+header.site .wrap {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.5rem;
+  padding: 1.1rem 0;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  gap: 1rem;
+}
+
+nav a { font-weight: 600; }
+
+main { padding: 2.25rem 0 3rem; }
+
+h1 {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.75rem;
+}
+
+h2 {
+  font-size: 1.35rem;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  margin: 2rem 0 0.5rem;
+}
+
+p, li { margin: 0.6rem 0; }
+
+.lede { font-size: 1.2rem; }
+
+.meta { color: var(--muted); }
+
+ul { padding-left: 1.2rem; }
+
+.cards {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: 1.5rem;
+}
+
+.card {
+  display: block;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  padding: 1.1rem 1.2rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.card strong { color: var(--accent); }
+
+.card span { display: block; color: var(--muted); margin-top: 0.2rem; }
+
+footer.site {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  padding: 1.25rem 0 2rem;
+  font-size: 0.95rem;
+}
