@@ -1,0 +1,201 @@
+name: TestFlight
+
+# Manual only. Secrets are not available to pull-request runs, and this
+# uploads a build. Dispatch it from main after the App Store Connect key is set.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: testflight-com.rgllm.tinylunch
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    name: Upload 1.0.0 (25)
+    runs-on: xcode-27
+    timeout-minutes: 90
+    env:
+      ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+      ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+      ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+      DIST_CERT_P12: ${{ secrets.DIST_CERT_P12 }}
+      DIST_CERT_PASSWORD: ${{ secrets.DIST_CERT_PASSWORD }}
+    steps:
+      - name: Check out TinyLunch
+        uses: actions/checkout@v4
+
+      - name: Select the release Xcode 27.0 SDK
+        run: |
+          set -euo pipefail
+          selected=""
+          for app in \
+            /Applications/Xcode_27.0.app \
+            /Applications/Xcode_27.0.0.app \
+            /Applications/Xcode_27.app \
+            /Applications/Xcode.app
+          do
+            if [ ! -d "$app" ]; then
+              continue
+            fi
+            lowered="$(printf '%s' "$app" | tr '[:upper:]' '[:lower:]')"
+            case "$lowered" in
+              *beta*) continue ;;
+            esac
+            selected="$app"
+            break
+          done
+          if [ -z "$selected" ]; then
+            echo "No release Xcode 27.0 was found. Refusing to use a beta SDK."
+            ls /Applications | grep -i xcode || true
+            exit 1
+          fi
+          sudo xcode-select -s "$selected"
+          echo "DEVELOPER_DIR=$(xcode-select -p)"
+          version_text="$(xcodebuild -version)"
+          printf '%s\n' "$version_text"
+          if printf '%s\n' "$version_text" | grep -qi beta; then
+            echo "Selected Xcode is a beta. Build 23 was rejected for a beta SDK."
+            exit 1
+          fi
+          first_line="$(printf '%s\n' "$version_text" | head -n 1)"
+          case "$first_line" in
+            "Xcode 27.0"|"Xcode 27.0."*) ;;
+            *)
+              echo "Selected Xcode does not match the project's Xcode 27.0 / iOS 27.0 SDK."
+              exit 1
+              ;;
+          esac
+          sdk_text="$(xcodebuild -version -sdk iphoneos)"
+          printf '%s\n' "$sdk_text"
+          if printf '%s\n' "$sdk_text" | grep -qi beta; then
+            echo "iphoneos SDK is a beta. Refusing to archive."
+            exit 1
+          fi
+          printf '%s\n' "$sdk_text" | grep -q 'iphoneos27.0'
+
+      - name: Import distribution certificate when provided
+        run: |
+          set -euo pipefail
+          if [ -z "${DIST_CERT_P12:-}" ] || [ -z "${DIST_CERT_PASSWORD:-}" ]; then
+            echo "DIST_CERT_P12 is not set. Signing uses the App Store Connect API key (cloud signing)."
+            exit 0
+          fi
+          echo "Importing distribution certificate into a temporary keychain."
+          umask 077
+          keychain_path="$RUNNER_TEMP/tinylunch-signing.keychain-db"
+          keychain_password="$(openssl rand -base64 32)"
+          echo "::add-mask::$keychain_password"
+          p12_path="$RUNNER_TEMP/dist.p12"
+          printf '%s' "$DIST_CERT_P12" | base64 -D > "$p12_path"
+          security create-keychain -p "$keychain_password" "$keychain_path"
+          security set-keychain-settings -lut 21600 "$keychain_path"
+          security unlock-keychain -p "$keychain_password" "$keychain_path"
+          security import "$p12_path" -f pkcs12 -P "$DIST_CERT_PASSWORD" -A -t cert -k "$keychain_path"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$keychain_password" "$keychain_path"
+          security list-keychains -d user -s "$keychain_path" login.keychain-db
+          security default-keychain -s "$keychain_path"
+          rm -f "$p12_path"
+          echo "Distribution certificate imported."
+
+      - name: Write the App Store Connect API key
+        run: |
+          set -euo pipefail
+          umask 077
+          if [ -z "${ASC_KEY_ID:-}" ] || [ -z "${ASC_ISSUER_ID:-}" ] || [ -z "${ASC_API_KEY_P8:-}" ]; then
+            echo "ASC_KEY_ID, ASC_ISSUER_ID, and ASC_API_KEY_P8 are required."
+            exit 1
+          fi
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          # Write the secret as-is. Do not echo it.
+          printf '%s' "$ASC_API_KEY_P8" > "$key_path"
+          last="$(tail -c 1 "$key_path" || true)"
+          if [ "$last" != $'\n' ]; then
+            printf '\n' >> "$key_path"
+          fi
+          test -s "$key_path"
+          if ! grep -q -e 'BEGIN PRIVATE KEY' -e 'BEGIN EC PRIVATE KEY' "$key_path"; then
+            echo "ASC_API_KEY_P8 is not a PEM private key. The file was not printed."
+            rm -f "$key_path"
+            exit 1
+          fi
+          echo "Wrote the App Store Connect API key into RUNNER_TEMP."
+
+      - name: Archive TinyLunch for iPhone
+        run: |
+          set -euo pipefail
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          xcodebuild \
+            -project TinyLunch.xcodeproj \
+            -scheme TinyLunch \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -archivePath "$RUNNER_TEMP/TinyLunch.xcarchive" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$key_path" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID" \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM=F86KMMECSR \
+            TARGETED_DEVICE_FAMILY=1 \
+            SUPPORTS_MACCATALYST=NO \
+            SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD=NO \
+            SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD=NO \
+            archive
+
+      - name: Check the archive is iPhone-only 1.0.0 (25)
+        run: |
+          set -euo pipefail
+          plist="$RUNNER_TEMP/TinyLunch.xcarchive/Products/Applications/TinyLunch.app/Info.plist"
+          short="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")"
+          build="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$plist")"
+          sdk="$(/usr/libexec/PlistBuddy -c 'Print :DTSDKName' "$plist")"
+          platform="$(/usr/libexec/PlistBuddy -c 'Print :DTPlatformName' "$plist")"
+          echo "CFBundleShortVersionString=$short"
+          echo "CFBundleVersion=$build"
+          echo "DTSDKName=$sdk"
+          echo "DTPlatformName=$platform"
+          test "$short" = "1.0.0"
+          test "$build" = "25"
+          test "$sdk" = "iphoneos27.0"
+          test "$platform" = "iphoneos"
+          if /usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily:0' "$plist" >/dev/null 2>&1; then
+            family="$(/usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily:0' "$plist")"
+            if /usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily:1' "$plist" >/dev/null 2>&1; then
+              echo "Archive supports more than iPhone."
+              exit 1
+            fi
+          else
+            family="$(/usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily' "$plist")"
+          fi
+          echo "UIDeviceFamily=$family"
+          test "$family" = "1"
+
+      - name: Upload to App Store Connect
+        run: |
+          set -euo pipefail
+          key_path="$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          xcodebuild \
+            -exportArchive \
+            -archivePath "$RUNNER_TEMP/TinyLunch.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist Config/ExportOptions.upload.plist \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath "$key_path" \
+            -authenticationKeyID "$ASC_KEY_ID" \
+            -authenticationKeyIssuerID "$ASC_ISSUER_ID"
+
+      - name: Remove signing material
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -n "${ASC_KEY_ID:-}" ]; then
+            rm -f "$RUNNER_TEMP/AuthKey_${ASC_KEY_ID}.p8"
+          fi
+          rm -f "$RUNNER_TEMP/dist.p12"
+          if [ -f "$RUNNER_TEMP/tinylunch-signing.keychain-db" ]; then
+            security delete-keychain "$RUNNER_TEMP/tinylunch-signing.keychain-db" || true
+          fi
