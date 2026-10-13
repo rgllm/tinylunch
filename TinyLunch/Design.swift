@@ -9,7 +9,11 @@ enum TinyLunchStyle {
         ? UIColor(red: 0.13, green: 0.14, blue: 0.12, alpha: 1) : .white })
     static let accent = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
         ? UIColor(red: 1, green: 0.68, blue: 0.48, alpha: 1)
-        : UIColor(red: 0.64, green: 0.23, blue: 0.10, alpha: 1) })
+        : UIColor(red: 0.45, green: 0.16, blue: 0.06, alpha: 1) })
+    /// Body and caption copy. Dark enough for small text on paper, cards, and the soft fill.
+    static let ink = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
+        ? UIColor(red: 0.93, green: 0.90, blue: 0.85, alpha: 1)
+        : UIColor(red: 0.24, green: 0.16, blue: 0.11, alpha: 1) })
     static let button = Color(red: 0.65, green: 0.24, blue: 0.11)
     static let soft = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
         ? UIColor(red: 0.21, green: 0.17, blue: 0.12, alpha: 1)
@@ -122,22 +126,34 @@ struct EmojiPlate: View {
             if taps.isMultiple(of: 5) { chef = true }
         } label: {
             ZStack {
-                Ellipse().fill(TinyLunchStyle.soft).frame(width: 254, height: 130).offset(y: 24)
-                Circle().fill(TinyLunchStyle.card).frame(width: 208, height: 208)
+                Ellipse().fill(TinyLunchStyle.soft).frame(width: 220, height: 108).offset(y: 18)
+                Circle().fill(TinyLunchStyle.card).frame(width: 188, height: 188)
                     .shadow(color: .black.opacity(0.055), radius: 12, x: 0, y: 12)
-                Circle().strokeBorder(TinyLunchStyle.soft, lineWidth: 2).frame(width: 176, height: 176)
-                Circle().fill(TinyLunchStyle.paper.opacity(0.6)).frame(width: 154, height: 154)
-                Text(foods[taps % foods.count]).font(.system(size: 88))
-                    .rotationEffect(.degrees(taps.isMultiple(of: 2) ? -12 : 9))
+                Circle().strokeBorder(TinyLunchStyle.soft, lineWidth: 2).frame(width: 158, height: 158)
+                Circle().fill(TinyLunchStyle.paper.opacity(0.6)).frame(width: 136, height: 136)
+                Text(foods[taps % foods.count])
+                    .font(.system(size: 72))
+                    .padding(32)
+                    .rotationEffect(.degrees(taps.isMultiple(of: 2) ? -8 : 6))
                     .animation(reduceMotion ? nil : .spring(duration: 0.4, bounce: 0.35), value: taps)
                     .accessibilityHidden(true)
-                Text("🍅").font(.system(size: 32)).rotationEffect(.degrees(18)).offset(x: 104, y: -64)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 250)
+            .overlay(alignment: .topTrailing) {
+                Text("🍅").font(.system(size: 28)).padding(.top, 12).padding(.trailing, 28)
                     .accessibilityHidden(true)
-                Text("🌿").font(.system(size: 33)).rotationEffect(.degrees(-20)).offset(x: -109, y: 64)
+            }
+            .overlay(alignment: .bottomLeading) {
+                Text("🌿").font(.system(size: 28)).padding(.leading, 24).padding(.bottom, 16)
                     .accessibilityHidden(true)
-                Image(systemName: "sparkle").font(.system(size: 17)).foregroundStyle(TinyLunchStyle.accent).offset(x: -115, y: -58)
+            }
+            .overlay(alignment: .topLeading) {
+                Image(systemName: "sparkle").font(.body).foregroundStyle(TinyLunchStyle.accent)
+                    .padding(.leading, 36).padding(.top, 28)
                     .accessibilityHidden(true)
-            }.frame(maxWidth: .infinity).frame(height: 230).contentShape(Rectangle())
+            }
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("The TinyLunch plate")
@@ -169,7 +185,7 @@ struct SurpriseSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
                     Text(kind == .chef ? (served ? "One imaginary pancake. No need to log this one." : "You found our tiny kitchen. There’s always a seat for the curious.") : "To good food, good company, and remembering to eat before it gets cold.")
-                        .foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        .foregroundStyle(TinyLunchStyle.ink).multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                     if kind == .chef {
                         Button(served ? "Compliments to the chef" : "Surprise me") {
@@ -180,9 +196,17 @@ struct SurpriseSheet: View {
                 }.padding(28)
             }
             .background(TinyLunchStyle.paper)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }
         .tint(TinyLunchStyle.accent)
+        .safeAreaInset(edge: .bottom) {
+            Button("Done") { dismiss() }
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 44)
+                .contentShape(Rectangle())
+                .padding(.horizontal, 24)
+                .padding(.vertical, 12)
+                .background(TinyLunchStyle.paper)
+        }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(.selection, trigger: served)
@@ -202,21 +226,26 @@ struct PrivacySheet: View {
                     MedicalDisclaimer(prominent: false)
                 }
                 Section {
-                    Label {
+                    HStack(alignment: .firstTextBaseline, spacing: 10) {
+                        Image(systemName: "lock.iphone")
+                            .font(.title2)
+                            .accessibilityHidden(true)
                         Text("Your plate. Your business.")
                             .font(.system(.title2, design: .rounded, weight: .bold))
                             .fixedSize(horizontal: false, vertical: true)
-                    } icon: {
-                        Image(systemName: "lock.iphone").accessibilityHidden(true)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .accessibilityElement(children: .combine)
                     .accessibilityAddTraits(.isHeader)
                     Text("TinyLunch is built for on-device estimates. Your food photos and meal details aren’t sent to a server.")
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Section("What stays") {
+                Section {
                     wrappingLabel("Only meals you choose to save", systemImage: "checkmark.circle")
                     wrappingLabel("Foods, portions, and estimates", systemImage: "list.bullet")
                     wrappingLabel("No saved photos", systemImage: "photo.badge.checkmark")
+                } header: {
+                    sectionHeader("What stays")
                 }
                 Section {
                     Text("History stays on this iPhone and is excluded from backups. Deleting the app removes it. You can delete individual meals in History.")
@@ -228,24 +257,50 @@ struct PrivacySheet: View {
                     Text("Estimating from a photo uses Apple Intelligence on this iPhone. If that on-device model isn’t available, History stays usable and new estimates wait until it is.")
                         .fixedSize(horizontal: false, vertical: true)
                 } header: {
-                    Text("Photo analysis")
+                    sectionHeader("Photo analysis")
                 } footer: {
                     Text("Adjust portions and preparation before saving. Unknown foods stay unknown instead of becoming zero.")
+                        .font(.footnote)
+                        .foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .scrollContentBackground(.hidden).background(TinyLunchStyle.paper)
             .navigationTitle("Made to stay local").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityHint("Closes About privacy.") } }
+            .safeAreaInset(edge: .bottom) {
+                Button("Done") { dismiss() }
+                    .buttonStyle(.plain)
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(TinyLunchStyle.accent)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .contentShape(Rectangle())
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .background(TinyLunchStyle.paper)
+                    .accessibilityHint("Closes About privacy.")
+            }
         }
         .presentationDragIndicator(.visible)
     }
 
+    private func sectionHeader(_ title: LocalizedStringKey) -> some View {
+        Text(title)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(TinyLunchStyle.ink)
+            .textCase(nil)
+    }
+
     private func wrappingLabel(_ title: LocalizedStringKey, systemImage: String) -> some View {
-        Label {
-            Text(title).fixedSize(horizontal: false, vertical: true)
-        } icon: {
-            Image(systemName: systemImage).accessibilityHidden(true)
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Image(systemName: systemImage)
+                .font(.body)
+                .accessibilityHidden(true)
+            Text(title)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
         }
+        .frame(minHeight: 44, alignment: .leading)
     }
 }
