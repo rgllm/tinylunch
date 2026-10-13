@@ -46,7 +46,7 @@ struct CaptureView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     if typeSize.isAccessibilitySize {
-                        wordmark.frame(maxWidth: .infinity, alignment: .leading)
+                        wordmark(resistsCompression: false)
                     }
                     if !model.modelAvailability.allowsPhotoAnalysis {
                         availabilityCard
@@ -67,7 +67,7 @@ struct CaptureView: View {
             .toolbar {
                 if !typeSize.isAccessibilitySize {
                     ToolbarItem(placement: .topBarLeading) {
-                        wordmark
+                        wordmark(resistsCompression: true)
                     }.sharedBackgroundVisibility(.hidden)
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -345,13 +345,14 @@ struct CaptureView: View {
         }.padding(.horizontal, 24).padding(.top, 14).padding(.bottom, 10).background(.regularMaterial)
     }
 
-    private var wordmark: some View {
+    private func wordmark(resistsCompression: Bool) -> some View {
         Text("TinyLunch")
             .font(.system(.title, design: .rounded, weight: .bold))
             .tracking(typeSize >= .xxxLarge ? 0 : -1.5)
             .foregroundStyle(TinyLunchStyle.accent)
-            .fixedSize(horizontal: false, vertical: true)
-            .frame(minHeight: 44, alignment: .leading)
+            .lineLimit(1)
+            .fixedSize(horizontal: resistsCompression, vertical: false)
+            .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
             .onLongPressGesture(minimumDuration: 1) { toast = true }
             .accessibilityLabel("TinyLunch")

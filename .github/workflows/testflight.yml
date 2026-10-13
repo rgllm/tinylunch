@@ -2,7 +2,7 @@ name: TestFlight
 
 # Not on pull requests: this uploads a build and needs Actions secrets.
 # workflow_dispatch stays for a token that can dispatch. Pushing a
-# testflight/* tag (for example testflight/1.0.0-25) starts the same job.
+# testflight/* tag (for example testflight/1.0.0-26) starts the same job.
 on:
   workflow_dispatch:
   push:
@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   upload:
-    name: Upload 1.0.0 (25)
+    name: Upload 1.0.0 (26)
     runs-on: xcode-27
     timeout-minutes: 90
     env:
@@ -150,7 +150,7 @@ jobs:
             SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD=NO \
             archive
 
-      - name: Check the archive is iPhone-only 1.0.0 (25)
+      - name: Check the archive is iPhone-only 1.0.0 (26)
         run: |
           set -euo pipefail
           plist="$RUNNER_TEMP/TinyLunch.xcarchive/Products/Applications/TinyLunch.app/Info.plist"
@@ -163,7 +163,7 @@ jobs:
           echo "DTSDKName=$sdk"
           echo "DTPlatformName=$platform"
           test "$short" = "1.0.0"
-          test "$build" = "25"
+          test "$build" = "26"
           test "$sdk" = "iphoneos27.0"
           test "$platform" = "iphoneos"
           if /usr/libexec/PlistBuddy -c 'Print :UIDeviceFamily:0' "$plist" >/dev/null 2>&1; then
