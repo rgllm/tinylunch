@@ -2,8 +2,6 @@
 
 English privacy policy and support pages for TinyLunch. Copy is limited to behaviour already described in the app, `docs/privacy-policy.md`, `docs/app-store.md`, and `PrivacyInfo.xcprivacy`.
 
-This checkout cannot publish the pages. `rgllm/tinylunch` is private, and GitHub Pages on the free plan needs a public repository. The GitHub token available to the agent can see only `rgllm/tinylunch` and does not have `repository_creation=write`, so it cannot create `rgllm/tinylunch-site` or enable Pages.
-
 ## What Rogério needs to do
 
 1. Create a **public** repository named `tinylunch-site` on the `rgllm` account: <https://github.com/new>
