@@ -75,7 +75,7 @@ To estimate a meal: allow Camera or pick a photo of food. Analysis uses Apple In
 
 Saved history is local JSON in Application Support. Photos stay in memory and are not written to the archive.
 
-Calories are model estimates. The Privacy sheet states that TinyLunch is not a medical device and does not give medical or dietary advice.
+Calories are model estimates. The start screen, review screen, saved-meal detail, and About privacy sheet state that TinyLunch is not a medical device, that figures are estimates only and not medical or dietary advice, and that a person should consult a qualified professional.
 
 The home screen has small decorative interactions: tap the plate five times for the chef's table, or long-press the TinyLunch wordmark for a toast. These do not affect food estimates. Debug launch arguments for tests and screenshots are compiled out of Release.
 

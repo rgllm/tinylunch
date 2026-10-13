@@ -5,6 +5,7 @@ struct HistoryView: View {
     var startMeal: () -> Void
     @State private var pendingDelete: Meal?
     @Environment(\.openURL) private var openURL
+    @Environment(\.dynamicTypeSize) private var typeSize
     var body: some View {
         NavigationStack {
             Group {
@@ -22,27 +23,51 @@ struct HistoryView: View {
                                     .rotationEffect(.degrees(6)).offset(x: 12)
                             }.frame(height: 214).accessibilityHidden(true)
                             Text(model.historyLoaded ? "No saved meals" : "History unavailable")
-                                .font(.system(.largeTitle, design: .rounded, weight: .bold)).multilineTextAlignment(.center)
+                                .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                                .multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .accessibilityAddTraits(.isHeader)
                             if model.historyLoaded && !model.modelAvailability.allowsPhotoAnalysis {
                                 availabilityCard
                             }
                             Text(emptyHistoryMessage)
                                 .foregroundStyle(.secondary).multilineTextAlignment(.center)
+                                .fixedSize(horizontal: false, vertical: true)
                             if model.historyLoaded {
-                                Button("Start a meal", systemImage: "plus") { startMeal() }.buttonStyle(PrimaryAction())
+                                Button { startMeal() } label: {
+                                    AccessibleActionLabel(title: "Start a meal", systemImage: "plus")
+                                }
+                                .buttonStyle(PrimaryAction())
+                                .accessibilityLabel("Start a meal")
+                                .accessibilityHint("Returns to the new meal screen.")
                             } else {
-                                Button("Retry", systemImage: "arrow.clockwise") { Task { await model.refresh() } }.buttonStyle(PrimaryAction())
+                                Button { Task { await model.refresh() } } label: {
+                                    AccessibleActionLabel(title: "Retry", systemImage: "arrow.clockwise")
+                                }
+                                .buttonStyle(PrimaryAction())
+                                .accessibilityLabel("Retry")
+                                .accessibilityHint("Loads saved meals again.")
                             }
-                            Label("Just meal details. No photos.", systemImage: "lock")
-                                .font(.footnote).foregroundStyle(.secondary)
+                            Label {
+                                Text("Just meal details. No photos.")
+                                    .fixedSize(horizontal: false, vertical: true)
+                            } icon: {
+                                Image(systemName: "lock").accessibilityHidden(true)
+                            }
+                            .font(.footnote).foregroundStyle(.secondary)
                         }.padding(.horizontal, 32).padding(.top, 52).padding(.bottom, 32)
                     }
                 } else {
                     List {
                         Section {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Good food,\nremembered.").font(.system(.largeTitle, design: .rounded, weight: .bold))
-                                Text("Your saved meals, just as you left them.").font(.subheadline).foregroundStyle(.secondary)
+                                Text("Good food,\nremembered.")
+                                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityAddTraits(.isHeader)
+                                Text("Your saved meals, just as you left them.")
+                                    .font(.subheadline).foregroundStyle(.secondary)
+                                    .fixedSize(horizontal: false, vertical: true)
                                 if !model.modelAvailability.allowsPhotoAnalysis {
                                     availabilityCard.buttonStyle(.borderless).padding(.top, 8)
                                 }
@@ -50,24 +75,35 @@ struct HistoryView: View {
                         }.listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
                         Section {
                             ForEach(model.meals) { meal in
-                                NavigationLink { SavedMealView(meal: meal) } label: {
+                                NavigationLink { SavedMealView(meal: meal) { pendingDelete = meal } } label: {
                                     HStack(alignment: .top, spacing: 14) {
-                                        FoodBadge(name: meal.items.first?.name ?? "", size: 52)
+                                        if !typeSize.isAccessibilitySize {
+                                            FoodBadge(name: meal.items.first?.name ?? "", size: 52)
+                                        }
                                         VStack(alignment: .leading, spacing: 6) {
                                             Text(meal.title).font(.headline)
+                                                .fixedSize(horizontal: false, vertical: true)
                                             Text(meal.calorieLabel).font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
+                                                .fixedSize(horizontal: false, vertical: true)
                                             if meal.isIncomplete { Text("Incomplete estimate").font(.caption).foregroundStyle(.secondary) }
                                             Text(meal.savedAt, format: .dateTime.day().month().hour().minute())
                                                 .font(.caption).foregroundStyle(.secondary)
-                                        }.padding(.vertical, 5)
+                                                .fixedSize(horizontal: false, vertical: true)
+                                        }
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.vertical, 5)
                                     }
                                 }
+                                .accessibilityHint("Shows this saved meal. Use the Delete meal action to remove it.")
                                 .swipeActions { Button("Delete", role: .destructive) { pendingDelete = meal }.disabled(model.saving) }
                                 .contextMenu { Button("Delete meal", systemImage: "trash", role: .destructive) { pendingDelete = meal }.disabled(model.saving) }
                                 .accessibilityAction(named: "Delete meal") { pendingDelete = meal }
                                 .listRowBackground(TinyLunchStyle.card)
                             }
-                        } footer: { Text("Saved on this iPhone. Swipe left to delete a meal.") }
+                        } footer: {
+                            Text("Saved on this iPhone. Choose Delete meal to remove one.")
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }.scrollContentBackground(.hidden)
                 }
             }
@@ -110,24 +146,44 @@ struct HistoryView: View {
 
 private struct SavedMealView: View {
     let meal: Meal
+    var delete: () -> Void
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(meal.title).font(.system(.largeTitle, design: .rounded, weight: .bold))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
                     Text(meal.savedAt, format: .dateTime.day().month(.wide).year().hour().minute())
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 MealSummary(meal: meal)
+                MedicalDisclaimer()
                 Text("On your plate").font(.system(.title3, design: .rounded, weight: .bold))
+                    .accessibilityAddTraits(.isHeader)
                 VStack(spacing: 18) {
                     ForEach(meal.items) { item in
                         FoodRow(item: item)
+                            .accessibilityHint("Saved food. This record cannot be edited.")
                         if item.id != meal.items.last?.id { Divider() }
                     }
                 }.tinyLunchCard()
-                Label("Saved as estimated. Your original details stay unchanged.", systemImage: "lock")
-                    .font(.footnote).foregroundStyle(.secondary)
+                Label {
+                    Text("Saved as estimated. Your original details stay unchanged.")
+                        .fixedSize(horizontal: false, vertical: true)
+                } icon: {
+                    Image(systemName: "lock").accessibilityHidden(true)
+                }
+                .font(.footnote).foregroundStyle(.secondary)
+                Button(role: .destructive) { delete() } label: {
+                    AccessibleActionLabel(title: "Delete meal", systemImage: "trash")
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                }
+                .buttonStyle(.bordered)
+                .accessibilityIdentifier("deleteSavedMeal")
+                .accessibilityLabel("Delete meal")
+                .accessibilityHint("Asks you to confirm before deleting this meal.")
             }.padding(24)
         }
         .background(TinyLunchStyle.paper)

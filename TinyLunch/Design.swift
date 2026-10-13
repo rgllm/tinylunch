@@ -32,11 +32,64 @@ struct PrimaryAction: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.headline)
+            .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity, minHeight: 26).padding(.vertical, 16).padding(.horizontal, 20)
             .foregroundStyle(enabled ? .white : Color.secondary)
             .background(enabled ? TinyLunchStyle.button : TinyLunchStyle.soft, in: RoundedRectangle(cornerRadius: 22))
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+/// Icon and title that stack at accessibility sizes so the title wraps instead of truncating.
+struct AccessibleActionLabel: View {
+    let title: LocalizedStringKey
+    let systemImage: String
+    @Environment(\.dynamicTypeSize) private var typeSize
+    var body: some View {
+        if typeSize.isAccessibilitySize {
+            VStack(spacing: 6) {
+                Image(systemName: systemImage).accessibilityHidden(true)
+                Text(title)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+            }
+        } else {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage).accessibilityHidden(true)
+                Text(title).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+struct MedicalDisclaimer: View {
+    var prominent = true
+    private var message: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 10) {
+            Image(systemName: "cross.case")
+                .font(.subheadline)
+                .foregroundStyle(TinyLunchStyle.accent)
+                .accessibilityHidden(true)
+            Text("TinyLunch is not a medical device. These are estimates only, not medical or dietary advice. Consult a qualified professional for guidance about your health.")
+                .font(.subheadline)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("medicalDisclaimer")
+    }
+    var body: some View {
+        if prominent {
+            message
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
+        } else {
+            message.frame(maxWidth: .infinity, alignment: .leading)
+        }
     }
 }
 
@@ -77,9 +130,13 @@ struct EmojiPlate: View {
                 Text(foods[taps % foods.count]).font(.system(size: 88))
                     .rotationEffect(.degrees(taps.isMultiple(of: 2) ? -12 : 9))
                     .animation(reduceMotion ? nil : .spring(duration: 0.4, bounce: 0.35), value: taps)
+                    .accessibilityHidden(true)
                 Text("🍅").font(.system(size: 32)).rotationEffect(.degrees(18)).offset(x: 104, y: -64)
+                    .accessibilityHidden(true)
                 Text("🌿").font(.system(size: 33)).rotationEffect(.degrees(-20)).offset(x: -109, y: 64)
+                    .accessibilityHidden(true)
                 Image(systemName: "sparkle").font(.system(size: 17)).foregroundStyle(TinyLunchStyle.accent).offset(x: -115, y: -58)
+                    .accessibilityHidden(true)
             }.frame(maxWidth: .infinity).frame(height: 230).contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -107,9 +164,13 @@ struct SurpriseSheet: View {
                         .rotationEffect(.degrees(served && !reduceMotion ? -8 : 0))
                         .accessibilityHidden(true)
                     Text(kind == .chef ? (served ? "On the house." : "The chef’s table") : "A little toast.")
-                        .font(.system(.largeTitle, design: .rounded, weight: .bold)).multilineTextAlignment(.center)
+                        .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
                     Text(kind == .chef ? (served ? "One imaginary pancake. No need to log this one." : "You found our tiny kitchen. There’s always a seat for the curious.") : "To good food, good company, and remembering to eat before it gets cold.")
                         .foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                     if kind == .chef {
                         Button(served ? "Compliments to the chef" : "Surprise me") {
                             if served { dismiss() }
@@ -134,33 +195,57 @@ struct PrivacySheet: View {
         NavigationStack {
             List {
                 Section {
-                    Label("Your plate. Your business.", systemImage: "lock.iphone").font(.system(.title2, design: .rounded, weight: .bold))
+                    Text("Not a medical device")
+                        .font(.headline)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                    MedicalDisclaimer(prominent: false)
+                }
+                Section {
+                    Label {
+                        Text("Your plate. Your business.")
+                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .fixedSize(horizontal: false, vertical: true)
+                    } icon: {
+                        Image(systemName: "lock.iphone").accessibilityHidden(true)
+                    }
+                    .accessibilityAddTraits(.isHeader)
                     Text("TinyLunch is built for on-device estimates. Your food photos and meal details aren’t sent to a server.")
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Section("What stays") {
-                    Label("Only meals you choose to save", systemImage: "checkmark.circle")
-                    Label("Foods, portions, and estimates", systemImage: "list.bullet")
-                    Label("No saved photos", systemImage: "photo.badge.checkmark")
+                    wrappingLabel("Only meals you choose to save", systemImage: "checkmark.circle")
+                    wrappingLabel("Foods, portions, and estimates", systemImage: "list.bullet")
+                    wrappingLabel("No saved photos", systemImage: "photo.badge.checkmark")
                 }
                 Section {
                     Text("History stays on this iPhone and is excluded from backups. Deleting the app removes it. You can delete individual meals in History.")
+                        .fixedSize(horizontal: false, vertical: true)
                     Text("Apple may need to download its model first. Choosing an iCloud photo may also need a connection.")
-                }
-                Section("Estimates, not advice") {
-                    Text("Calories are model estimates, not lab measurements or medical advice. TinyLunch is not a medical device and does not diagnose, treat, or replace professional nutrition guidance.")
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Section {
                     Text("Estimating from a photo uses Apple Intelligence on this iPhone. If that on-device model isn’t available, History stays usable and new estimates wait until it is.")
+                        .fixedSize(horizontal: false, vertical: true)
                 } header: {
                     Text("Photo analysis")
                 } footer: {
                     Text("Adjust portions and preparation before saving. Unknown foods stay unknown instead of becoming zero.")
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
             .scrollContentBackground(.hidden).background(TinyLunchStyle.paper)
             .navigationTitle("Made to stay local").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() }.accessibilityHint("Closes About privacy.") } }
         }
         .presentationDragIndicator(.visible)
+    }
+
+    private func wrappingLabel(_ title: LocalizedStringKey, systemImage: String) -> some View {
+        Label {
+            Text(title).fixedSize(horizontal: false, vertical: true)
+        } icon: {
+            Image(systemName: systemImage).accessibilityHidden(true)
+        }
     }
 }

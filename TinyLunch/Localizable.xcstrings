@@ -278,9 +278,6 @@
     "Saved meal" : {
 
     },
-    "Saved on this iPhone. Swipe left to delete a meal." : {
-
-    },
     "Saving…" : {
 
     },
@@ -387,6 +384,114 @@
 
     },
     "Meals you save stay in this list, where you can open or delete them." : {
+
+    },
+    "TinyLunch is not a medical device. These are estimates only, not medical or dietary advice. Consult a qualified professional for guidance about your health." : {
+
+    },
+    "Not a medical device" : {
+
+    },
+    "Shows how TinyLunch stays on your iPhone and that it is not a medical device." : {
+
+    },
+    "Discards this unsaved meal." : {
+
+    },
+    "Opens the camera to photograph a meal." : {
+
+    },
+    "Estimates this meal on your iPhone." : {
+
+    },
+    "Photo analysis is unavailable." : {
+
+    },
+    "Selects a different photo." : {
+
+    },
+    "Selects one photo from your library." : {
+
+    },
+    "Opens the camera to replace this photo." : {
+
+    },
+    "Checks whether photo analysis is available." : {
+
+    },
+    "Preview of the meal you can analyze." : {
+
+    },
+    "Correct or remove this food." : {
+
+    },
+    "Adds a food by name for an on-device estimate." : {
+
+    },
+    "Saves meal details on this iPhone. The photo is not saved." : {
+
+    },
+    "Saving meal" : {
+
+    },
+    "Stops importing this photo." : {
+
+    },
+    "Stops this estimate and keeps your photo." : {
+
+    },
+    "The food to estimate." : {
+
+    },
+    "How the food was prepared. Changing this needs a new estimate." : {
+
+    },
+    "Enter a weight in grams. Changing only the grams updates the estimate on this iPhone." : {
+
+    },
+    "Sets the portion to half the original weight." : {
+
+    },
+    "Restores the original portion." : {
+
+    },
+    "Sets the portion to double the original weight." : {
+
+    },
+    "Applies the food, preparation, and portion." : {
+
+    },
+    "Dismisses the keyboard." : {
+
+    },
+    "Closes About privacy." : {
+
+    },
+    "Shows this saved meal. Use the Delete meal action to remove it." : {
+
+    },
+    "Saved on this iPhone. Choose Delete meal to remove one." : {
+
+    },
+    "Returns to the new meal screen." : {
+
+    },
+    "Loads saved meals again." : {
+
+    },
+    "Saved food. This record cannot be edited." : {
+
+    },
+    "Asks you to confirm before deleting this meal." : {
+
+    },
+    "Some food could not be estimated and is not included in this subtotal." : {
+
+    },
+    "Known foods subtotal. This is an estimate, not a measurement." : {
+
+    },
+    "Estimated meal total. This is an estimate, not a measurement." : {
 
     }
   },
