@@ -1,0 +1,207 @@
+name: iOS
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  simulator:
+    name: Build and test (iOS Simulator)
+    # xcode-27 is the GitHub-hosted macOS image that carries the Xcode 27 toolchains.
+    # macos-15 and macos-26 stop at the iOS 26 SDK, which cannot build this target.
+    runs-on: xcode-27
+    timeout-minutes: 45
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Select newest Xcode that supports iOS 27
+        id: xcode
+        run: |
+          python3 - <<'PY'
+          import json, os, re, subprocess, sys
+          from pathlib import Path
+
+          minimum = (27, 0)
+
+          def version_tuple(text):
+              numbers = re.findall(r"\d+", text)
+              return tuple(int(number) for number in numbers) or (0,)
+
+          def dotted(value):
+              return ".".join(str(part) for part in value)
+
+          def run(command, env):
+              completed = subprocess.run(
+                  command,
+                  env=env,
+                  text=True,
+                  stdout=subprocess.PIPE,
+                  stderr=subprocess.STDOUT,
+                  check=False,
+              )
+              return completed.returncode, completed.stdout
+
+          seen = set()
+          candidates = []
+          for app in sorted(Path("/Applications").glob("Xcode*.app")):
+              resolved = app.resolve()
+              if resolved in seen:
+                  continue
+              seen.add(resolved)
+              developer = resolved / "Contents" / "Developer"
+              xcodebuild = developer / "usr" / "bin" / "xcodebuild"
+              if not xcodebuild.is_file():
+                  continue
+              env = os.environ.copy()
+              env["DEVELOPER_DIR"] = str(developer)
+              status, output = run([str(xcodebuild), "-version"], env)
+              if status != 0 or not output.strip():
+                  print(f"skip {resolved}: xcodebuild -version failed\n{output}")
+                  continue
+              version_match = re.search(r"(\d+(?:\.\d+)*)", output.splitlines()[0])
+              if not version_match:
+                  print(f"skip {resolved}: no version in {output.splitlines()[0]!r}")
+                  continue
+              version = version_match.group(1)
+              status, sdks = run([str(xcodebuild), "-showsdks"], env)
+              if status != 0:
+                  print(f"skip {resolved}: xcodebuild -showsdks failed\n{sdks}")
+                  continue
+              simulator_sdks = [
+                  version_tuple(match)
+                  for match in re.findall(r"iphonesimulator(\d+(?:\.\d+)*)", sdks)
+              ]
+              if not simulator_sdks:
+                  print(f"found {resolved} Xcode {version}: no iOS Simulator SDK")
+                  continue
+              newest_sdk = max(simulator_sdks)
+              print(f"found {resolved} Xcode {version} iOS Simulator SDK {dotted(newest_sdk)}")
+              if newest_sdk >= minimum:
+                  candidates.append((version_tuple(version), str(developer), version, newest_sdk))
+
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          summary_path = Path(os.environ["GITHUB_STEP_SUMMARY"])
+          env_path = Path(os.environ["GITHUB_ENV"])
+
+          def write_output(**values):
+              with output_path.open("a", encoding="utf-8") as handle:
+                  for key, value in values.items():
+                      handle.write(f"{key}={value}\n")
+
+          if not candidates:
+              write_output(supported="false", xcode_version="", simulator_sdk="", destination="", simulator_name="")
+              with summary_path.open("a", encoding="utf-8") as handle:
+                  handle.write(
+                      "No installed Xcode provides an iOS Simulator SDK of 27.0 or newer. "
+                      "The deployment target is iOS 27.0.\n"
+                  )
+              sys.exit(0)
+
+          candidates.sort()
+          _, developer, version, sdk = candidates[-1]
+          env = os.environ.copy()
+          env["DEVELOPER_DIR"] = developer
+          status, listing = run(["xcrun", "simctl", "list", "devices", "available", "-j"], env)
+          destination = ""
+          simulator_name = ""
+          if status == 0:
+              devices = json.loads(listing).get("devices", {})
+              choices = []
+              for runtime, entries in devices.items():
+                  match = re.search(r"iOS-(\d+(?:-\d+)*)", runtime)
+                  if not match:
+                      continue
+                  runtime_version = version_tuple(match.group(1).replace("-", "."))
+                  if runtime_version < minimum:
+                      continue
+                  for device in entries:
+                      if not device.get("isAvailable", True):
+                          continue
+                      name = device.get("name", "")
+                      if not name.startswith("iPhone"):
+                          continue
+                      choices.append((runtime_version, name == "iPhone 17", device["udid"], name))
+              if choices:
+                  choices.sort()
+                  _, _, udid, simulator_name = choices[-1]
+                  destination = f"platform=iOS Simulator,id={udid}"
+          else:
+              print(listing)
+
+          write_output(
+              supported="true",
+              xcode_version=version,
+              simulator_sdk=dotted(sdk),
+              destination=destination,
+              simulator_name=simulator_name,
+          )
+          with env_path.open("a", encoding="utf-8") as handle:
+              handle.write(f"DEVELOPER_DIR={developer}\n")
+          with summary_path.open("a", encoding="utf-8") as handle:
+              handle.write(
+                  f"Selected Xcode {version} at `{developer}` "
+                  f"(iOS Simulator SDK {dotted(sdk)}).\n"
+              )
+              if simulator_name:
+                  handle.write(f"Test destination: {simulator_name}.\n")
+          print(f"selected Xcode {version} at {developer}")
+          print(f"destination: {destination or 'generic/platform=iOS Simulator'}")
+          PY
+
+      # continue-on-error applies only when this image has no iOS 27 SDK.
+      # A real compile or test failure still fails the job. GitHub-hosted
+      # macos-15 and macos-26 images do not ship the iOS 27 SDK; this job
+      # uses the xcode-27 image so that path should stay unused.
+      - name: Build for iOS Simulator
+        id: build
+        continue-on-error: ${{ steps.xcode.outputs.supported != 'true' }}
+        run: |
+          if [[ "${{ steps.xcode.outputs.supported }}" != "true" ]]; then
+            {
+              echo "### Build skipped: no iOS 27 SDK on this runner"
+              echo "TinyLunch's deployment target is iOS 27.0 (\`project.yml\`, \`IPHONEOS_DEPLOYMENT_TARGET\`)."
+              echo "This runner has no Xcode whose iOS Simulator SDK is 27.0 or newer, so \`xcodebuild\` cannot compile the app."
+              echo "The build step uses \`continue-on-error\` for that case only. Images without Xcode 27, including current macos-15 and macos-26 runners, stop at the iOS 26 SDK."
+            } | tee -a "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          destination="${{ steps.xcode.outputs.destination }}"
+          if [[ -z "$destination" ]]; then
+            destination="generic/platform=iOS Simulator"
+          fi
+          xcodebuild -version
+          xcodebuild \
+            -project TinyLunch.xcodeproj \
+            -scheme TinyLunch \
+            -destination "$destination" \
+            -derivedDataPath "${RUNNER_TEMP}/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Unit and UI tests
+        if: steps.xcode.outputs.supported == 'true'
+        run: |
+          destination="${{ steps.xcode.outputs.destination }}"
+          if [[ -z "$destination" ]]; then
+            echo "Xcode ${{ steps.xcode.outputs.xcode_version }} has an iOS 27 SDK, but no available iPhone simulator running iOS 27 or newer was found."
+            exit 1
+          fi
+          # Screenshot tests skip unless CAPTURE_APP_STORE_SCREENSHOTS=1.
+          # The remaining UI tests are a few app launches, so they run with the unit tests.
+          xcodebuild \
+            -project TinyLunch.xcodeproj \
+            -scheme TinyLunch \
+            -destination "$destination" \
+            -derivedDataPath "${RUNNER_TEMP}/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            test
