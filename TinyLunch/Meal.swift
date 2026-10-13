@@ -1,12 +1,22 @@
 import Foundation
 
-struct FoodItem: Codable, Identifiable, Equatable, Sendable {
+/// Where an item's kcal per 100 g came from.
+/// v1 always stores `estimated` and leaves the catalog fields empty. `database` is reserved for a bundled table.
+enum EnergyBasis: String, Codable, Equatable, Sendable {
+    case estimated
+    case database
+}
+
+struct FoodItem: Identifiable, Equatable, Sendable {
     var id = UUID()
     var name: String
     var grams: Double?
     var kcalPer100g: Double?
     var preparation: String
     var portionConfirmed = false
+    var energyBasis: EnergyBasis = .estimated
+    var catalogID: String?
+    var catalogVersion: String?
 
     // Bounds are input sanity checks, not confidence in model accuracy.
     var calories: Double? {
@@ -15,6 +25,48 @@ struct FoodItem: Codable, Identifiable, Equatable, Sendable {
               kcalPer100g.isFinite, kcalPer100g >= 0, kcalPer100g <= 1_000,
               !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return nil }
         return grams * kcalPer100g / 100
+    }
+}
+
+extension FoodItem: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case id, name, grams, kcalPer100g, preparation, portionConfirmed
+        case energyBasis, catalogID, catalogVersion
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        grams = try container.decodeIfPresent(Double.self, forKey: .grams)
+        kcalPer100g = try container.decodeIfPresent(Double.self, forKey: .kcalPer100g)
+        preparation = try container.decode(String.self, forKey: .preparation)
+        portionConfirmed = try container.decode(Bool.self, forKey: .portionConfirmed)
+        // Absent or null stays estimated so archives written before these fields open unchanged.
+        energyBasis = try container.decodeIfPresent(EnergyBasis.self, forKey: .energyBasis) ?? .estimated
+        catalogID = try container.decodeIfPresent(String.self, forKey: .catalogID)
+        catalogVersion = try container.decodeIfPresent(String.self, forKey: .catalogVersion)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encode(name, forKey: .name)
+        try container.encodeIfPresent(grams, forKey: .grams)
+        try container.encodeIfPresent(kcalPer100g, forKey: .kcalPer100g)
+        try container.encode(preparation, forKey: .preparation)
+        try container.encode(portionConfirmed, forKey: .portionConfirmed)
+        try container.encode(energyBasis, forKey: .energyBasis)
+        if let catalogID {
+            try container.encode(catalogID, forKey: .catalogID)
+        } else {
+            try container.encodeNil(forKey: .catalogID)
+        }
+        if let catalogVersion {
+            try container.encode(catalogVersion, forKey: .catalogVersion)
+        } else {
+            try container.encodeNil(forKey: .catalogVersion)
+        }
     }
 }
 
@@ -36,6 +88,8 @@ struct Meal: Codable, Identifiable, Equatable, Sendable {
 
 actor MealStore {
     private struct Archive: Codable {
+        /// Schema 1 includes optional per-item energy basis and catalog fields.
+        /// Missing keys decode as estimated and nil. Load does not rewrite old files.
         var schemaVersion = 1
         var meals: [Meal]
     }
