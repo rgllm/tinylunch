@@ -107,7 +107,7 @@ These cannot be done from the repo:
 1. App record exists: TinyLunch, Apple ID `6811014228`, bundle `com.rgllm.tinylunch`.
 2. Privacy and support are live at https://engino.pt/privacidade. App Privacy publication requires the publisher agreement.
 3. Four 6.9-inch screenshots are uploaded in home, review, history, dark-mode order.
-4. Sign into Xcode with team `F86KMMECSR`, export and upload `.build/TinyLunch-build24.xcarchive`, and select build 24. Existing build 23 was uploaded on 12 September using a beta SDK and declares iPhone and iPad support. Apple rejected it during Add for Review validation. Build 24 uses Xcode 27.0 (27A266a) and targets iPhone only.
+4. Upload 1.0.0 (25) with `.github/workflows/testflight.yml` (workflow_dispatch on `xcode-27`). It selects the release Xcode 27.0 SDK, not the beta toolchains on that image, and targets iPhone only. Existing build 23 was uploaded on 12 September using a beta SDK and declares iPhone and iPad support. Apple rejected it during Add for Review validation. Build 24 was a local iPhone-only archive with Xcode 27.0 (27A266a) and was not the store upload.
 5. Fill all App Review contact fields together, including the phone number supplied by the publisher. The contact fields were not persisted while the phone number was absent.
 6. Publish the Data Not Collected privacy answers after the publisher accepts Apple's declaration.
 7. Re-run Add for Review validation after replacing the build. Leave the final Submit for Review action to Rogério.

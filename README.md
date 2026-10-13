@@ -34,7 +34,7 @@ Listing copy, review notes, privacy answers, and remaining submission steps: `do
 ./scripts/archive.sh               # Release archive + IPA in .build/
 ```
 
-Upload from Xcode Organizer (Distribute App → App Store Connect). Command-line export needs an Apple Distribution certificate; this machine currently has only `Apple Development: Rogerio Moreira`. Prepared store version is 1.0.0 (build 24), following the existing uploaded build 23.
+Upload from Xcode Organizer (Distribute App → App Store Connect), or dispatch `.github/workflows/testflight.yml`. That workflow uses the release Xcode 27.0 iOS 27.0 SDK on the `xcode-27` runner, keeps the app iPhone-only, and cloud-signs with the App Store Connect API key. A local `scripts/archive.sh` export still needs an Apple Distribution certificate; this machine currently has only `Apple Development: Rogerio Moreira`. Prepared store version is 1.0.0 (build 25). Build 23 was rejected for a beta SDK and iPad support.
 
 ## Data and privacy
 
