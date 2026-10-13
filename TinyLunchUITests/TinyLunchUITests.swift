@@ -63,6 +63,33 @@ final class TinyLunchUITests: XCTestCase {
     }
 
 
+    @MainActor func testWordmarkStaysOneLineBelowTheStatusBar() {
+        assertWordmarkLayout(sizeCategory: "UICTContentSizeCategoryLarge")
+        assertWordmarkLayout(sizeCategory: "UICTContentSizeCategoryAccessibilityXL")
+    }
+
+    @MainActor private func assertWordmarkLayout(sizeCategory: String) {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "-UIPreferredContentSizeCategoryName", sizeCategory]
+        app.launch()
+        let title = app.staticTexts["tinyLunchWordmark"]
+        XCTAssertTrue(title.waitForExistence(timeout: 10), "Missing TinyLunch title at \(sizeCategory)")
+        XCTAssertEqual(title.label, "TinyLunch")
+        let frame = title.frame
+        XCTAssertFalse(frame.isEmpty)
+        XCTAssertGreaterThan(frame.width, frame.height * 1.5, "TinyLunch title wrapped at \(sizeCategory)")
+        let statusBar = app.statusBars.firstMatch
+        XCTAssertTrue(statusBar.waitForExistence(timeout: 2))
+        XCTAssertGreaterThanOrEqual(
+            frame.minY,
+            statusBar.frame.maxY - 1,
+            "TinyLunch title overlaps the status bar at \(sizeCategory)"
+        )
+        let window = app.windows.firstMatch.frame
+        XCTAssertGreaterThanOrEqual(frame.minX, window.minX - 1)
+        XCTAssertLessThanOrEqual(frame.maxX, window.maxX + 1)
+    }
+
     @MainActor func testLargestTextKeepsCaptureReachable() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset-history", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
