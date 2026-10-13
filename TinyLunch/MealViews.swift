@@ -55,20 +55,20 @@ struct FoodRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if item.energyBasis == .estimated {
                     Text("Estimated")
-                        .font(.body.weight(.semibold))
+                        .font(.headline)
                         .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Text(item.calories.map { "\($0.formatted(.number.precision(.fractionLength(0)))) kcal" } ?? "Not estimated")
-                    .font(.body.weight(.semibold)).foregroundStyle(TinyLunchStyle.accent)
+                    .font(.headline).foregroundStyle(TinyLunchStyle.accent)
                     .fixedSize(horizontal: false, vertical: true)
                 if let grams = item.grams {
                     Text("\(grams.formatted()) g · \(item.portionConfirmed ? "Confirmed portion" : "Suggested portion")")
-                        .font(.body).foregroundStyle(.primary)
+                        .font(.headline).foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if !item.preparation.isEmpty {
-                    Text(item.preparation).font(.body).foregroundStyle(.primary)
+                    Text(item.preparation).font(.headline).foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }
@@ -167,7 +167,6 @@ struct FoodEditor: View {
                             portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
                         }.padding(.vertical, 4)
                     }
-                } footer: {
                     Group {
                         if allowsIdentityEdit {
                             Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
@@ -175,7 +174,7 @@ struct FoodEditor: View {
                             Text("Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again.")
                         }
                     }
-                    .font(.body)
+                    .font(.headline)
                     .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 }.listRowBackground(TinyLunchStyle.card)
@@ -263,8 +262,7 @@ struct FoodEditor: View {
 
     private func portionButton(_ title: LocalizedStringKey, multiplier: Double, original: Double, hint: LocalizedStringKey) -> some View {
         Button(title) { grams = original * multiplier; portionChange += 1 }
-            .font(.subheadline.weight(.medium)).buttonStyle(.bordered).buttonBorderShape(.capsule)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .buttonStyle(ScaledTextButton())
             .disabled(original * multiplier > 10_000)
             .accessibilityHint(hint)
     }

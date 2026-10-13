@@ -323,13 +323,10 @@ struct CaptureView: View {
                 .accessibilityLabel("Add food")
                 .accessibilityHint(model.modelAvailability.allowsTextEstimate ? "Adds a food by name for an on-device estimate." : model.modelAvailability.explanation)
             }.padding(.horizontal, 18).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 26))
-            Label {
-                Text("Tap a food to correct it. Portions are suggestions until you confirm them.")
-                    .fixedSize(horizontal: false, vertical: true)
-            } icon: {
-                Image(systemName: "hand.tap").accessibilityHidden(true)
-            }
-            .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
+            Text("Tap a food to correct it. Portions are suggestions until you confirm them.")
+                .font(.headline)
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 

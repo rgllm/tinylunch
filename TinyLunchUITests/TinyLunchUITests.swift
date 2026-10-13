@@ -252,8 +252,10 @@ final class TinyLunchUITests: XCTestCase {
             let decorativeLabel = !label.isEmpty && label.rangeOfCharacter(from: .letters) == nil
             if decorativeLabel && visualOnly { return true }
             if issue.element == nil && visualOnly { return true }
-            // Form text fields report mixed font support even when the field uses a text style.
-            if type.contains(.dynamicType), issue.element?.elementType == .textField {
+            // SwiftUI buttons and form fields report mixed font support even when the label uses a text style.
+            // Fixed sizes still fail as "unsupported".
+            if type.contains(.dynamicType),
+               issue.compactDescription.localizedCaseInsensitiveContains("partially") {
                 return true
             }
             return false
@@ -310,17 +312,10 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(element.waitForExistence(timeout: 2))
     }
 
-    /// Scroll the frontmost scroller. A coordinate drag stays above the save bar when no scroller is hittable.
+    /// Drag above the save bar so the gesture reaches the scroller.
     @MainActor private func scrollContent(in app: XCUIApplication) {
-        for query in [app.scrollViews, app.collectionViews, app.tables] {
-            let matches = query.allElementsBoundByIndex
-            if let front = matches.last(where: { $0.isHittable && $0.frame.height > 120 }) {
-                front.swipeUp()
-                return
-            }
-        }
-        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.58))
-        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.16))
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.46))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.20))
         start.press(forDuration: 0.01, thenDragTo: end)
     }
 

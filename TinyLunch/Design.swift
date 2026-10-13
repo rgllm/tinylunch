@@ -77,7 +77,7 @@ struct MedicalDisclaimer: View {
                 .foregroundStyle(TinyLunchStyle.accent)
                 .accessibilityHidden(true)
             Text("TinyLunch is not a medical device. These are estimates only, not medical or dietary advice. Consult a qualified professional for guidance about your health.")
-                .font(.subheadline)
+                .font(.headline)
                 .foregroundStyle(.primary)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -90,7 +90,7 @@ struct MedicalDisclaimer: View {
             message
                 .padding(16)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
+                .background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 20))
         } else {
             message.frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -100,8 +100,8 @@ struct MedicalDisclaimer: View {
 struct ScaledTextButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.body)
-            .frame(minHeight: 44, alignment: .leading)
+            .font(.headline)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
     }
 }
@@ -121,7 +121,8 @@ struct FoodBadge: View {
         Text(emoji)
             .font(.title2)
             .frame(width: size, height: size)
-            .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: size * 0.3))
+            .background(TinyLunchStyle.soft, in: RoundedRectangle(cornerRadius: size * 0.3))
+            .clipped()
             .accessibilityHidden(true)
             .accessibilityIdentifier("decorativeGlyph")
     }
@@ -153,6 +154,7 @@ struct EmojiPlate: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 250)
+            .clipped()
             .overlay(alignment: .topTrailing) {
                 Text("🍅").font(.title).padding(.top, 12).padding(.trailing, 28)
                     .accessibilityHidden(true)
