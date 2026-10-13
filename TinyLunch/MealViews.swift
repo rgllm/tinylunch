@@ -36,6 +36,16 @@ struct FoodRow: View {
             if !typeSize.isAccessibilitySize { FoodBadge(name: item.name) }
             VStack(alignment: .leading, spacing: 6) {
                 Text(item.name).font(.headline).foregroundStyle(.primary)
+                if item.energyBasis == .estimated {
+                    Text("Estimated")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(TinyLunchStyle.accent)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 3)
+                        .background(TinyLunchStyle.soft, in: Capsule())
+                        .fixedSize(horizontal: true, vertical: false)
+                        .accessibilityLabel("Estimated")
+                }
                 Text(item.calories.map { "\($0.formatted(.number.precision(.fractionLength(0)))) kcal" } ?? "Not estimated")
                     .font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
                 if let grams = item.grams {

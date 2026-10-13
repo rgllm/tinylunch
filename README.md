@@ -41,7 +41,7 @@ Upload from Xcode Organizer (Distribute App → App Store Connect). Command-line
 - Food energy is a model estimate. Swift calculates `grams * kcalPer100g / 100` and the known-item subtotal. Unknown values remain unknown.
 - Portion sanity bounds are greater than zero through 10,000 g; energy bounds are zero through 1,000 kcal per 100 g. These prevent invalid arithmetic, not inaccurate model judgments.
 - `MealStore` writes a versioned JSON archive atomically in Application Support/TinyLunch, using complete file protection and excluding its directory from backups. There is no CloudKit, backend, analytics, or network client.
-- The archive contains meal IDs, timestamps, food data, assumptions, and estimator version. It contains no images or photo identifiers. Deleting a saved meal removes it from the archive. Device-only history is lost when the app is removed and is not backed up.
+- The archive contains meal IDs, timestamps, food data, assumptions, estimator version, each item's energy basis, and optional catalog id and version. This version saves every item as estimated and leaves the catalog fields empty. Archives written before those fields still open, and each omitted basis is read as estimated, without rewriting the file. It contains no images or photo identifiers. Deleting a saved meal removes it from the archive. Device-only history is lost when the app is removed and is not backed up.
 - Photo selection uses PhotosPicker; camera access is requested only on capture. Images remain in memory and are released after successful analysis or discard. An iCloud library image may need a system download to import.
 - Model downloads are managed by Apple. Real offline inference, memory/thermal behavior, and camera permissions require device verification.
 

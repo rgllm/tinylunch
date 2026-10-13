@@ -45,12 +45,14 @@ Keep the model as a **recognizer**, not as the nutrition table.
 5. Changing grams only rescales. Changing the food or cooking method invalidates the catalog row until a new match is confirmed.
 6. Save stores the snapshot. Opening History does not look up the catalog again.
 
-Suggested extra fields on a food item, without changing historical records in place:
+Fields already stored on each food item, so adding a catalog does not require a migration:
 
-- `energyBasis`: `catalog` or `model`
-- `catalogID` (stable source ID, for example an FDC ID)
-- `catalogVersion` (dataset name + release date)
+- `energyBasis`: `estimated` or `database`. This version always writes `estimated`.
+- `catalogID` (stable source ID, for example an FDC ID). Always nil in this version.
+- `catalogVersion` (dataset name + release date). Always nil in this version.
 - existing `kcalPer100g`, `grams`, `preparation`
+
+Archives saved before these fields decode as `estimated` with nil catalog values. Opening history does not rewrite them.
 
 Runtime lookup stays on-device. Downloads and CSV transforms belong in a development script. Do not call the USDA API, Open Food Facts, or any other network from the app.
 
@@ -91,8 +93,8 @@ Links:
 
 When the catalog is present:
 
-- Catalog hit after user confirmation or a single unambiguous match: `energyBasis = catalog`.
-- No hit: keep the model kcal if it passed validation, labeled as a model estimate; otherwise unknown.
+- Catalog hit after user confirmation or a single unambiguous match: `energyBasis = database`, with `catalogID` and `catalogVersion` copied from the row.
+- No hit: keep the model kcal if it passed validation, with `energyBasis = estimated`; otherwise unknown.
 - Never invent a catalog ID or source URL for a model value.
 
 This policy can change once measurement exists. It must be explicit in the UI.
