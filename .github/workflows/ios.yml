@@ -1,7 +1,9 @@
 name: iOS
 
 # Pull requests only. A push to main does not start a simulator.
-# Paths are the iOS app, its tests, the Xcode project, and this workflow file.
+# Paths are the iOS app, its tests, and the Xcode project. This workflow
+# file is not included: a pull request that only edits .github/workflows
+# must not start a macOS runner.
 on:
   pull_request:
     branches: [main]
@@ -11,7 +13,6 @@ on:
       - 'TinyLunchUITests/**'
       - 'project.yml'
       - 'TinyLunch.xcodeproj/**'
-      - '.github/workflows/ios.yml'
 
 permissions:
   contents: read
