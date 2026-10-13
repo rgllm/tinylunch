@@ -45,6 +45,9 @@ struct CaptureView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
+                    if typeSize.isAccessibilitySize {
+                        wordmark.frame(maxWidth: .infinity, alignment: .leading)
+                    }
                     if !model.modelAvailability.allowsPhotoAnalysis {
                         availabilityCard
                     }
@@ -54,13 +57,7 @@ struct CaptureView: View {
                         captureContent
                     }
                     if model.busy || model.importing {
-                        HStack(spacing: 16) {
-                            ProgressView()
-                            Text(model.importing ? "Importing photo…" : "Estimating on your iPhone…")
-                                .font(.subheadline)
-                            Spacer(minLength: 0)
-                            Button("Cancel") { model.cancel() }.font(.subheadline.weight(.semibold))
-                        }.tinyLunchCard()
+                        activityRow
                     }
                 }
                 .padding(.horizontal, 24).padding(.top, 18).padding(.bottom, 28)
@@ -68,21 +65,34 @@ struct CaptureView: View {
             .background(TinyLunchStyle.paper)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Text("TinyLunch").font(.system(.title, design: .rounded, weight: .bold)).tracking(-1.5)
-                        .foregroundStyle(TinyLunchStyle.accent).padding(.vertical, 6).fixedSize()
-                        .contentShape(Rectangle())
-                        .onLongPressGesture(minimumDuration: 1) { toast = true }
-                        .accessibilityLabel("TinyLunch")
-                        .accessibilityIdentifier("tinyLunchWordmark")
-                        .accessibilityAction(named: "A little toast") { toast = true }
-                }.sharedBackgroundVisibility(.hidden)
+                if !typeSize.isAccessibilitySize {
+                    ToolbarItem(placement: .topBarLeading) {
+                        wordmark
+                    }.sharedBackgroundVisibility(.hidden)
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if model.draft != nil || model.image != nil {
-                        Button("Start over", systemImage: "arrow.counterclockwise") { discard = true }
-                            .disabled(model.saving)
+                        Button { discard = true } label: {
+                            if typeSize.isAccessibilitySize {
+                                Image(systemName: "arrow.counterclockwise")
+                            } else {
+                                Label("Start over", systemImage: "arrow.counterclockwise")
+                            }
+                        }
+                        .accessibilityLabel("Start over")
+                        .accessibilityHint("Discards this unsaved meal.")
+                        .disabled(model.saving)
                     } else {
-                        Button("About privacy", systemImage: "lock.iphone") { privacy = true }
+                        Button { privacy = true } label: {
+                            if typeSize.isAccessibilitySize {
+                                Image(systemName: "lock.iphone")
+                            } else {
+                                Label("About privacy", systemImage: "lock.iphone")
+                            }
+                        }
+                        .accessibilityLabel("About privacy")
+                        .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
+                        .accessibilityIdentifier("aboutPrivacy")
                     }
                 }
             }
@@ -122,82 +132,147 @@ struct CaptureView: View {
         return VStack(spacing: 24) {
             if let image = model.image {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("Looking good.").font(.system(.largeTitle, design: .rounded, weight: .bold))
+                    Text("Looking good.")
+                        .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
                     Text("Keep the whole meal in view. You can adjust the estimate next.")
                         .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
                     Image(uiImage: image).resizable().scaledToFit().frame(maxHeight: 310)
                         .frame(maxWidth: .infinity).clipShape(RoundedRectangle(cornerRadius: 28))
                         .accessibilityLabel("Selected food photo")
+                        .accessibilityHint("Preview of the meal you can analyze.")
                 }
             } else if model.savedNotice {
                 VStack(spacing: 18) {
                     Text("🥡").font(.system(size: 94)).accessibilityHidden(true).padding(.top, 28)
-                    Label("Meal saved", systemImage: "checkmark.circle.fill")
-                        .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                    HStack(spacing: 8) {
+                        Image(systemName: "checkmark.circle.fill").accessibilityHidden(true)
+                        Text("Meal saved")
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                    .accessibilityElement(children: .combine)
+                    .accessibilityAddTraits(.isHeader)
                     Text("Tucked away in History.\nJust the details, never the photo.")
                         .foregroundStyle(.secondary).multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                 }.frame(maxWidth: .infinity).padding(.bottom, 22)
             } else if typeSize.isAccessibilitySize {
-                Text("Your next meal.").font(.system(.title, design: .rounded, weight: .bold))
+                Text("Your next meal.")
+                    .font(.system(.title, design: .rounded, weight: .bold))
+                    .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityAddTraits(.isHeader)
             } else {
                 VStack(spacing: 4) {
                     Text("A little insight.\nEvery bite.")
                         .font(.system(size: titleSize, weight: .bold, design: .rounded))
                         .tracking(-1.3).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
                     Text("Your plate, with a little perspective.")
                         .font(.subheadline).foregroundStyle(.secondary).padding(.top, 8)
                         .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
                     EmojiPlate().padding(.top, 12)
                 }
             }
 
+            if !typeSize.isAccessibilitySize { MedicalDisclaimer() }
+
             VStack(spacing: 12) {
                 if model.image != nil {
-                    Button { model.analyze() } label: { Label("Analyze meal", systemImage: "sparkles") }
-                        .buttonStyle(PrimaryAction())
-                        .disabled(!model.modelAvailability.allowsPhotoAnalysis || model.busy || model.importing)
-                        .accessibilityHint(model.modelAvailability.allowsPhotoAnalysis ? "Estimates this photo on your iPhone." : model.modelAvailability.explanation)
+                    Button { model.analyze() } label: {
+                        AccessibleActionLabel(title: "Analyze meal", systemImage: "sparkles")
+                    }
+                    .buttonStyle(PrimaryAction())
+                    .disabled(!model.modelAvailability.allowsPhotoAnalysis || model.busy || model.importing)
+                    .accessibilityLabel("Analyze meal")
+                    .accessibilityHint(model.modelAvailability.allowsPhotoAnalysis ? "Estimates this meal on your iPhone." : model.modelAvailability.explanation)
                 } else {
-                    Button { Task { await openCamera() } } label: { Label("Take photo", systemImage: "camera.fill") }
-                        .buttonStyle(PrimaryAction()).disabled(model.busy || model.importing)
+                    Button { Task { await openCamera() } } label: {
+                        AccessibleActionLabel(title: "Take photo", systemImage: "camera.fill")
+                    }
+                    .buttonStyle(PrimaryAction())
+                    .disabled(model.busy || model.importing)
+                    .accessibilityLabel("Take photo")
+                    .accessibilityHint("Opens the camera to photograph a meal.")
                 }
                 PhotosPicker(selection: $selection, matching: .images) {
-                    Label(hasImage ? "Replace photo" : "Choose photo", systemImage: "photo.on.rectangle")
-                        .font(.headline).frame(maxWidth: .infinity, minHeight: 52)
+                    AccessibleActionLabel(title: hasImage ? "Replace photo" : "Choose photo", systemImage: "photo.on.rectangle")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, minHeight: 52)
                         .background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 22))
-                }.disabled(model.busy || model.importing)
+                }
+                .disabled(model.busy || model.importing)
+                .accessibilityLabel(hasImage ? "Replace photo" : "Choose photo")
+                .accessibilityHint(hasImage ? "Selects a different photo." : "Selects one photo from your library.")
                 if model.image != nil {
-                    Button("Retake photo") { Task { await openCamera() } }
-                        .frame(minHeight: 44).disabled(model.busy || model.importing)
+                    Button { Task { await openCamera() } } label: {
+                        Text("Retake photo")
+                            .font(.headline)
+                            .multilineTextAlignment(.center)
+                            .fixedSize(horizontal: false, vertical: true)
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .disabled(model.busy || model.importing)
+                    .accessibilityHint("Opens the camera to replace this photo.")
                 }
             }
 
+            if typeSize.isAccessibilitySize { MedicalDisclaimer() }
+
             if typeSize.isAccessibilitySize && model.image == nil && !model.savedNotice { EmojiPlate() }
             Button { privacy = true } label: {
-                Label("On your iPhone. Just for you.", systemImage: "lock.shield")
-                    .font(.footnote).foregroundStyle(.secondary).frame(minHeight: 44)
-            }.buttonStyle(.plain)
+                AccessibleActionLabel(title: "On your iPhone. Just for you.", systemImage: "lock.shield")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("On your iPhone. Just for you.")
+            .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
         }
     }
 
     private func review(_ meal: Meal) -> some View {
         VStack(alignment: .leading, spacing: 24) {
             VStack(alignment: .leading, spacing: 6) {
-                Text("Let’s take a look.").font(.system(.largeTitle, design: .rounded, weight: .bold))
-                Text("A starting point, with room to adjust.").foregroundStyle(.secondary)
+                Text("Let’s take a look.")
+                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                Text("A starting point, with room to adjust.")
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             MealSummary(meal: meal)
-            HStack {
-                Text("On your plate").font(.system(.title3, design: .rounded, weight: .bold))
-                Spacer()
-                Text("\(meal.items.count) items").font(.subheadline).foregroundStyle(.secondary)
+            MedicalDisclaimer()
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("On your plate")
+                        .font(.system(.title3, design: .rounded, weight: .bold))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                    Text("\(meal.items.count) items")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                        .accessibilityLabel("\(meal.items.count) items")
+                }
+            } else {
+                HStack {
+                    Text("On your plate").font(.system(.title3, design: .rounded, weight: .bold))
+                        .accessibilityAddTraits(.isHeader)
+                    Spacer()
+                    Text("\(meal.items.count) items").font(.subheadline).foregroundStyle(.secondary)
+                }
             }
             VStack(spacing: 0) {
                 ForEach(meal.items) { item in
                     HStack(alignment: .top, spacing: 8) {
                         Button { editing = item } label: { FoodRow(item: item) }
                             .buttonStyle(.plain).frame(maxWidth: .infinity, alignment: .leading)
+                            .accessibilityLabel(item.accessibilityDescription)
                             .accessibilityHint("Edit this food and its portion.")
                             .accessibilityIdentifier("editFood-\(item.name)")
                         Menu {
@@ -206,41 +281,100 @@ struct CaptureView: View {
                                 model.draft?.items.removeAll { $0.id == item.id }
                             }
                         } label: {
-                            Image(systemName: "ellipsis").frame(width: 44, height: 44)
-                        }.accessibilityLabel("Options for \(item.name)")
+                            Image(systemName: "ellipsis")
+                                .font(.body)
+                                .frame(minWidth: 44, minHeight: 44)
+                        }
+                        .accessibilityLabel("Options for \(item.name)")
+                        .accessibilityHint("Correct or remove this food.")
                     }.padding(.vertical, 16).disabled(model.busy || model.saving)
                     if item.id != meal.items.last?.id { Divider() }
                 }
                 if meal.items.isEmpty {
                     Text("Nothing on the plate yet. Add a food to continue.")
-                        .foregroundStyle(.secondary).padding(.vertical, 20)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 20)
                 }
                 Divider()
-                Button("Add food", systemImage: "plus.circle") {
+                Button {
                     editing = FoodItem(name: "", grams: nil, kcalPer100g: nil, preparation: "")
-                }.font(.headline).frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
-                    .disabled(model.busy || model.saving || !model.modelAvailability.allowsTextEstimate)
-                    .accessibilityHint(model.modelAvailability.allowsTextEstimate ? "Add a food for an on-device estimate." : model.modelAvailability.explanation)
+                } label: {
+                    AccessibleActionLabel(title: "Add food", systemImage: "plus.circle")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
+                }
+                .disabled(model.busy || model.saving || !model.modelAvailability.allowsTextEstimate)
+                .accessibilityLabel("Add food")
+                .accessibilityHint(model.modelAvailability.allowsTextEstimate ? "Adds a food by name for an on-device estimate." : model.modelAvailability.explanation)
             }.padding(.horizontal, 18).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 26))
-            Label("Tap a food to correct it. Portions are suggestions until you confirm them.", systemImage: "hand.tap")
-                .font(.footnote).foregroundStyle(.secondary)
+            Label {
+                Text("Tap a food to correct it. Portions are suggestions until you confirm them.")
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "hand.tap").accessibilityHidden(true)
+            }
+            .font(.footnote).foregroundStyle(.secondary)
         }
     }
 
     private func saveBar(_ meal: Meal) -> some View {
         VStack(spacing: 8) {
             Button { Task { await model.save() } } label: {
-                HStack {
-                    if model.saving { ProgressView().tint(.white) }
+                HStack(alignment: .center, spacing: 8) {
+                    if model.saving {
+                        ProgressView().tint(.white).accessibilityHidden(true)
+                    }
                     Text(model.saving ? "Saving…" : "Save meal")
-                    Spacer()
-                    Image(systemName: "arrow.down.to.line")
+                        .multilineTextAlignment(typeSize.isAccessibilitySize ? .center : .leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: typeSize.isAccessibilitySize ? .center : .leading)
+                    if !model.saving && !typeSize.isAccessibilitySize {
+                        Image(systemName: "arrow.down.to.line").accessibilityHidden(true)
+                    }
                 }
             }.buttonStyle(PrimaryAction())
                 .disabled(model.busy || model.saving || meal.items.isEmpty || !model.historyLoaded)
                 .accessibilityIdentifier("saveMeal")
-            Text("Only the details. Never the photo.").font(.caption).foregroundStyle(.secondary)
+                .accessibilityLabel(model.saving ? "Saving meal" : "Save meal")
+                .accessibilityHint("Saves meal details on this iPhone. The photo is not saved.")
+            Text("Only the details. Never the photo.")
+                .font(.caption).foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }.padding(.horizontal, 24).padding(.top, 14).padding(.bottom, 10).background(.regularMaterial)
+    }
+
+    private var wordmark: some View {
+        Text("TinyLunch")
+            .font(.system(.title, design: .rounded, weight: .bold))
+            .tracking(typeSize >= .xxxLarge ? 0 : -1.5)
+            .foregroundStyle(TinyLunchStyle.accent)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+            .onLongPressGesture(minimumDuration: 1) { toast = true }
+            .accessibilityLabel("TinyLunch")
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityIdentifier("tinyLunchWordmark")
+            .accessibilityAction(named: "A little toast") { toast = true }
+    }
+
+    private var activityRow: some View {
+        let status = model.importing ? "Importing photo…" : "Estimating on your iPhone…"
+        return HStack(alignment: .center, spacing: 16) {
+            ProgressView().accessibilityHidden(true)
+            Text(status)
+                .font(.subheadline)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityAddTraits(.updatesFrequently)
+            Button("Cancel") { model.cancel() }
+                .font(.subheadline.weight(.semibold))
+                .frame(minHeight: 44)
+                .accessibilityHint(model.importing ? "Stops importing this photo." : "Stops this estimate and keeps your photo.")
+        }
+        .tinyLunchCard()
     }
 
     private var availabilityCard: some View {
@@ -281,11 +415,15 @@ struct AnalysisAvailabilityCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Label(state.title, systemImage: state.symbol)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-                .accessibilityIdentifier("photoAnalysisUnavailable")
+            Label {
+                Text(state.title).fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: state.symbol).accessibilityHidden(true)
+            }
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(.primary)
+            .accessibilityLabel(state.title)
+            .accessibilityIdentifier("photoAnalysisUnavailable")
             Text(state.explanation)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -297,6 +435,7 @@ struct AnalysisAvailabilityCard: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
         .accessibilityElement(children: .contain)
+        .accessibilityLabel(state.title)
         .accessibilityIdentifier("analysisUnavailableCard")
     }
 
@@ -329,7 +468,11 @@ struct AnalysisAvailabilityCard: View {
             case .openHistory: openHistory()
             }
         } label: {
-            Label(action.title, systemImage: action.symbol)
+            Label {
+                Text(action.title).fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: action.symbol).accessibilityHidden(true)
+            }
         }
         .buttonStyle(.borderless)
         .font(.subheadline.weight(.semibold))

@@ -105,4 +105,129 @@ final class TinyLunchUITests: XCTestCase {
         cancel.tap()
     }
 
+    @MainActor func testMedicalDisclaimerOnReviewAboutAndSavedMeal() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
+        app.launch()
+        assertVisibleDisclaimer(in: app)
+
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--reset-history"]
+        app.launch()
+        let aboutButton = app.buttons["aboutPrivacy"]
+        XCTAssertTrue(aboutButton.waitForExistence(timeout: 10))
+        aboutButton.tap()
+        XCTAssertTrue(app.staticTexts["Not a medical device"].waitForExistence(timeout: 5))
+        assertVisibleDisclaimer(in: app)
+        app.buttons["Done"].tap()
+
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
+        app.launch()
+        XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
+        app.buttons["saveMeal"].tap()
+        app.tabBars.buttons["History"].tap()
+        let saved = app.staticTexts["Rice, Unidentified sauce"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        saved.tap()
+        assertVisibleDisclaimer(in: app)
+        XCTAssertTrue(app.buttons["deleteSavedMeal"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor func testAccessibilityAuditMainFlow() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
+        try app.performAccessibilityAudit()
+        app.buttons["aboutPrivacy"].tap()
+        XCTAssertTrue(app.staticTexts["Not a medical device"].waitForExistence(timeout: 5))
+        try app.performAccessibilityAudit()
+        app.buttons["Done"].tap()
+
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
+        app.launch()
+        XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
+        try app.performAccessibilityAudit()
+        app.buttons["editFood-Rice"].tap()
+        XCTAssertTrue(app.buttons["Apply"].waitForExistence(timeout: 5))
+        try app.performAccessibilityAudit()
+        app.buttons["Cancel"].tap()
+        app.buttons["saveMeal"].tap()
+        app.tabBars.buttons["History"].tap()
+        let saved = app.staticTexts["Rice, Unidentified sauce"]
+        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        try app.performAccessibilityAudit()
+        saved.tap()
+        XCTAssertTrue(app.buttons["deleteSavedMeal"].waitForExistence(timeout: 5))
+        try app.performAccessibilityAudit()
+    }
+
+    @MainActor func testDynamicTypeReviewEditSaveAndHistory() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        let disclaimer = app.descendants(matching: .any)["medicalDisclaimer"]
+        XCTAssertTrue(disclaimer.waitForExistence(timeout: 10))
+        reveal(disclaimer, in: app)
+        XCTAssertTrue(disclaimer.isHittable)
+        assertFullyInside(disclaimer, of: app)
+        let save = app.buttons["saveMeal"]
+        reveal(save, in: app)
+        XCTAssertTrue(save.isHittable)
+        assertFullyInside(save, of: app)
+        let rice = app.buttons["editFood-Rice"]
+        reveal(rice, in: app)
+        XCTAssertTrue(rice.isHittable)
+        rice.tap()
+        let grams = app.textFields["portionGrams"]
+        XCTAssertTrue(grams.waitForExistence(timeout: 5) || app.textFields["Portion in grams"].exists)
+        XCTAssertTrue(app.buttons["Half"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Double"].exists)
+        let apply = app.buttons["Apply"]
+        reveal(apply, in: app)
+        XCTAssertTrue(apply.isHittable)
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["Apply"].waitForNonExistence(timeout: 5))
+        reveal(save, in: app)
+        save.tap()
+        app.tabBars.buttons["History"].tap()
+        let title = app.staticTexts["Rice, Unidentified sauce"]
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        reveal(title, in: app)
+        title.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["medicalDisclaimer"].waitForExistence(timeout: 5))
+        let delete = app.buttons["deleteSavedMeal"]
+        reveal(delete, in: app)
+        XCTAssertTrue(delete.isHittable)
+    }
+
+    @MainActor private func assertVisibleDisclaimer(in app: XCUIApplication) {
+        let element = app.descendants(matching: .any)["medicalDisclaimer"]
+        XCTAssertTrue(element.waitForExistence(timeout: 10))
+        XCTAssertTrue(element.label.localizedCaseInsensitiveContains("not a medical device"))
+        XCTAssertTrue(element.label.contains("estimates only"))
+        XCTAssertTrue(element.label.contains("not medical or dietary advice"))
+        XCTAssertTrue(element.label.contains("Consult a qualified professional"))
+    }
+
+    @MainActor private func reveal(_ element: XCUIElement, in app: XCUIApplication) {
+        var attempts = 0
+        while !element.isHittable && attempts < 8 {
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.72))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.42))
+            start.press(forDuration: 0.01, thenDragTo: end)
+            attempts += 1
+        }
+    }
+
+    @MainActor private func assertFullyInside(_ element: XCUIElement, of app: XCUIApplication) {
+        let window = app.windows.firstMatch.frame
+        let frame = element.frame
+        XCTAssertFalse(frame.isEmpty)
+        XCTAssertGreaterThanOrEqual(frame.minX, window.minX - 1)
+        XCTAssertLessThanOrEqual(frame.maxX, window.maxX + 1)
+    }
+
 }
