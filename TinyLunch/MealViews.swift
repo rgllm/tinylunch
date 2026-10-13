@@ -55,23 +55,26 @@ struct FoodRow: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 if item.energyBasis == .estimated {
                     Text("Estimated")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(TinyLunchStyle.ink)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Text(item.calories.map { "\($0.formatted(.number.precision(.fractionLength(0)))) kcal" } ?? "Not estimated")
-                    .font(.subheadline.weight(.semibold)).foregroundStyle(TinyLunchStyle.accent)
+                    .font(.body.weight(.semibold)).foregroundStyle(TinyLunchStyle.accent)
                     .fixedSize(horizontal: false, vertical: true)
                 if let grams = item.grams {
                     Text("\(grams.formatted()) g · \(item.portionConfirmed ? "Confirmed portion" : "Suggested portion")")
-                        .font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
+                        .font(.body).foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if !item.preparation.isEmpty {
-                    Text(item.preparation).font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
+                    Text(item.preparation).font(.body).foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-            }.frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 2)
+            .background(TinyLunchStyle.card)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(item.accessibilityDescription)
@@ -126,20 +129,9 @@ struct FoodEditor: View {
     }
     var body: some View {
         NavigationStack {
+            VStack(spacing: 0) {
+            editorBanner
             Form {
-                Section {
-                    if typeSize.isAccessibilitySize {
-                        VStack(alignment: .leading, spacing: 8) {
-                            FoodBadge(name: name, size: 54)
-                            editorIntro
-                        }.padding(.vertical, 6)
-                    } else {
-                        HStack(spacing: 14) {
-                            FoodBadge(name: name, size: 54)
-                            editorIntro
-                        }.padding(.vertical, 6)
-                    }
-                }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
                     TextField("Food name", text: $name)
@@ -183,8 +175,8 @@ struct FoodEditor: View {
                             Text("Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again.")
                         }
                     }
-                    .font(.footnote)
-                    .foregroundStyle(TinyLunchStyle.ink)
+                    .font(.body)
+                    .foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                 }.listRowBackground(TinyLunchStyle.card)
                 if busy {
@@ -218,6 +210,7 @@ struct FoodEditor: View {
                 .padding(.horizontal, 24).padding(.top, 12).padding(.bottom, 8)
                 .background(TinyLunchStyle.paper)
             }
+            }
         }
         .presentationDragIndicator(.visible)
         .sensoryFeedback(.selection, trigger: portionChange)
@@ -229,6 +222,26 @@ struct FoodEditor: View {
             .foregroundStyle(TinyLunchStyle.ink)
             .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityAddTraits(.isHeader)
+    }
+
+    private var editorBanner: some View {
+        Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    FoodBadge(name: name, size: 54)
+                    editorIntro
+                }
+            } else {
+                HStack(spacing: 14) {
+                    FoodBadge(name: name, size: 54)
+                    editorIntro
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(TinyLunchStyle.card)
     }
 
     private var editorIntro: some View {

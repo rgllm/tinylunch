@@ -481,15 +481,17 @@ struct AnalysisAvailabilityCard: View {
     }
 
     private func button(_ action: AnalysisAvailabilityState.Action) -> some View {
-        Button(action.title) {
+        Button {
             switch action {
             case .openSettings: openSettings()
             case .retry: retry()
             case .openHistory: openHistory()
             }
+        } label: {
+            Text(action.title)
+                .foregroundStyle(TinyLunchStyle.accent)
         }
         .buttonStyle(ScaledTextButton())
-        .foregroundStyle(TinyLunchStyle.accent)
         .accessibilityIdentifier(action.accessibilityIdentifier)
     }
 }

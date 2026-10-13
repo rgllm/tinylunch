@@ -178,6 +178,8 @@ final class TinyLunchUITests: XCTestCase {
         app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
         app.launch()
         XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
+        let preparation = app.staticTexts["Cooked; example data"]
+        reveal(preparation, in: app)
         try audit(app)
         let rice = app.buttons["editFood-Rice"]
         XCTAssertTrue(rice.waitForExistence(timeout: 5))
@@ -192,6 +194,7 @@ final class TinyLunchUITests: XCTestCase {
         try audit(app)
         saved.tap()
         XCTAssertTrue(app.buttons["deleteSavedMeal"].waitForExistence(timeout: 5))
+        reveal(app.staticTexts["Cooked; example data"], in: app)
         try audit(app)
     }
 

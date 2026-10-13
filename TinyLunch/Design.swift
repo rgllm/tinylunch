@@ -100,7 +100,7 @@ struct MedicalDisclaimer: View {
 struct ScaledTextButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .font(.body.weight(.semibold))
+            .font(.body)
             .frame(minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
     }
