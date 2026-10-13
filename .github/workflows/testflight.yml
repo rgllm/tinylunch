@@ -1,9 +1,13 @@
 name: TestFlight
 
-# Manual only. Secrets are not available to pull-request runs, and this
-# uploads a build. Dispatch it from main after the App Store Connect key is set.
+# Not on pull requests: this uploads a build and needs Actions secrets.
+# workflow_dispatch stays for a token that can dispatch. Pushing a
+# testflight/* tag (for example testflight/1.0.0-25) starts the same job.
 on:
   workflow_dispatch:
+  push:
+    tags:
+      - 'testflight/*'
 
 permissions:
   contents: read
