@@ -349,6 +349,45 @@
     },
     "Your saved meals, just as you left them." : {
 
+    },
+    "This iPhone can’t estimate meals" : {
+
+    },
+    "Apple Intelligence isn’t available on this device, so photo analysis stays off. Open History to view or delete saved meals." : {
+
+    },
+    "Apple Intelligence is turned off" : {
+
+    },
+    "Turn it on in Settings, under Apple Intelligence & Siri, then return to TinyLunch. Estimates stay on this iPhone. History stays available while it’s off." : {
+
+    },
+    "The on-device model isn’t ready" : {
+
+    },
+    "Apple is still downloading or preparing Apple Intelligence. That download is handled by the system. Try again when it finishes. History stays available." : {
+
+    },
+    "Photo analysis isn’t available" : {
+
+    },
+    "This on-device model can’t look at photos. Saved meals in History can still be opened and deleted." : {
+
+    },
+    "The on-device model is unavailable right now. Try again in a moment, or open History. Saved meals stay on this iPhone." : {
+
+    },
+    "Open History" : {
+
+    },
+    "Try again" : {
+
+    },
+    "Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again." : {
+
+    },
+    "Meals you save stay in this list, where you can open or delete them." : {
+
     }
   },
   "version" : "1.0"

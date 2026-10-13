@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		0D94D56A81CDB6BCBFD05186 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = 0B06FCD67527770037D776F8 /* Localizable.xcstrings */; };
+		B8D4F302E129786DA04F5643 /* AnalysisAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7C3E2F1D018675C93E45F32 /* AnalysisAvailabilityTests.swift */; };
+		F5B2D1E0C907564B82D34E21 /* AnalysisAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4A1C0D9B8F7465A91C23D10 /* AnalysisAvailability.swift */; };
 		2B79A803082FDFBABD9723EF /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5EBEAD6E04AA36278BFAB289 /* HistoryView.swift */; };
 		31B4C722B761A6DCEA59BD7D /* MealViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB9A18A489D99436E2441631 /* MealViews.swift */; };
 		343E04F6EBAF9A4542AA5BB3 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 362409DD09B5B3CD093931E7 /* AppModel.swift */; };
@@ -43,6 +45,8 @@
 
 /* Begin PBXFileReference section */
 		0727B9B884BB2C5F8293A67D /* Estimator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Estimator.swift; sourceTree = "<group>"; };
+		A7C3E2F1D018675C93E45F32 /* AnalysisAvailabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisAvailabilityTests.swift; sourceTree = "<group>"; };
+		E4A1C0D9B8F7465A91C23D10 /* AnalysisAvailability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysisAvailability.swift; sourceTree = "<group>"; };
 		0B06FCD67527770037D776F8 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		190A89FE6EB7B9E0090D53C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		21280533A6D0AE90A7D88856 /* TinyLunchTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TinyLunchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -66,6 +70,7 @@
 		12E1A4F3494EBC4979A72939 /* TinyLunchTests */ = {
 			isa = PBXGroup;
 			children = (
+				A7C3E2F1D018675C93E45F32 /* AnalysisAvailabilityTests.swift */,
 				650350A2620F6983B1CBE47E /* TinyLunchTests.swift */,
 			);
 			path = TinyLunchTests;
@@ -94,6 +99,7 @@
 		B3EDFC037618EEE4BCD7D2AC /* TinyLunch */ = {
 			isa = PBXGroup;
 			children = (
+				E4A1C0D9B8F7465A91C23D10 /* AnalysisAvailability.swift */,
 				362409DD09B5B3CD093931E7 /* AppModel.swift */,
 				190A89FE6EB7B9E0090D53C8 /* Assets.xcassets */,
 				EE78469864BF30B2B0F388E1 /* CameraView.swift */,
@@ -248,6 +254,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F5B2D1E0C907564B82D34E21 /* AnalysisAvailability.swift in Sources */,
 				343E04F6EBAF9A4542AA5BB3 /* AppModel.swift in Sources */,
 				A21D86756F425C301B125599 /* CameraView.swift in Sources */,
 				428C3623DB7ABD45B69EB808 /* Design.swift in Sources */,
@@ -264,6 +271,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B8D4F302E129786DA04F5643 /* AnalysisAvailabilityTests.swift in Sources */,
 				90C014E7BACD5D588D758EE6 /* TinyLunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

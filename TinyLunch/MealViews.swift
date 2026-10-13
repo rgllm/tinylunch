@@ -63,6 +63,7 @@ struct FoodRow: View {
 struct FoodEditor: View {
     let item: FoodItem
     let busy: Bool
+    let allowsIdentityEdit: Bool
     var cancel: () -> Void
     var commit: (String, String, Double?) -> Void
     @Environment(\.dismiss) private var dismiss
@@ -72,9 +73,10 @@ struct FoodEditor: View {
     @State private var grams: Double?
     @FocusState private var portionFocused: Bool
     @State private var portionChange = 0
-    init(item: FoodItem, busy: Bool, cancel: @escaping () -> Void, commit: @escaping (String, String, Double?) -> Void) {
+    init(item: FoodItem, busy: Bool, allowsIdentityEdit: Bool = true, cancel: @escaping () -> Void, commit: @escaping (String, String, Double?) -> Void) {
         self.item = item
         self.busy = busy
+        self.allowsIdentityEdit = allowsIdentityEdit
         self.cancel = cancel
         self.commit = commit
         _name = State(initialValue: item.name)
@@ -100,7 +102,9 @@ struct FoodEditor: View {
                 }.listRowBackground(TinyLunchStyle.card)
                 Section("Food") {
                     TextField("Food name", text: $name).accessibilityIdentifier("foodName")
+                        .disabled(!allowsIdentityEdit)
                     TextField("Preparation and assumptions", text: $preparation, axis: .vertical)
+                        .disabled(!allowsIdentityEdit)
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     HStack {
@@ -119,7 +123,11 @@ struct FoodEditor: View {
                         }.padding(.vertical, 4)
                     }
                 } header: { Text("Portion") } footer: {
-                    Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
+                    if allowsIdentityEdit {
+                        Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
+                    } else {
+                        Text("Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again.")
+                    }
                 }.listRowBackground(TinyLunchStyle.card)
                 if busy {
                     Section { ProgressView("Updating estimate…") }

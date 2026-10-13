@@ -4,7 +4,7 @@ import FoundationModels
 import ImageIO
 
 protocol FoodEstimating: Sendable {
-    func availability() async -> String?
+    func availability() async -> AnalysisAvailabilityState
     func analyze(_ image: Data) async throws -> [FoodItem]
     func estimate(name: String, preparation: String) async throws -> FoodItem
 }
@@ -18,7 +18,7 @@ enum EstimateError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .imageInputUnavailable:
-            return "This on-device model cannot analyze photos. Your saved meals remain available."
+            return AnalysisAvailabilityState.visionUnavailable.explanation
         case .unavailable(let message):
             return message
         case .unreadableImage:
@@ -105,15 +105,12 @@ actor AppleEstimator: FoodEstimating {
         var assumptions: String
     }
 
-    func availability() -> String? {
+    func availability() -> AnalysisAvailabilityState {
         let model = SystemLanguageModel(useCase: .general)
-        if let message = Self.availabilityMessage(for: model) {
-            return message
-        }
-        guard model.capabilities.contains(.vision) else {
-            return EstimateError.imageInputUnavailable.errorDescription
-        }
-        return nil
+        return AnalysisAvailabilityMapping.state(
+            availability: model.availability,
+            supportsVision: Self.supportsVision(model)
+        )
     }
 
     func analyze(_ image: Data) async throws -> [FoodItem] {
@@ -182,28 +179,24 @@ actor AppleEstimator: FoodEstimating {
 
     private func onDeviceModel(requiresVision: Bool) throws -> SystemLanguageModel {
         let model = SystemLanguageModel(useCase: .general)
-        if let message = Self.availabilityMessage(for: model) {
-            throw EstimateError.unavailable(message)
-        }
-        if requiresVision, !model.capabilities.contains(.vision) {
-            throw EstimateError.imageInputUnavailable
+        let state = AnalysisAvailabilityMapping.state(
+            availability: model.availability,
+            supportsVision: Self.supportsVision(model)
+        )
+        if requiresVision {
+            guard state.allowsPhotoAnalysis else {
+                if state.status == .visionUnavailable { throw EstimateError.imageInputUnavailable }
+                throw EstimateError.unavailable(state.explanation)
+            }
+        } else if !state.allowsTextEstimate {
+            throw EstimateError.unavailable(state.explanation)
         }
         return model
     }
 
-    private static func availabilityMessage(for model: SystemLanguageModel) -> String? {
-        switch model.availability {
-        case .available:
-            return nil
-        case .unavailable(.appleIntelligenceNotEnabled):
-            return "Turn on Apple Intelligence in Settings to estimate meals on this iPhone."
-        case .unavailable(.modelNotReady):
-            return "Apple’s on-device model is not ready. Allow its system download to finish, then retry."
-        case .unavailable(.deviceNotEligible):
-            return "This device does not support Apple’s on-device model. Your saved meals remain available."
-        @unknown default:
-            return "The on-device model is unavailable. Your saved meals remain available."
-        }
+    private static func supportsVision(_ model: SystemLanguageModel) -> Bool {
+        guard case .available = model.availability else { return false }
+        return model.capabilities.contains(.vision)
     }
 
     private static func cgImage(from data: Data) throws -> CGImage {
@@ -244,7 +237,7 @@ actor AppleEstimator: FoodEstimating {
             }
         }
         if case .assetsUnavailable = error as? SystemLanguageModel.Error {
-            return EstimateError.unavailable("Apple’s on-device model is not ready. Allow its system download to finish, then retry.")
+            return EstimateError.unavailable(AnalysisAvailabilityState.modelNotReady.explanation)
         }
         return EstimateError.unavailable("The meal could not be estimated. Your photo is still here so you can retry.")
     }
@@ -253,7 +246,7 @@ actor AppleEstimator: FoodEstimating {
 #if DEBUG
 /// Available only through explicit UI test launch arguments, never the normal app flow.
 struct FixtureEstimator: FoodEstimating {
-    func availability() async -> String? { nil }
+    func availability() async -> AnalysisAvailabilityState { .ready }
     func analyze(_ image: Data) async throws -> [FoodItem] {
         [FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked; example data"),
          FoodItem(name: "Unidentified sauce", grams: nil, kcalPer100g: nil, preparation: "Unknown; example data")]

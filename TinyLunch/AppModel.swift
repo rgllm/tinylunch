@@ -7,7 +7,7 @@ final class AppModel {
     var meals: [Meal] = []
     var draft: Meal?
     var image: UIImage?
-    var unavailable: String?
+    var modelAvailability = AnalysisAvailabilityState.ready
     var error: String?
     var busy = false
     var saving = false
@@ -25,7 +25,7 @@ final class AppModel {
     }
 
     func refresh() async {
-        unavailable = await estimator.availability()
+        modelAvailability = await estimator.availability()
         do {
             #if DEBUG
             if ProcessInfo.processInfo.arguments.contains("--marketing-history") {
@@ -104,7 +104,7 @@ final class AppModel {
     }
 
     func analyze() {
-        guard !busy, !importing, unavailable == nil,
+        guard !busy, !importing, modelAvailability.allowsPhotoAnalysis,
               let data = image?.jpegData(compressionQuality: 0.85) else { return }
         cancel()
         busy = true
@@ -137,6 +137,10 @@ final class AppModel {
             meal.items[index].portionConfirmed = true
             draft = meal
             onSuccess()
+            return
+        }
+        guard modelAvailability.allowsTextEstimate else {
+            error = modelAvailability.explanation
             return
         }
         cancel()

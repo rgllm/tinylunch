@@ -4,6 +4,7 @@ struct HistoryView: View {
     @Bindable var model: AppModel
     var startMeal: () -> Void
     @State private var pendingDelete: Meal?
+    @Environment(\.openURL) private var openURL
     var body: some View {
         NavigationStack {
             Group {
@@ -22,7 +23,10 @@ struct HistoryView: View {
                             }.frame(height: 214).accessibilityHidden(true)
                             Text(model.historyLoaded ? "No saved meals" : "History unavailable")
                                 .font(.system(.largeTitle, design: .rounded, weight: .bold)).multilineTextAlignment(.center)
-                            Text(model.historyLoaded ? "A place for meals worth remembering.\nTap Save after an estimate to keep it here." : "Your meals are still on this iPhone. Try loading them again.")
+                            if model.historyLoaded && !model.modelAvailability.allowsPhotoAnalysis {
+                                availabilityCard
+                            }
+                            Text(emptyHistoryMessage)
                                 .foregroundStyle(.secondary).multilineTextAlignment(.center)
                             if model.historyLoaded {
                                 Button("Start a meal", systemImage: "plus") { startMeal() }.buttonStyle(PrimaryAction())
@@ -39,6 +43,9 @@ struct HistoryView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Good food,\nremembered.").font(.system(.largeTitle, design: .rounded, weight: .bold))
                                 Text("Your saved meals, just as you left them.").font(.subheadline).foregroundStyle(.secondary)
+                                if !model.modelAvailability.allowsPhotoAnalysis {
+                                    availabilityCard.buttonStyle(.borderless).padding(.top, 8)
+                                }
                             }.padding(.vertical, 12)
                         }.listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
                         Section {
@@ -73,6 +80,31 @@ struct HistoryView: View {
                 }
             }
         }
+    }
+
+    private var availabilityCard: some View {
+        AnalysisAvailabilityCard(
+            state: model.modelAvailability,
+            showsHistoryAction: false,
+            retry: { Task { await model.refresh() } },
+            openSettings: openSystemSettings,
+            openHistory: {}
+        )
+    }
+
+    private var emptyHistoryMessage: String {
+        if !model.historyLoaded {
+            return String(localized: "Your meals are still on this iPhone. Try loading them again.")
+        }
+        if !model.modelAvailability.allowsPhotoAnalysis {
+            return String(localized: "Meals you save stay in this list, where you can open or delete them.")
+        }
+        return String(localized: "A place for meals worth remembering.\nTap Save after an estimate to keep it here.")
+    }
+
+    private func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        openURL(url)
     }
 }
 

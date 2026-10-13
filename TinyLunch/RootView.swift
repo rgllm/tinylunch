@@ -8,7 +8,9 @@ struct RootView: View {
     @State private var tab = 0
     var body: some View {
         TabView(selection: $tab) {
-            Tab("New meal", systemImage: "camera", value: 0) { CaptureView(model: model) }
+            Tab("New meal", systemImage: "camera", value: 0) {
+                CaptureView(model: model, showHistory: { tab = 1 })
+            }
             Tab("History", systemImage: "clock", value: 1) { HistoryView(model: model, startMeal: { tab = 0 }) }
         }
         .tint(TinyLunchStyle.accent)
@@ -27,6 +29,7 @@ struct RootView: View {
 
 struct CaptureView: View {
     @Bindable var model: AppModel
+    var showHistory: () -> Void
     @State private var selection: PhotosPickerItem?
     @State private var camera = false
     @State private var permissionDenied = false
@@ -34,7 +37,6 @@ struct CaptureView: View {
     @State private var discard = false
     @State private var privacy = false
     @State private var toast = false
-    @State private var statusExpanded = false
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .largeTitle) private var titleSize = 37
@@ -43,6 +45,9 @@ struct CaptureView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
+                    if !model.modelAvailability.allowsPhotoAnalysis {
+                        availabilityCard
+                    }
                     if let meal = model.draft {
                         review(meal)
                     } else {
@@ -88,7 +93,12 @@ struct CaptureView: View {
                 Button("Discard", role: .destructive) { model.reset() }
             }
             .sheet(item: $editing) { item in
-                FoodEditor(item: item, busy: model.busy, cancel: model.cancel) { name, preparation, grams in
+                FoodEditor(
+                    item: item,
+                    busy: model.busy,
+                    allowsIdentityEdit: model.modelAvailability.allowsTextEstimate,
+                    cancel: model.cancel
+                ) { name, preparation, grams in
                     model.update(item, name: name, preparation: preparation, grams: grams, onSuccess: { editing = nil })
                 }.interactiveDismissDisabled(model.busy)
             }
@@ -146,7 +156,8 @@ struct CaptureView: View {
                 if model.image != nil {
                     Button { model.analyze() } label: { Label("Analyze meal", systemImage: "sparkles") }
                         .buttonStyle(PrimaryAction())
-                        .disabled(model.unavailable != nil || model.busy || model.importing)
+                        .disabled(!model.modelAvailability.allowsPhotoAnalysis || model.busy || model.importing)
+                        .accessibilityHint(model.modelAvailability.allowsPhotoAnalysis ? "Estimates this photo on your iPhone." : model.modelAvailability.explanation)
                 } else {
                     Button { Task { await openCamera() } } label: { Label("Take photo", systemImage: "camera.fill") }
                         .buttonStyle(PrimaryAction()).disabled(model.busy || model.importing)
@@ -162,19 +173,6 @@ struct CaptureView: View {
                 }
             }
 
-            if let reason = model.unavailable {
-                DisclosureGroup(isExpanded: $statusExpanded) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(reason).font(.subheadline).foregroundStyle(.secondary)
-                        Button("Check again", systemImage: "arrow.clockwise") { Task { await model.refresh() } }
-                            .font(.subheadline.weight(.semibold)).frame(minHeight: 44)
-                    }.padding(.top, 10)
-                } label: {
-                    Label("Photo analysis unavailable", systemImage: "info.circle")
-                        .font(.subheadline.weight(.medium)).foregroundStyle(.primary)
-                        .accessibilityIdentifier("photoAnalysisUnavailable")
-                }.padding(16).background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
-            }
             if typeSize.isAccessibilitySize && model.image == nil && !model.savedNotice { EmojiPlate() }
             Button { privacy = true } label: {
                 Label("On your iPhone. Just for you.", systemImage: "lock.shield")
@@ -221,7 +219,8 @@ struct CaptureView: View {
                 Button("Add food", systemImage: "plus.circle") {
                     editing = FoodItem(name: "", grams: nil, kcalPer100g: nil, preparation: "")
                 }.font(.headline).frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
-                    .disabled(model.busy || model.saving || model.unavailable != nil)
+                    .disabled(model.busy || model.saving || !model.modelAvailability.allowsTextEstimate)
+                    .accessibilityHint(model.modelAvailability.allowsTextEstimate ? "Add a food for an on-device estimate." : model.modelAvailability.explanation)
             }.padding(.horizontal, 18).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 26))
             Label("Tap a food to correct it. Portions are suggestions until you confirm them.", systemImage: "hand.tap")
                 .font(.footnote).foregroundStyle(.secondary)
@@ -244,6 +243,20 @@ struct CaptureView: View {
         }.padding(.horizontal, 24).padding(.top, 14).padding(.bottom, 10).background(.regularMaterial)
     }
 
+    private var availabilityCard: some View {
+        AnalysisAvailabilityCard(
+            state: model.modelAvailability,
+            retry: { Task { await model.refresh() } },
+            openSettings: openSystemSettings,
+            openHistory: showHistory
+        )
+    }
+
+    private func openSystemSettings() {
+        guard let url = URL(string: UIApplication.openSettingsURLString) else { return }
+        openURL(url)
+    }
+
     private func openCamera() async {
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
             model.error = "A camera is not available on this device. Choose a photo instead."
@@ -256,5 +269,72 @@ struct CaptureView: View {
             else { permissionDenied = true }
         default: permissionDenied = true
         }
+    }
+}
+
+struct AnalysisAvailabilityCard: View {
+    let state: AnalysisAvailabilityState
+    var showsHistoryAction = true
+    var retry: () -> Void
+    var openSettings: () -> Void
+    var openHistory: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label(state.title, systemImage: state.symbol)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.primary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("photoAnalysisUnavailable")
+            Text(state.explanation)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("analysisAvailabilityExplanation")
+            actions
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("analysisUnavailableCard")
+    }
+
+    private var actions: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) { actionButtons }
+            VStack(alignment: .leading, spacing: 0) { actionButtons }
+        }
+    }
+
+    @ViewBuilder
+    private var actionButtons: some View {
+        if let action = state.primaryAction, includes(action) {
+            button(action)
+        }
+        if let action = state.secondaryAction, includes(action) {
+            button(action)
+        }
+    }
+
+    private func includes(_ action: AnalysisAvailabilityState.Action) -> Bool {
+        showsHistoryAction || action != .openHistory
+    }
+
+    private func button(_ action: AnalysisAvailabilityState.Action) -> some View {
+        Button {
+            switch action {
+            case .openSettings: openSettings()
+            case .retry: retry()
+            case .openHistory: openHistory()
+            }
+        } label: {
+            Label(action.title, systemImage: action.symbol)
+        }
+        .buttonStyle(.borderless)
+        .font(.subheadline.weight(.semibold))
+        .frame(minHeight: 44)
+        .contentShape(Rectangle())
+        .accessibilityIdentifier(action.accessibilityIdentifier)
     }
 }
