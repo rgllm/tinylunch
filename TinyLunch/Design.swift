@@ -38,8 +38,8 @@ struct PrimaryAction: ButtonStyle {
         configuration.label.font(.headline)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity, minHeight: 26).padding(.vertical, 16).padding(.horizontal, 20)
-            .foregroundStyle(enabled ? .white : Color.secondary)
-            .background(enabled ? TinyLunchStyle.button : TinyLunchStyle.soft, in: RoundedRectangle(cornerRadius: 22))
+            .foregroundStyle(enabled ? .white : TinyLunchStyle.ink)
+            .background(enabled ? TinyLunchStyle.button : TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 22))
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)
     }

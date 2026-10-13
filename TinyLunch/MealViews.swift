@@ -130,8 +130,10 @@ struct FoodEditor: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-            editorBanner
             Form {
+                Section {
+                    editorBanner
+                }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
                     TextField("Food name", text: $name)
