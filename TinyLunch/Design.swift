@@ -97,6 +97,15 @@ struct MedicalDisclaimer: View {
     }
 }
 
+struct ScaledTextButton: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body.weight(.semibold))
+            .frame(minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+    }
+}
+
 struct FoodBadge: View {
     let name: String
     var size: CGFloat = 46
@@ -109,9 +118,12 @@ struct FoodBadge: View {
         return symbols.first { lower.contains($0.0) }?.1 ?? "🍽️"
     }
     var body: some View {
-        Text(emoji).font(.system(size: size * 0.56)).frame(width: size, height: size)
+        Text(emoji)
+            .font(.title2)
+            .frame(width: size, height: size)
             .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: size * 0.3))
             .accessibilityHidden(true)
+            .accessibilityIdentifier("decorativeGlyph")
     }
 }
 
@@ -137,16 +149,19 @@ struct EmojiPlate: View {
                     .rotationEffect(.degrees(taps.isMultiple(of: 2) ? -8 : 6))
                     .animation(reduceMotion ? nil : .spring(duration: 0.4, bounce: 0.35), value: taps)
                     .accessibilityHidden(true)
+                    .accessibilityIdentifier("decorativeGlyph")
             }
             .frame(maxWidth: .infinity)
             .frame(height: 250)
             .overlay(alignment: .topTrailing) {
-                Text("🍅").font(.system(size: 28)).padding(.top, 12).padding(.trailing, 28)
+                Text("🍅").font(.title).padding(.top, 12).padding(.trailing, 28)
                     .accessibilityHidden(true)
+                    .accessibilityIdentifier("decorativeGlyph")
             }
             .overlay(alignment: .bottomLeading) {
-                Text("🌿").font(.system(size: 28)).padding(.leading, 24).padding(.bottom, 16)
+                Text("🌿").font(.title).padding(.leading, 24).padding(.bottom, 16)
                     .accessibilityHidden(true)
+                    .accessibilityIdentifier("decorativeGlyph")
             }
             .overlay(alignment: .topLeading) {
                 Image(systemName: "sparkle").font(.body).foregroundStyle(TinyLunchStyle.accent)
@@ -217,55 +232,50 @@ struct PrivacySheet: View {
     @Environment(\.dismiss) private var dismiss
     var body: some View {
         NavigationStack {
-            List {
-                Section {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 22) {
                     Text("Not a medical device")
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
                     MedicalDisclaimer(prominent: false)
-                }
-                Section {
                     HStack(alignment: .firstTextBaseline, spacing: 10) {
                         Image(systemName: "lock.iphone")
                             .font(.title2)
                             .accessibilityHidden(true)
                         Text("Your plate. Your business.")
-                            .font(.system(.title2, design: .rounded, weight: .bold))
+                            .font(.title2.weight(.bold))
                             .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .accessibilityElement(children: .combine)
                     .accessibilityAddTraits(.isHeader)
                     Text("TinyLunch is built for on-device estimates. Your food photos and meal details aren’t sent to a server.")
+                        .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
-                }
-                Section {
+                    sectionHeader("What stays")
                     wrappingLabel("Only meals you choose to save", systemImage: "checkmark.circle")
                     wrappingLabel("Foods, portions, and estimates", systemImage: "list.bullet")
                     wrappingLabel("No saved photos", systemImage: "photo.badge.checkmark")
-                } header: {
-                    sectionHeader("What stays")
-                }
-                Section {
                     Text("History stays on this iPhone and is excluded from backups. Deleting the app removes it. You can delete individual meals in History.")
+                        .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
                     Text("Apple may need to download its model first. Choosing an iCloud photo may also need a connection.")
+                        .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
-                }
-                Section {
-                    Text("Estimating from a photo uses Apple Intelligence on this iPhone. If that on-device model isn’t available, History stays usable and new estimates wait until it is.")
-                        .fixedSize(horizontal: false, vertical: true)
-                } header: {
                     sectionHeader("Photo analysis")
-                } footer: {
+                    Text("Estimating from a photo uses Apple Intelligence on this iPhone. If that on-device model isn’t available, History stays usable and new estimates wait until it is.")
+                        .font(.body)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text("Adjust portions and preparation before saving. Unknown foods stay unknown instead of becoming zero.")
-                        .font(.footnote)
+                        .font(.body)
                         .foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                .padding(24)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .scrollContentBackground(.hidden).background(TinyLunchStyle.paper)
+            .background(TinyLunchStyle.paper)
             .navigationTitle("Made to stay local").navigationBarTitleDisplayMode(.inline)
             .safeAreaInset(edge: .bottom) {
                 Button("Done") { dismiss() }
@@ -285,9 +295,10 @@ struct PrivacySheet: View {
 
     private func sectionHeader(_ title: LocalizedStringKey) -> some View {
         Text(title)
-            .font(.subheadline.weight(.semibold))
+            .font(.body.weight(.semibold))
             .foregroundStyle(TinyLunchStyle.ink)
-            .textCase(nil)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityAddTraits(.isHeader)
     }
 
     private func wrappingLabel(_ title: LocalizedStringKey, systemImage: String) -> some View {

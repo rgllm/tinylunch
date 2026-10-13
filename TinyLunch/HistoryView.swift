@@ -100,10 +100,14 @@ struct HistoryView: View {
                                 .accessibilityAction(named: "Delete meal") { pendingDelete = meal }
                                 .listRowBackground(TinyLunchStyle.card)
                             }
-                        } footer: {
-                            Text("Saved on this iPhone. Choose Delete meal to remove one.")
-                                .fixedSize(horizontal: false, vertical: true)
                         }
+                        Section {
+                            Text("Saved on this iPhone. Choose Delete meal to remove one.")
+                                .font(.body)
+                                .foregroundStyle(TinyLunchStyle.ink)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }.listRowBackground(Color.clear)
                     }.scrollContentBackground(.hidden)
                 }
             }
@@ -184,7 +188,7 @@ private struct SavedMealView: View {
                 .accessibilityIdentifier("deleteSavedMeal")
                 .accessibilityLabel("Delete meal")
                 .accessibilityHint("Asks you to confirm before deleting this meal.")
-            }.padding(24)
+            }.padding(24).padding(.bottom, 24)
         }
         .background(TinyLunchStyle.paper)
         .navigationTitle("Saved meal").navigationBarTitleDisplayMode(.inline)

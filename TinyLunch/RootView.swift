@@ -62,6 +62,7 @@ struct CaptureView: View {
                     }
                     .padding(.horizontal, 24).padding(.top, 18).padding(.bottom, 28)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 if let meal = model.draft { saveBar(meal) }
             }
             .background(TinyLunchStyle.paper)
@@ -145,7 +146,7 @@ struct CaptureView: View {
                 }
             } else if model.savedNotice {
                 VStack(spacing: 18) {
-                    Text("🥡").font(.system(size: 72)).frame(width: 120, height: 120).accessibilityHidden(true).padding(.top, 28)
+                    Text("🥡").font(.largeTitle).accessibilityHidden(true).accessibilityIdentifier("decorativeGlyph").padding(.top, 28)
                     HStack(spacing: 8) {
                         Image(systemName: "checkmark.circle.fill").font(.largeTitle).accessibilityHidden(true)
                         Text("Meal saved")
@@ -281,7 +282,10 @@ struct CaptureView: View {
                 ForEach(meal.items) { item in
                     HStack(alignment: .top, spacing: 8) {
                         Button { editing = item } label: { FoodRow(item: item) }
-                            .buttonStyle(.plain).frame(maxWidth: .infinity, alignment: .leading)
+                            .buttonStyle(.plain)
+                            .tint(.primary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .layoutPriority(1)
                             .accessibilityLabel(item.accessibilityDescription)
                             .accessibilityHint("Edit this food and its portion.")
                             .accessibilityIdentifier("editFood-\(item.name)")
@@ -293,8 +297,9 @@ struct CaptureView: View {
                         } label: {
                             Image(systemName: "ellipsis")
                                 .font(.body)
-                                .frame(minWidth: 44, minHeight: 44)
+                                .frame(width: 44, height: 44)
                         }
+                        .fixedSize()
                         .accessibilityLabel("Options for \(item.name)")
                         .accessibilityHint("Correct or remove this food.")
                     }.padding(.vertical, 16).disabled(model.busy || model.saving)
@@ -483,11 +488,8 @@ struct AnalysisAvailabilityCard: View {
             case .openHistory: openHistory()
             }
         }
-        .buttonStyle(.plain)
-        .font(.body.weight(.semibold))
+        .buttonStyle(ScaledTextButton())
         .foregroundStyle(TinyLunchStyle.accent)
-        .frame(minHeight: 44)
-        .contentShape(Rectangle())
         .accessibilityIdentifier(action.accessibilityIdentifier)
     }
 }

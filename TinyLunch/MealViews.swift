@@ -14,12 +14,13 @@ struct MealSummary: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityAddTraits(.isHeader)
                 if !typeSize.isAccessibilitySize {
-                    Text("🍽️").font(.title).frame(width: 44, height: 44).accessibilityHidden(true)
+                    Text("🍽️").font(.title).frame(width: 44, height: 44)
+                        .accessibilityHidden(true)
+                        .accessibilityIdentifier("decorativeGlyph")
                 }
             }.foregroundStyle(TinyLunchStyle.ink)
             Text(meal.calorieLabel)
                 .font(.system(size: amountSize, weight: .semibold, design: .rounded))
-                .tracking(typeSize.isAccessibilitySize ? 0 : -2)
                 .foregroundStyle(TinyLunchStyle.accent)
                 .contentTransition(.numericText()).animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: meal.calories)
                 .fixedSize(horizontal: false, vertical: true)
@@ -51,25 +52,23 @@ struct FoodRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(item.name).font(.headline).foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 if item.energyBasis == .estimated {
                     Text("Estimated")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(TinyLunchStyle.accent)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(TinyLunchStyle.soft, in: Capsule())
-                        .fixedSize(horizontal: true, vertical: true)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(TinyLunchStyle.ink)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Text(item.calories.map { "\($0.formatted(.number.precision(.fractionLength(0)))) kcal" } ?? "Not estimated")
-                    .font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
+                    .font(.subheadline.weight(.semibold)).foregroundStyle(TinyLunchStyle.accent)
                     .fixedSize(horizontal: false, vertical: true)
                 if let grams = item.grams {
                     Text("\(grams.formatted()) g · \(item.portionConfirmed ? "Confirmed portion" : "Suggested portion")")
-                        .font(.caption).foregroundStyle(TinyLunchStyle.ink)
+                        .font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if !item.preparation.isEmpty {
-                    Text(item.preparation).font(.caption).foregroundStyle(TinyLunchStyle.ink)
+                    Text(item.preparation).font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }.frame(maxWidth: .infinity, alignment: .leading)
@@ -142,6 +141,7 @@ struct FoodEditor: View {
                     }
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
+                    editorHeader("Food")
                     TextField("Food name", text: $name)
                         .accessibilityIdentifier("foodName")
                         .disabled(!allowsIdentityEdit)
@@ -150,16 +150,14 @@ struct FoodEditor: View {
                         .accessibilityIdentifier("foodPreparation")
                         .disabled(!allowsIdentityEdit)
                         .accessibilityHint(allowsIdentityEdit ? "How the food was prepared. Changing this needs a new estimate." : "Changing the food or preparation waits until on-device estimates are available again.")
-                } header: {
-                    editorHeader("Food")
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
-                    let portionStyle: Font.TextStyle = typeSize.isAccessibilitySize ? .title2 : .largeTitle
+                    editorHeader("Portion")
                     let unitStyle: Font.TextStyle = typeSize.isAccessibilitySize ? .title3 : .title2
                     HStack(alignment: .firstTextBaseline) {
                         TextField("Grams", value: $grams, format: .number)
                             .keyboardType(.decimalPad).focused($portionFocused)
-                            .font(.system(portionStyle, design: .rounded, weight: .semibold))
+                            .font(.title2)
                             .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                             .accessibilityLabel("Portion in grams")
                             .accessibilityHint("Enter a weight in grams. Changing only the grams updates the estimate on this iPhone.")
@@ -177,8 +175,6 @@ struct FoodEditor: View {
                             portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
                         }.padding(.vertical, 4)
                     }
-                } header: {
-                    editorHeader("Portion")
                 } footer: {
                     Group {
                         if allowsIdentityEdit {
@@ -229,20 +225,23 @@ struct FoodEditor: View {
 
     private func editorHeader(_ title: LocalizedStringKey) -> some View {
         Text(title)
-            .font(.subheadline.weight(.semibold))
+            .font(.body.weight(.semibold))
             .foregroundStyle(TinyLunchStyle.ink)
-            .textCase(nil)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityAddTraits(.isHeader)
     }
 
     private var editorIntro: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text("Make it your portion").font(.headline)
+            Text("Make it your portion")
+                .font(.body.weight(.semibold))
                 .fixedSize(horizontal: false, vertical: true)
-            Text("Small adjustments count.").font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
+            Text("Small adjustments count.")
+                .font(.body)
+                .foregroundStyle(TinyLunchStyle.ink)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
     }
 
     private func apply() {
