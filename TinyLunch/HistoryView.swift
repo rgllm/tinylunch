@@ -31,7 +31,7 @@ struct HistoryView: View {
                                 availabilityCard
                             }
                             Text(emptyHistoryMessage)
-                                .foregroundStyle(.secondary).multilineTextAlignment(.center)
+                                .foregroundStyle(TinyLunchStyle.ink).multilineTextAlignment(.center)
                                 .fixedSize(horizontal: false, vertical: true)
                             if model.historyLoaded {
                                 Button { startMeal() } label: {
@@ -54,7 +54,7 @@ struct HistoryView: View {
                             } icon: {
                                 Image(systemName: "lock").accessibilityHidden(true)
                             }
-                            .font(.footnote).foregroundStyle(.secondary)
+                            .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
                         }.padding(.horizontal, 32).padding(.top, 52).padding(.bottom, 32)
                     }
                 } else {
@@ -66,7 +66,7 @@ struct HistoryView: View {
                                     .fixedSize(horizontal: false, vertical: true)
                                     .accessibilityAddTraits(.isHeader)
                                 Text("Your saved meals, just as you left them.")
-                                    .font(.subheadline).foregroundStyle(.secondary)
+                                    .font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
                                     .fixedSize(horizontal: false, vertical: true)
                                 if !model.modelAvailability.allowsPhotoAnalysis {
                                     availabilityCard.buttonStyle(.borderless).padding(.top, 8)
@@ -85,9 +85,9 @@ struct HistoryView: View {
                                                 .fixedSize(horizontal: false, vertical: true)
                                             Text(meal.calorieLabel).font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
                                                 .fixedSize(horizontal: false, vertical: true)
-                                            if meal.isIncomplete { Text("Incomplete estimate").font(.caption).foregroundStyle(.secondary) }
+                                            if meal.isIncomplete { Text("Incomplete estimate").font(.caption).foregroundStyle(TinyLunchStyle.ink) }
                                             Text(meal.savedAt, format: .dateTime.day().month().hour().minute())
-                                                .font(.caption).foregroundStyle(.secondary)
+                                                .font(.caption).foregroundStyle(TinyLunchStyle.ink)
                                                 .fixedSize(horizontal: false, vertical: true)
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -100,10 +100,14 @@ struct HistoryView: View {
                                 .accessibilityAction(named: "Delete meal") { pendingDelete = meal }
                                 .listRowBackground(TinyLunchStyle.card)
                             }
-                        } footer: {
-                            Text("Saved on this iPhone. Choose Delete meal to remove one.")
-                                .fixedSize(horizontal: false, vertical: true)
                         }
+                        Section {
+                            Text("Saved on this iPhone. Choose Delete meal to remove one.")
+                                .font(.body)
+                                .foregroundStyle(TinyLunchStyle.ink)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }.listRowBackground(Color.clear)
                     }.scrollContentBackground(.hidden)
                 }
             }
@@ -155,7 +159,7 @@ private struct SavedMealView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
                     Text(meal.savedAt, format: .dateTime.day().month(.wide).year().hour().minute())
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 MealSummary(meal: meal)
@@ -175,7 +179,7 @@ private struct SavedMealView: View {
                 } icon: {
                     Image(systemName: "lock").accessibilityHidden(true)
                 }
-                .font(.footnote).foregroundStyle(.secondary)
+                .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
                 Button(role: .destructive) { delete() } label: {
                     AccessibleActionLabel(title: "Delete meal", systemImage: "trash")
                         .frame(maxWidth: .infinity, minHeight: 44)
@@ -184,7 +188,7 @@ private struct SavedMealView: View {
                 .accessibilityIdentifier("deleteSavedMeal")
                 .accessibilityLabel("Delete meal")
                 .accessibilityHint("Asks you to confirm before deleting this meal.")
-            }.padding(24)
+            }.padding(24).padding(.bottom, 24)
         }
         .background(TinyLunchStyle.paper)
         .navigationTitle("Saved meal").navigationBarTitleDisplayMode(.inline)

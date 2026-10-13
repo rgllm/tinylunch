@@ -145,13 +145,16 @@ final class AnalysisAvailabilityTests: XCTestCase {
     }
 
     @MainActor
-    func testPortionEditsStillApplyWhenTheModelIsNotReady() {
+    func testPortionEditsStillApplyWhenTheModelIsNotReady() async {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
         defer { try? FileManager.default.removeItem(at: directory) }
         let model = AppModel(
             estimator: ScriptedEstimator(modelAvailability: .modelNotReady),
             store: MealStore(directory: directory)
         )
+        await model.refresh()
+        XCTAssertEqual(model.modelAvailability, .modelNotReady)
+        XCTAssertFalse(model.modelAvailability.allowsTextEstimate)
         let rice = FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked")
         model.draft = Meal(items: [rice])
 

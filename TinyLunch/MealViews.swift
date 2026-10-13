@@ -14,12 +14,13 @@ struct MealSummary: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityAddTraits(.isHeader)
                 if !typeSize.isAccessibilitySize {
-                    Text("🍽️").font(.title).accessibilityHidden(true)
+                    Text("🍽️").font(.title).frame(width: 44, height: 44)
+                        .accessibilityHidden(true)
+                        .accessibilityIdentifier("decorativeGlyph")
                 }
-            }.foregroundStyle(.secondary)
+            }.foregroundStyle(TinyLunchStyle.ink)
             Text(meal.calorieLabel)
                 .font(.system(size: amountSize, weight: .semibold, design: .rounded))
-                .tracking(typeSize.isAccessibilitySize ? 0 : -2)
                 .foregroundStyle(TinyLunchStyle.accent)
                 .contentTransition(.numericText()).animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: meal.calories)
                 .fixedSize(horizontal: false, vertical: true)
@@ -37,7 +38,7 @@ struct MealSummary: View {
                 .accessibilityHint("Some food could not be estimated and is not included in this subtotal.")
             }
             Text(meal.isIncomplete ? "Some food couldn’t be estimated and isn’t included in this subtotal." : "An estimate based on portions and preparation. Adjust either to make it more useful.")
-                .font(.subheadline).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+                .font(.subheadline).foregroundStyle(TinyLunchStyle.ink).fixedSize(horizontal: false, vertical: true)
         }.tinyLunchCard()
     }
 }
@@ -51,28 +52,29 @@ struct FoodRow: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(item.name).font(.headline).foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 if item.energyBasis == .estimated {
                     Text("Estimated")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(TinyLunchStyle.accent)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
-                        .background(TinyLunchStyle.soft, in: Capsule())
-                        .fixedSize(horizontal: true, vertical: true)
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
                 Text(item.calories.map { "\($0.formatted(.number.precision(.fractionLength(0)))) kcal" } ?? "Not estimated")
-                    .font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
+                    .font(.headline).foregroundStyle(TinyLunchStyle.accent)
                     .fixedSize(horizontal: false, vertical: true)
                 if let grams = item.grams {
                     Text("\(grams.formatted()) g · \(item.portionConfirmed ? "Confirmed portion" : "Suggested portion")")
-                        .font(.caption).foregroundStyle(.secondary)
+                        .font(.headline).foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if !item.preparation.isEmpty {
-                    Text(item.preparation).font(.caption).foregroundStyle(.secondary)
+                    Text(item.preparation).font(.headline).foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-            }.frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 2)
+            .background(TinyLunchStyle.card)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(item.accessibilityDescription)
@@ -127,21 +129,13 @@ struct FoodEditor: View {
     }
     var body: some View {
         NavigationStack {
+            VStack(spacing: 0) {
             Form {
                 Section {
-                    if typeSize.isAccessibilitySize {
-                        VStack(alignment: .leading, spacing: 8) {
-                            FoodBadge(name: name, size: 54)
-                            editorIntro
-                        }.padding(.vertical, 6)
-                    } else {
-                        HStack(spacing: 14) {
-                            FoodBadge(name: name, size: 54)
-                            editorIntro
-                        }.padding(.vertical, 6)
-                    }
+                    editorBanner
                 }.listRowBackground(TinyLunchStyle.card)
-                Section("Food") {
+                Section {
+                    editorHeader("Food")
                     TextField("Food name", text: $name)
                         .accessibilityIdentifier("foodName")
                         .disabled(!allowsIdentityEdit)
@@ -152,19 +146,19 @@ struct FoodEditor: View {
                         .accessibilityHint(allowsIdentityEdit ? "How the food was prepared. Changing this needs a new estimate." : "Changing the food or preparation waits until on-device estimates are available again.")
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
-                    let portionStyle: Font.TextStyle = typeSize.isAccessibilitySize ? .title2 : .largeTitle
+                    editorHeader("Portion")
                     let unitStyle: Font.TextStyle = typeSize.isAccessibilitySize ? .title3 : .title2
                     HStack(alignment: .firstTextBaseline) {
                         TextField("Grams", value: $grams, format: .number)
                             .keyboardType(.decimalPad).focused($portionFocused)
-                            .font(.system(portionStyle, design: .rounded, weight: .semibold))
+                            .font(.title2)
                             .frame(minWidth: 0, maxWidth: .infinity, alignment: .leading)
                             .accessibilityLabel("Portion in grams")
                             .accessibilityHint("Enter a weight in grams. Changing only the grams updates the estimate on this iPhone.")
                             .accessibilityIdentifier("portionGrams")
                         Text("g")
                             .font(.system(unitStyle))
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(TinyLunchStyle.ink)
                             .accessibilityHidden(true)
                     }.padding(.vertical, 6)
                     if let original = item.grams, original.isFinite, original > 0 {
@@ -175,14 +169,16 @@ struct FoodEditor: View {
                             portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
                         }.padding(.vertical, 4)
                     }
-                } header: { Text("Portion") } footer: {
-                    if allowsIdentityEdit {
-                        Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
-                            .fixedSize(horizontal: false, vertical: true)
-                    } else {
-                        Text("Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again.")
-                            .fixedSize(horizontal: false, vertical: true)
+                    Group {
+                        if allowsIdentityEdit {
+                            Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
+                        } else {
+                            Text("Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again.")
+                        }
                     }
+                    .font(.headline)
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
                 }.listRowBackground(TinyLunchStyle.card)
                 if busy {
                     Section { ProgressView("Updating estimate…") }
@@ -192,50 +188,74 @@ struct FoodEditor: View {
             .disabled(busy)
             .navigationTitle("Correct food").navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                if !typeSize.isAccessibilitySize {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Cancel") { cancel(); dismiss() }
-                    }
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Apply") { apply() }
-                            .fontWeight(.semibold).disabled(!valid)
-                            .accessibilityHint("Applies the food, preparation, and portion.")
-                    }
-                }
                 ToolbarItemGroup(placement: .keyboard) {
                     Spacer()
                     Button("Done") { portionFocused = false }
+                        .font(.body.weight(.semibold))
                         .accessibilityHint("Dismisses the keyboard.")
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                if typeSize.isAccessibilitySize {
-                    VStack(spacing: 8) {
-                        Button("Apply") { apply() }
-                            .buttonStyle(PrimaryAction())
-                            .disabled(!valid)
-                            .accessibilityHint("Applies the food, preparation, and portion.")
-                        Button("Cancel") { cancel(); dismiss() }
-                            .frame(minHeight: 44)
-                    }
-                    .padding(.horizontal, 24).padding(.top, 12).padding(.bottom, 8)
-                    .background(.regularMaterial)
+                VStack(spacing: 8) {
+                    Button("Apply") { apply() }
+                        .buttonStyle(PrimaryAction())
+                        .disabled(!valid)
+                        .accessibilityHint("Applies the food, preparation, and portion.")
+                    Button("Cancel") { cancel(); dismiss() }
+                        .buttonStyle(.plain)
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(TinyLunchStyle.ink)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .contentShape(Rectangle())
                 }
+                .padding(.horizontal, 24).padding(.top, 12).padding(.bottom, 8)
+                .background(TinyLunchStyle.paper)
+            }
             }
         }
         .presentationDragIndicator(.visible)
         .sensoryFeedback(.selection, trigger: portionChange)
     }
 
+    private func editorHeader(_ title: LocalizedStringKey) -> some View {
+        Text(title)
+            .font(.body.weight(.semibold))
+            .foregroundStyle(TinyLunchStyle.ink)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    private var editorBanner: some View {
+        Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) {
+                    FoodBadge(name: name, size: 54)
+                    editorIntro
+                }
+            } else {
+                HStack(spacing: 14) {
+                    FoodBadge(name: name, size: 54)
+                    editorIntro
+                }
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.vertical, 16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(TinyLunchStyle.card)
+    }
+
     private var editorIntro: some View {
         VStack(alignment: .leading, spacing: 3) {
-            Text("Make it your portion").font(.headline)
+            Text("Make it your portion")
+                .font(.body.weight(.semibold))
                 .fixedSize(horizontal: false, vertical: true)
-            Text("Small adjustments count.").font(.subheadline).foregroundStyle(.secondary)
+            Text("Small adjustments count.")
+                .font(.body)
+                .foregroundStyle(TinyLunchStyle.ink)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
     }
 
     private func apply() {
@@ -244,8 +264,7 @@ struct FoodEditor: View {
 
     private func portionButton(_ title: LocalizedStringKey, multiplier: Double, original: Double, hint: LocalizedStringKey) -> some View {
         Button(title) { grams = original * multiplier; portionChange += 1 }
-            .font(.subheadline.weight(.medium)).buttonStyle(.bordered).buttonBorderShape(.capsule)
-            .frame(maxWidth: .infinity, minHeight: 44)
+            .buttonStyle(ScaledTextButton())
             .disabled(original * multiplier > 10_000)
             .accessibilityHint(hint)
     }
