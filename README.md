@@ -53,7 +53,7 @@ Upload from Xcode Organizer (Distribute App → App Store Connect), or push a `t
 
 ## Verification on 20 September 2026
 
-`xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -destination 'platform=iOS Simulator,id=D55EFB4A-5EDE-4609-8350-81974DE9AB65' -derivedDataPath .build test` passed four unit tests and five UI tests on iPhone 17 Pro Max, iOS 27.0. Four screenshot-generation tests were intentionally skipped because capture mode was not enabled.
+`xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -destination 'platform=iOS Simulator,name=iPhone 17 Pro Max,OS=27.0' -derivedDataPath .build test` passed four unit tests and five UI tests on iPhone 17 Pro Max, iOS 27.0. Four screenshot-generation tests were intentionally skipped because capture mode was not enabled.
 
 `xcodebuild -project TinyLunch.xcodeproj -scheme TinyLunch -configuration Release -destination 'generic/platform=iOS' -archivePath .build/TinyLunch-release.xcarchive -allowProvisioningUpdates archive` succeeded. Export with `Config/ExportOptions.plist` failed with `No Accounts` and no matching distribution signing certificate. The archive is not an uploaded build.
 
