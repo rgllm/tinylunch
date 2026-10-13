@@ -1,10 +1,17 @@
 name: iOS
 
+# Pull requests only. A push to main does not start a simulator.
+# Paths are the iOS app, its tests, the Xcode project, and this workflow file.
 on:
   pull_request:
     branches: [main]
-  push:
-    branches: [main]
+    paths:
+      - 'TinyLunch/**'
+      - 'TinyLunchTests/**'
+      - 'TinyLunchUITests/**'
+      - 'project.yml'
+      - 'TinyLunch.xcodeproj/**'
+      - '.github/workflows/ios.yml'
 
 permissions:
   contents: read
@@ -20,9 +27,22 @@ jobs:
     # macos-15 and macos-26 stop at the iOS 26 SDK, which cannot build this target.
     runs-on: xcode-27
     timeout-minutes: 45
+    env:
+      DERIVED_DATA_PATH: ${{ github.workspace }}/.derivedData
     steps:
       - name: Check out
         uses: actions/checkout@v4
+
+      - name: Cache Swift packages and DerivedData
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ github.workspace }}/.derivedData
+            ~/Library/Caches/org.swift.swiftpm
+            ~/Library/org.swift.swiftpm
+          key: ${{ runner.os }}-xcode27-${{ hashFiles('TinyLunch/**/*.swift', 'TinyLunchTests/**/*.swift', 'TinyLunchUITests/**/*.swift', 'project.yml', 'TinyLunch.xcodeproj/project.pbxproj', 'TinyLunch.xcodeproj/xcshareddata/**') }}
+          restore-keys: |
+            ${{ runner.os }}-xcode27-
 
       - name: Select newest Xcode that supports iOS 27
         id: xcode
@@ -184,7 +204,7 @@ jobs:
             -project TinyLunch.xcodeproj \
             -scheme TinyLunch \
             -destination "$destination" \
-            -derivedDataPath "${RUNNER_TEMP}/DerivedData" \
+            -derivedDataPath "$DERIVED_DATA_PATH" \
             CODE_SIGNING_ALLOWED=NO \
             build
 
@@ -196,12 +216,14 @@ jobs:
             echo "Xcode ${{ steps.xcode.outputs.xcode_version }} has an iOS 27 SDK, but no available iPhone simulator running iOS 27 or newer was found."
             exit 1
           fi
-          # Screenshot tests skip unless CAPTURE_APP_STORE_SCREENSHOTS=1.
-          # The remaining UI tests are a few app launches, so they run with the unit tests.
+          # One simulator, chosen above. Screenshot tests are not part of CI.
           xcodebuild \
             -project TinyLunch.xcodeproj \
             -scheme TinyLunch \
             -destination "$destination" \
-            -derivedDataPath "${RUNNER_TEMP}/DerivedData" \
+            -derivedDataPath "$DERIVED_DATA_PATH" \
+            -only-testing:TinyLunchTests \
+            -only-testing:TinyLunchUITests \
+            -skip-testing:TinyLunchUITests/ScreenshotTests \
             CODE_SIGNING_ALLOWED=NO \
             test
