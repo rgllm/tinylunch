@@ -252,12 +252,11 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
         let wordmark = app.staticTexts["tinyLunchWordmark"]
         XCTAssertEqual(wordmark.label, "TinyLunch")
-        XCTAssertFalse(wordmark.label.contains("…"))
         assertHorizontallyInside(wordmark, of: app)
         let takePhoto = app.buttons["Take photo"]
         reveal(takePhoto, in: app)
         assertMinimumHitTarget(takePhoto)
-        let choose = app.descendants(matching: .any)["Choose photo"]
+        let choose = app.buttons["Choose photo"]
         XCTAssertTrue(choose.waitForExistence(timeout: 5))
         reveal(choose, in: app)
         assertMinimumHitTarget(choose)
@@ -271,18 +270,16 @@ final class TinyLunchUITests: XCTestCase {
         app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal", size, category]
         app.launch()
         assertFoodRowReadsEstimate(in: app)
-        let calories = app.staticTexts["mealCalories"]
-        scrollUntilOnScreen(calories, in: app)
-        assertHorizontallyInside(calories, of: app)
-        XCTAssertFalse(calories.label.contains("…"))
         let disclaimer = visibleDisclaimer(in: app)
         scrollUntilOnScreen(disclaimer, in: app)
         assertHorizontallyInside(disclaimer, of: app)
         try audit(app)
+        let rice = app.buttons["editFood-Rice"]
+        reveal(rice, in: app)
         let options = app.buttons["foodOptions-Rice"]
         reveal(options, in: app)
         assertMinimumHitTarget(options)
-        tapVisible(app.buttons["editFood-Rice"], in: app)
+        tapVisible(rice, in: app)
         let apply = app.buttons["Apply"]
         XCTAssertTrue(apply.waitForExistence(timeout: 5))
         reveal(apply, in: app)

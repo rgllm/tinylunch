@@ -154,7 +154,7 @@ struct FoodEditor: View {
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
-                    TextField("Food name", text: $name, axis: typeSize.isAccessibilitySize ? .vertical : .horizontal)
+                    TextField("Food name", text: $name)
                         .accessibilityIdentifier("foodName")
                         .accessibilityLabel("Food name")
                         .disabled(!allowsIdentityEdit)
@@ -294,7 +294,10 @@ struct FoodEditor: View {
     }
 
     private func apply() {
-        commit(name.trimmingCharacters(in: .whitespacesAndNewlines), preparation, grams)
+        let singleLine = name
+            .replacingOccurrences(of: "\n", with: " ")
+            .replacingOccurrences(of: "\r", with: " ")
+        commit(singleLine.trimmingCharacters(in: .whitespacesAndNewlines), preparation, grams)
     }
 
     private func portionButton(_ title: LocalizedStringKey, multiplier: Double, original: Double, hint: LocalizedStringKey) -> some View {

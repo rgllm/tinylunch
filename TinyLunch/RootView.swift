@@ -42,6 +42,7 @@ struct CaptureView: View {
     @State private var privacySource = PrivacySource.toolbar
     @State private var toast = false
     @State private var suppressEstimateAnnouncement = false
+    @State private var imageAtImportStart: UIImage?
     @Environment(\.openURL) private var openURL
     @Environment(\.dynamicTypeSize) private var typeSize
     @AccessibilityFocusState private var focusedFood: UUID?
@@ -161,20 +162,19 @@ struct CaptureView: View {
             .sensoryFeedback(.selection, trigger: toast)
             .onChange(of: model.savedNotice) { _, saved in
                 guard saved else { return }
-                VoiceOverAnnouncement.post(String(localized: "Meal saved. Tucked away in History."))
                 Task { @MainActor in savedFocused = true }
             }
             .onChange(of: model.busy) { _, busy in
                 guard busy else { return }
-                VoiceOverAnnouncement.post(String(localized: "Estimating on your iPhone."))
                 guard editing == nil else { return }
                 Task { @MainActor in activityFocused = true }
             }
             .onChange(of: model.importing) { _, importing in
                 if importing {
+                    imageAtImportStart = model.image
                     VoiceOverAnnouncement.post(String(localized: "Importing photo."))
                     Task { @MainActor in activityFocused = true }
-                } else if model.image != nil, model.draft == nil, model.error == nil {
+                } else if let image = model.image, image !== imageAtImportStart, model.draft == nil, model.error == nil {
                     VoiceOverAnnouncement.post(String(localized: "Photo ready to analyze."))
                     Task { @MainActor in captureFocus = .analyze }
                 }
@@ -363,7 +363,6 @@ struct CaptureView: View {
                 .disabled(model.busy || model.importing)
                 .accessibilityLabel(hasImage ? "Replace photo" : "Choose photo")
                 .accessibilityHint(hasImage ? "Selects a different photo." : "Selects one photo from your library.")
-                .accessibilityAddTraits(.isButton)
                 if model.image != nil {
                     Button { Task { await openCamera() } } label: {
                         Text("Retake photo")
@@ -446,7 +445,6 @@ struct CaptureView: View {
                             .accessibilityElement(children: .combine)
                             .accessibilityLabel(item.accessibilityDescription)
                             .accessibilityHint("Corrects this food and its portion. Use the actions to correct or remove it.")
-                            .accessibilityAddTraits(.isButton)
                             .accessibilityIdentifier("editFood-\(item.name)")
                             .accessibilityFocused($focusedFood, equals: item.id)
                             .accessibilityAction(named: "Correct food") { edit(item) }

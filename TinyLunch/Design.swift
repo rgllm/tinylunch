@@ -222,7 +222,6 @@ struct EmojiPlate: View {
         .accessibilityLabel("The TinyLunch plate")
         .accessibilityHint("Tap to change the food on the plate.")
         .accessibilityIdentifier("emojiPlate")
-        .accessibilityAddTraits(.isButton)
         .accessibilityFocused($plateFocused)
         .accessibilityAction(named: "Discover the chef’s table") { chef = true }
         .sensoryFeedback(.selection, trigger: taps)

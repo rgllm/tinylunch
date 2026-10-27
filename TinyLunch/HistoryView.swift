@@ -99,7 +99,6 @@ struct HistoryView: View {
                                 .accessibilityElement(children: .combine)
                                 .accessibilityLabel(meal.historyAccessibilityLabel)
                                 .accessibilityHint("Shows this saved meal. Use the Delete meal action to remove it.")
-                                .accessibilityAddTraits(.isButton)
                                 .accessibilityIdentifier("historyMeal-\(meal.title)")
                                 .accessibilityAction(named: "Delete meal") { pendingDelete = meal }
                                 .swipeActions { Button("Delete", role: .destructive) { pendingDelete = meal }.disabled(model.saving) }
