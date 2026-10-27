@@ -24,18 +24,16 @@ struct MealSummary: View {
                 .foregroundStyle(TinyLunchStyle.accent)
                 .contentTransition(.numericText()).animation(reduceMotion ? nil : .easeOut(duration: 0.2), value: meal.calories)
                 .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityIdentifier("mealCalories")
+                .accessibilityLabel(meal.spokenEnergy)
                 .accessibilityHint(meal.isIncomplete ? "Known foods subtotal. This is an estimate, not a measurement." : "Estimated meal total. This is an estimate, not a measurement.")
             Divider()
             if meal.isIncomplete {
-                Label {
-                    Text("Incomplete estimate").fixedSize(horizontal: false, vertical: true)
-                } icon: {
-                    Image(systemName: "circle.lefthalf.filled").accessibilityHidden(true)
-                }
-                .font(.subheadline.weight(.semibold))
-                .accessibilityLabel("Incomplete estimate")
-                .accessibilityHint("Some food could not be estimated and is not included in this subtotal.")
+                IconLabel(title: "Incomplete estimate", systemImage: "circle.lefthalf.filled")
+                    .font(.subheadline.weight(.semibold))
+                    .accessibilityLabel("Incomplete estimate")
+                    .accessibilityHint("Some food could not be estimated and is not included in this subtotal.")
             }
             Text(meal.isIncomplete ? "Some food couldn’t be estimated and isn’t included in this subtotal." : "An estimate based on portions and preparation. Adjust either to make it more useful.")
                 .font(.subheadline).foregroundStyle(TinyLunchStyle.ink).fixedSize(horizontal: false, vertical: true)
@@ -53,7 +51,7 @@ struct FoodRow: View {
                 Text(item.name).font(.headline).foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                if item.energyBasis == .estimated {
+                if item.showsEstimatedBadge {
                     Text("Estimated")
                         .font(.headline)
                         .foregroundStyle(.primary)
@@ -76,17 +74,19 @@ struct FoodRow: View {
             .padding(.vertical, 2)
             .background(TinyLunchStyle.card)
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(item.accessibilityDescription)
     }
 }
 
 extension FoodItem {
+    /// The badge is a model energy estimate. Unknown items stay unlabeled instead of reading as estimated.
+    var showsEstimatedBadge: Bool { energyBasis == .estimated && calories != nil }
+
     var accessibilityDescription: String {
         var parts = [name]
-        if energyBasis == .estimated { parts.append("Estimated") }
+        if showsEstimatedBadge { parts.append("Estimated") }
         if let calories {
-            parts.append("\(calories.formatted(.number.precision(.fractionLength(0)))) kilocalories")
+            let amount = calories.formatted(.number.precision(.fractionLength(0)))
+            parts.append("\(amount) kilocalories")
         } else {
             parts.append("Not estimated")
         }
@@ -99,6 +99,22 @@ extension FoodItem {
     }
 }
 
+extension Meal {
+    var spokenEnergy: String {
+        guard let calories else { return "No estimate" }
+        let amount = calories.formatted(.number.precision(.fractionLength(0)))
+        return "\(amount) kilocalories"
+    }
+
+    /// One element for a history row: title, energy, incomplete status, and the save time.
+    var historyAccessibilityLabel: String {
+        var parts = [title, spokenEnergy]
+        if isIncomplete { parts.append("Incomplete estimate") }
+        parts.append(savedAt.formatted(.dateTime.day().month().hour().minute()))
+        return parts.joined(separator: ", ")
+    }
+}
+
 struct FoodEditor: View {
     let item: FoodItem
     let busy: Bool
@@ -107,6 +123,8 @@ struct FoodEditor: View {
     var commit: (String, String, Double?) -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
+    @AccessibilityFocusState private var introFocused: Bool
+    @AccessibilityFocusState private var updatingFocused: Bool
     @State private var name: String
     @State private var preparation: String
     @State private var grams: Double?
@@ -136,19 +154,24 @@ struct FoodEditor: View {
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
-                    TextField("Food name", text: $name)
+                    TextField("Food name", text: $name, axis: typeSize.isAccessibilitySize ? .vertical : .horizontal)
                         .accessibilityIdentifier("foodName")
+                        .accessibilityLabel("Food name")
                         .disabled(!allowsIdentityEdit)
                         .accessibilityHint(allowsIdentityEdit ? "The food to estimate." : "Changing the food or preparation waits until on-device estimates are available again.")
                     TextField("Preparation and assumptions", text: $preparation, axis: .vertical)
                         .accessibilityIdentifier("foodPreparation")
+                        .accessibilityLabel("Preparation and assumptions")
                         .disabled(!allowsIdentityEdit)
                         .accessibilityHint(allowsIdentityEdit ? "How the food was prepared. Changing this needs a new estimate." : "Changing the food or preparation waits until on-device estimates are available again.")
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Portion")
                     let unitStyle: Font.TextStyle = typeSize.isAccessibilitySize ? .title3 : .title2
-                    HStack(alignment: .firstTextBaseline) {
+                    let portionLayout = typeSize.isAccessibilitySize
+                        ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+                        : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 4))
+                    portionLayout {
                         TextField("Grams", value: $grams, format: .number)
                             .keyboardType(.decimalPad).focused($portionFocused)
                             .font(.title2)
@@ -160,7 +183,8 @@ struct FoodEditor: View {
                             .font(.system(unitStyle))
                             .foregroundStyle(TinyLunchStyle.ink)
                             .accessibilityHidden(true)
-                    }.padding(.vertical, 6)
+                    }
+                    .padding(.vertical, 6)
                     if let original = item.grams, original.isFinite, original > 0 {
                         let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
                         layout {
@@ -181,7 +205,10 @@ struct FoodEditor: View {
                     .fixedSize(horizontal: false, vertical: true)
                 }.listRowBackground(TinyLunchStyle.card)
                 if busy {
-                    Section { ProgressView("Updating estimate…") }
+                    Section {
+                        ProgressView("Updating estimate…")
+                            .accessibilityFocused($updatingFocused)
+                    }
                 }
             }
             .scrollContentBackground(.hidden).background(TinyLunchStyle.paper)
@@ -192,6 +219,7 @@ struct FoodEditor: View {
                     Spacer()
                     Button("Done") { portionFocused = false }
                         .font(.body.weight(.semibold))
+                        .frame(minWidth: 44, minHeight: 44)
                         .accessibilityHint("Dismisses the keyboard.")
                 }
             }
@@ -215,6 +243,11 @@ struct FoodEditor: View {
         }
         .presentationDragIndicator(.visible)
         .sensoryFeedback(.selection, trigger: portionChange)
+        .onAppear { Task { @MainActor in introFocused = true } }
+        .onChange(of: busy) { _, isBusy in
+            guard isBusy else { return }
+            Task { @MainActor in updatingFocused = true }
+        }
     }
 
     private func editorHeader(_ title: LocalizedStringKey) -> some View {
@@ -250,6 +283,8 @@ struct FoodEditor: View {
             Text("Make it your portion")
                 .font(.body.weight(.semibold))
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityFocused($introFocused)
             Text("Small adjustments count.")
                 .font(.body)
                 .foregroundStyle(TinyLunchStyle.ink)

@@ -35,7 +35,7 @@ final class ScreenshotTests: XCTestCase {
         let directory = try output
         let app = launch(arguments: ["--ui-testing", "--reset-history", "--marketing-screenshots", "--marketing-review"])
         XCTAssertTrue(app.staticTexts["Let’s take a look."].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.staticTexts["Grilled salmon"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["editFood-Grilled salmon"].waitForExistence(timeout: 5))
         save(app.screenshot(), as: "02-review.png", in: directory)
     }
 
@@ -44,7 +44,7 @@ final class ScreenshotTests: XCTestCase {
         let app = launch(arguments: ["--ui-testing", "--reset-history", "--marketing-screenshots", "--marketing-history"])
         XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
         app.tabBars.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Grilled salmon, Jasmine rice, Broccoli"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.descendants(matching: .any)["historyMeal-Grilled salmon, Jasmine rice, Broccoli"].waitForExistence(timeout: 10))
         save(app.screenshot(), as: "03-history.png", in: directory)
     }
 

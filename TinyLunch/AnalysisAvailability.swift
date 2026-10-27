@@ -41,6 +41,14 @@ struct AnalysisAvailabilityState: Equatable, Sendable {
             case .openHistory: "openHistoryFromAnalysis"
             }
         }
+
+        var accessibilityHint: String {
+            switch self {
+            case .openSettings: String(localized: "Opens Settings so you can turn on Apple Intelligence.")
+            case .retry: String(localized: "Checks whether on-device estimates are available.")
+            case .openHistory: String(localized: "Shows saved meals.")
+            }
+        }
     }
 
     let status: Status
