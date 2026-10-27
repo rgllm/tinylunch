@@ -1,6 +1,14 @@
 import SwiftUI
+import UIKit
 
 /// Shared colors follow appearance; the interface still uses native navigation and controls.
+
+enum VoiceOverAnnouncement {
+    /// Status that is easy to miss when the control VoiceOver was on disappears.
+    @MainActor static func post(_ message: String) {
+        UIAccessibility.post(notification: .announcement, argument: message)
+    }
+}
 enum TinyLunchStyle {
     static let paper = Color(uiColor: UIColor { $0.userInterfaceStyle == .dark
         ? UIColor(red: 0.08, green: 0.085, blue: 0.075, alpha: 1)
@@ -70,17 +78,23 @@ struct AccessibleActionLabel: View {
 
 struct MedicalDisclaimer: View {
     var prominent = true
+    @Environment(\.dynamicTypeSize) private var typeSize
     private var message: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Image(systemName: "cross.case")
-                .font(.subheadline)
-                .foregroundStyle(TinyLunchStyle.accent)
-                .accessibilityHidden(true)
-            Text("TinyLunch is not a medical device. These are estimates only, not medical or dietary advice. Consult a qualified professional for guidance about your health.")
-                .font(.headline)
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        let icon = Image(systemName: "cross.case")
+            .font(.subheadline)
+            .foregroundStyle(TinyLunchStyle.accent)
+            .accessibilityHidden(true)
+        let copy = Text("TinyLunch is not a medical device. These are estimates only, not medical or dietary advice. Consult a qualified professional for guidance about your health.")
+            .font(.headline)
+            .foregroundStyle(.primary)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        return Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) { icon; copy }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 10) { icon; copy }
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("medicalDisclaimer")
@@ -101,8 +115,40 @@ struct ScaledTextButton: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.headline)
+            .multilineTextAlignment(.leading)
+            .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
+    }
+}
+
+/// Icon and wrapping title. Stacks at accessibility sizes so the title is not clipped beside the symbol.
+struct IconLabel: View {
+    let title: LocalizedStringKey
+    let systemImage: String
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    var body: some View {
+        Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 6) { icon; titleText }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 8) { icon; titleText }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isStaticText)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var icon: some View {
+        Image(systemName: systemImage).accessibilityHidden(true)
+    }
+
+    private var titleText: some View {
+        Text(title)
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -120,9 +166,8 @@ struct FoodBadge: View {
     var body: some View {
         Text(emoji)
             .font(.title2)
-            .frame(width: size, height: size)
+            .frame(minWidth: size, minHeight: size)
             .background(TinyLunchStyle.soft, in: RoundedRectangle(cornerRadius: size * 0.3))
-            .clipped()
             .accessibilityHidden(true)
             .accessibilityIdentifier("decorativeGlyph")
     }
@@ -131,6 +176,7 @@ struct FoodBadge: View {
 struct EmojiPlate: View {
     @State private var taps = 0
     @State private var chef = false
+    @AccessibilityFocusState private var plateFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let foods = ["🥑", "🍋", "🥐", "🍓", "🍳"]
     var body: some View {
@@ -176,9 +222,12 @@ struct EmojiPlate: View {
         .accessibilityLabel("The TinyLunch plate")
         .accessibilityHint("Tap to change the food on the plate.")
         .accessibilityIdentifier("emojiPlate")
+        .accessibilityFocused($plateFocused)
         .accessibilityAction(named: "Discover the chef’s table") { chef = true }
         .sensoryFeedback(.selection, trigger: taps)
-        .sheet(isPresented: $chef) { SurpriseSheet(kind: .chef) }
+        .sheet(isPresented: $chef, onDismiss: {
+            Task { @MainActor in plateFocused = true }
+        }) { SurpriseSheet(kind: .chef) }
     }
 }
 
@@ -187,6 +236,7 @@ struct SurpriseSheet: View {
     let kind: Kind
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @AccessibilityFocusState private var titleFocused: Bool
     @State private var served = false
     var body: some View {
         NavigationStack {
@@ -201,6 +251,7 @@ struct SurpriseSheet: View {
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
+                        .accessibilityFocused($titleFocused)
                     Text(kind == .chef ? (served ? "One imaginary pancake. No need to log this one." : "You found our tiny kitchen. There’s always a seat for the curious.") : "To good food, good company, and remembering to eat before it gets cold.")
                         .foregroundStyle(TinyLunchStyle.ink).multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
@@ -223,7 +274,9 @@ struct SurpriseSheet: View {
                 .padding(.horizontal, 24)
                 .padding(.vertical, 12)
                 .background(TinyLunchStyle.paper)
+                .accessibilityHint("Closes this screen.")
         }
+        .onAppear { Task { @MainActor in titleFocused = true } }
         .presentationDetents([.medium, .large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(.selection, trigger: served)
@@ -232,6 +285,8 @@ struct SurpriseSheet: View {
 
 struct PrivacySheet: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @AccessibilityFocusState private var noticeFocused: Bool
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -240,18 +295,9 @@ struct PrivacySheet: View {
                         .font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
+                        .accessibilityFocused($noticeFocused)
                     MedicalDisclaimer(prominent: false)
-                    HStack(alignment: .firstTextBaseline, spacing: 10) {
-                        Image(systemName: "lock.iphone")
-                            .font(.title2)
-                            .accessibilityHidden(true)
-                        Text("Your plate. Your business.")
-                            .font(.title2.weight(.bold))
-                            .fixedSize(horizontal: false, vertical: true)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityAddTraits(.isHeader)
+                    privacyHeading
                     Text("TinyLunch is built for on-device estimates. Your food photos and meal details aren’t sent to a server.")
                         .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
@@ -292,7 +338,27 @@ struct PrivacySheet: View {
                     .accessibilityHint("Closes About privacy.")
             }
         }
+        .onAppear { Task { @MainActor in noticeFocused = true } }
         .presentationDragIndicator(.visible)
+    }
+
+    private var privacyHeading: some View {
+        let icon = Image(systemName: "lock.iphone")
+            .font(.title2)
+            .accessibilityHidden(true)
+        let title = Text("Your plate. Your business.")
+            .font(.title2.weight(.bold))
+            .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity, alignment: .leading)
+        return Group {
+            if typeSize.isAccessibilitySize {
+                VStack(alignment: .leading, spacing: 8) { icon; title }
+            } else {
+                HStack(alignment: .firstTextBaseline, spacing: 10) { icon; title }
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
     }
 
     private func sectionHeader(_ title: LocalizedStringKey) -> some View {
@@ -304,16 +370,8 @@ struct PrivacySheet: View {
     }
 
     private func wrappingLabel(_ title: LocalizedStringKey, systemImage: String) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 10) {
-            Image(systemName: systemImage)
-                .font(.body)
-                .accessibilityHidden(true)
-            Text(title)
-                .font(.body)
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .frame(minHeight: 44, alignment: .leading)
+        IconLabel(title: title, systemImage: systemImage)
+            .font(.body)
+            .foregroundStyle(.primary)
     }
 }

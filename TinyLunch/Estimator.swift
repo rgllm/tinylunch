@@ -245,6 +245,17 @@ actor AppleEstimator: FoodEstimating {
 
 #if DEBUG
 /// Available only through explicit UI test launch arguments, never the normal app flow.
+struct UnavailableEstimator: FoodEstimating {
+    func availability() async -> AnalysisAvailabilityState { .appleIntelligenceNotEnabled }
+    func analyze(_ image: Data) async throws -> [FoodItem] {
+        throw EstimateError.unavailable(AnalysisAvailabilityState.appleIntelligenceNotEnabled.explanation)
+    }
+    func estimate(name: String, preparation: String) async throws -> FoodItem {
+        throw EstimateError.unavailable(AnalysisAvailabilityState.appleIntelligenceNotEnabled.explanation)
+    }
+}
+
+/// Available only through explicit UI test launch arguments, never the normal app flow.
 struct FixtureEstimator: FoodEstimating {
     func availability() async -> AnalysisAvailabilityState { .ready }
     func analyze(_ image: Data) async throws -> [FoodItem] {

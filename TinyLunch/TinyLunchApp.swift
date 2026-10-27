@@ -12,7 +12,11 @@ struct TinyLunchApp: App {
             directory = URL.temporaryDirectory.appendingPathComponent("TinyLunchUITests", isDirectory: true)
             if args.contains("--reset-history") { try? FileManager.default.removeItem(at: directory) }
         }
-        if args.contains("--example-meal") || args.contains("--marketing-screenshots") { estimator = FixtureEstimator() }
+        if args.contains("--analysis-unavailable") {
+            estimator = UnavailableEstimator()
+        } else if args.contains("--example-meal") || args.contains("--marketing-screenshots") {
+            estimator = FixtureEstimator()
+        }
         #endif
         let model = AppModel(estimator: estimator, store: MealStore(directory: directory))
         #if DEBUG

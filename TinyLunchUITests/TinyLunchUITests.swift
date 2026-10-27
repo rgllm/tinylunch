@@ -10,12 +10,12 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(save.waitForExistence(timeout: 5))
         save.tap()
         app.tabBars.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Rice, Unidentified sauce"].waitForExistence(timeout: 5))
+        XCTAssertTrue(historyRow(app, title: "Rice, Unidentified sauce").waitForExistence(timeout: 5))
         app.terminate()
         app.launchArguments = ["--ui-testing"]
         app.launch()
         app.tabBars.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["Rice, Unidentified sauce"].waitForExistence(timeout: 5))
+        XCTAssertTrue(historyRow(app, title: "Rice, Unidentified sauce").waitForExistence(timeout: 5))
     }
 
     @MainActor func testNormalBuildDoesNotShowFixtureMeal() {
@@ -40,11 +40,16 @@ final class TinyLunchUITests: XCTestCase {
         scrollUntilExists(doubled, in: app)
         doubled.tap()
         app.buttons["Apply"].tap()
-        XCTAssertTrue(app.staticTexts["mealCalories"].waitForExistence(timeout: 5))
-        XCTAssertEqual(app.staticTexts["mealCalories"].label, "390 kcal")
+        let total = app.staticTexts["mealCalories"]
+        XCTAssertTrue(total.waitForExistence(timeout: 5))
+        XCTAssertTrue(total.label.contains("390"))
+        XCTAssertTrue(total.label.localizedCaseInsensitiveContains("kilocalories"))
         app.buttons["saveMeal"].tap()
         app.tabBars.buttons["History"].tap()
-        XCTAssertTrue(app.staticTexts["390 kcal"].waitForExistence(timeout: 5))
+        let savedMeal = historyRow(app, title: "Rice, Unidentified sauce")
+        XCTAssertTrue(savedMeal.waitForExistence(timeout: 5))
+        XCTAssertTrue(savedMeal.label.contains("390"))
+        XCTAssertTrue(savedMeal.label.localizedCaseInsensitiveContains("kilocalories"))
     }
 
     @MainActor func testHiddenPlateAndWordmarkSurprises() {
@@ -157,7 +162,7 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
         app.buttons["saveMeal"].tap()
         app.tabBars.buttons["History"].tap()
-        let saved = app.staticTexts["Rice, Unidentified sauce"]
+        let saved = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         saved.tap()
         assertVisibleDisclaimer(in: app)
@@ -174,11 +179,16 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Not a medical device"].waitForExistence(timeout: 5))
         try audit(app)
         app.buttons["Done"].tap()
+        app.tabBars.buttons["History"].tap()
+        XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
+        try audit(app)
+        app.tabBars.buttons["New meal"].tap()
 
         app.terminate()
         app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
         app.launch()
         XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
+        assertFoodRowReadsEstimate(in: app)
         try audit(app)
         let rice = app.buttons["editFood-Rice"]
         XCTAssertTrue(rice.waitForExistence(timeout: 5))
@@ -188,11 +198,108 @@ final class TinyLunchUITests: XCTestCase {
         app.buttons["Cancel"].tap()
         app.buttons["saveMeal"].tap()
         app.tabBars.buttons["History"].tap()
-        let saved = app.staticTexts["Rice, Unidentified sauce"]
+        let saved = historyRow(app, title: "Rice, Unidentified sauce")
+        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        XCTAssertTrue(saved.label.localizedCaseInsensitiveContains("Incomplete estimate"))
+        try audit(app)
+        saved.tap()
+        XCTAssertTrue(app.buttons["deleteSavedMeal"].waitForExistence(timeout: 5))
+        try audit(app)
+    }
+
+    @MainActor func testAccessibilityAuditWhenAppleIntelligenceIsOff() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--analysis-unavailable"]
+        app.launch()
+        let unavailable = app.descendants(matching: .any)["Apple Intelligence is turned off"]
+        XCTAssertTrue(unavailable.waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["openAnalysisSettings"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["retryAnalysis"].exists)
+        XCTAssertTrue(app.buttons["Take photo"].exists)
+        try audit(app)
+        app.tabBars.buttons["History"].tap()
+        XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
+        XCTAssertTrue(unavailable.waitForExistence(timeout: 5))
+        try audit(app)
+
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal", "--analysis-unavailable"]
+        app.launch()
+        XCTAssertTrue(app.buttons["editFood-Rice"].waitForExistence(timeout: 10))
+        XCTAssertTrue(unavailable.waitForExistence(timeout: 10))
+        assertVisibleDisclaimer(in: app)
+        assertFoodRowReadsEstimate(in: app)
+        try audit(app)
+        let save = app.buttons["saveMeal"]
+        XCTAssertTrue(save.waitForExistence(timeout: 5))
+        save.tap()
+        app.tabBars.buttons["History"].tap()
+        let saved = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         try audit(app)
         saved.tap()
         XCTAssertTrue(app.buttons["deleteSavedMeal"].waitForExistence(timeout: 5))
+        assertVisibleDisclaimer(in: app)
+        try audit(app)
+    }
+
+    @MainActor func testAccessibilityAuditAtAccessibilityXXXL() throws {
+        let size = "-UIPreferredContentSizeCategoryName"
+        let category = "UICTContentSizeCategoryAccessibilityXXXL"
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", size, category]
+        app.launch()
+        XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
+        let wordmark = app.staticTexts["tinyLunchWordmark"]
+        XCTAssertEqual(wordmark.label, "TinyLunch")
+        assertHorizontallyInside(wordmark, of: app)
+        let takePhoto = app.buttons["Take photo"]
+        reveal(takePhoto, in: app)
+        assertMinimumHitTarget(takePhoto)
+        let choose = app.buttons["Choose photo"]
+        XCTAssertTrue(choose.waitForExistence(timeout: 5))
+        reveal(choose, in: app)
+        assertMinimumHitTarget(choose)
+        assertMinimumHitTarget(app.buttons["aboutPrivacy"])
+        try audit(app)
+        app.tabBars.buttons["History"].tap()
+        XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
+        try audit(app)
+
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal", size, category]
+        app.launch()
+        assertFoodRowReadsEstimate(in: app)
+        let disclaimer = visibleDisclaimer(in: app)
+        scrollUntilOnScreen(disclaimer, in: app)
+        assertHorizontallyInside(disclaimer, of: app)
+        try audit(app)
+        let rice = app.buttons["editFood-Rice"]
+        reveal(rice, in: app)
+        let options = app.buttons["foodOptions-Rice"]
+        reveal(options, in: app)
+        assertMinimumHitTarget(options)
+        tapVisible(rice, in: app)
+        let apply = app.buttons["Apply"]
+        XCTAssertTrue(apply.waitForExistence(timeout: 5))
+        reveal(apply, in: app)
+        assertMinimumHitTarget(apply)
+        assertMinimumHitTarget(app.buttons["Cancel"])
+        try audit(app)
+        app.buttons["Cancel"].tap()
+        let save = app.buttons["saveMeal"]
+        reveal(save, in: app)
+        assertMinimumHitTarget(save)
+        save.tap()
+        app.tabBars.buttons["History"].tap()
+        let saved = historyRow(app, title: "Rice, Unidentified sauce")
+        XCTAssertTrue(saved.waitForExistence(timeout: 5))
+        try audit(app)
+        tapVisible(saved, in: app)
+        let delete = app.buttons["deleteSavedMeal"]
+        reveal(delete, in: app)
+        assertMinimumHitTarget(delete)
+        assertHorizontallyInside(visibleDisclaimer(in: app), of: app)
         try audit(app)
     }
 
@@ -228,7 +335,7 @@ final class TinyLunchUITests: XCTestCase {
         reveal(save, in: app)
         save.tap()
         app.tabBars.buttons["History"].tap()
-        let title = app.staticTexts["Rice, Unidentified sauce"]
+        let title = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(title.waitForExistence(timeout: 5))
         tapVisible(title, in: app)
         XCTAssertTrue(visibleDisclaimer(in: app).exists)
@@ -247,6 +354,9 @@ final class TinyLunchUITests: XCTestCase {
             let type = issue.auditType
             let visualOnly = type.contains(.contrast) || type.contains(.textClipped) || type.contains(.dynamicType)
             if identifier == "decorativeGlyph" { return true }
+            // The meal total uses @ScaledMetric relative to large title, so the point size
+            // grows with Dynamic Type. The audit only recognizes text styles.
+            if identifier == "mealCalories", type.contains(.dynamicType) { return true }
             let decorativeLabel = !label.isEmpty && label.rangeOfCharacter(from: .letters) == nil
             if decorativeLabel && visualOnly { return true }
             if issue.element == nil && visualOnly { return true }
@@ -261,6 +371,36 @@ final class TinyLunchUITests: XCTestCase {
             }
             return false
         }
+    }
+
+    @MainActor private func assertFoodRowReadsEstimate(in app: XCUIApplication) {
+        let rice = app.buttons["editFood-Rice"]
+        XCTAssertTrue(rice.waitForExistence(timeout: 10))
+        let riceParts = spokenParts(rice.label)
+        XCTAssertEqual(riceParts.first, "Rice")
+        XCTAssertTrue(riceParts.contains("Estimated"))
+        XCTAssertTrue(rice.label.localizedCaseInsensitiveContains("kilocalories"))
+        XCTAssertFalse(riceParts.contains("Not estimated"))
+        let sauce = app.buttons["editFood-Unidentified sauce"]
+        XCTAssertTrue(sauce.waitForExistence(timeout: 5))
+        let sauceParts = spokenParts(sauce.label)
+        XCTAssertTrue(sauceParts.contains("Not estimated"))
+        XCTAssertFalse(sauceParts.contains("Estimated"))
+    }
+
+    private func spokenParts(_ label: String) -> [String] {
+        label.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+
+    @MainActor private func historyRow(_ app: XCUIApplication, title: String) -> XCUIElement {
+        app.descendants(matching: .any)["historyMeal-\(title)"]
+    }
+
+    @MainActor private func assertMinimumHitTarget(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(element.exists, file: file, line: line)
+        let frame = element.frame
+        XCTAssertGreaterThanOrEqual(frame.width, 44, "Hit target width \(frame.width) for \(element.identifier) \(element.label)", file: file, line: line)
+        XCTAssertGreaterThanOrEqual(frame.height, 44, "Hit target height \(frame.height) for \(element.identifier) \(element.label)", file: file, line: line)
     }
 
     @MainActor private func assertVisibleDisclaimer(in app: XCUIApplication) {

@@ -155,4 +155,35 @@ final class TinyLunchTests: XCTestCase {
         XCTAssertEqual(reopened.first?.items[1].calories, 120 * 89 / 100)
         XCTAssertEqual(reopened.first?.isIncomplete, false)
     }
+
+    func testVoiceOverGroupsNameEnergyAndEstimate() {
+        let rice = FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked")
+        let sauce = FoodItem(name: "Sauce", grams: nil, kcalPer100g: nil, preparation: "Unknown")
+        let riceParts = spokenParts(rice.accessibilityDescription)
+        XCTAssertEqual(riceParts.first, "Rice")
+        XCTAssertTrue(riceParts.contains("Estimated"))
+        XCTAssertTrue(rice.accessibilityDescription.localizedCaseInsensitiveContains("kilocalories"))
+        XCTAssertTrue(rice.accessibilityDescription.contains(195.formatted(.number.precision(.fractionLength(0)))))
+        XCTAssertTrue(rice.accessibilityDescription.contains("Suggested portion"))
+        XCTAssertTrue(rice.accessibilityDescription.contains("Cooked"))
+        XCTAssertTrue(rice.showsEstimatedBadge)
+        XCTAssertFalse(spokenParts(sauce.accessibilityDescription).contains("Estimated"))
+        XCTAssertTrue(spokenParts(sauce.accessibilityDescription).contains("Not estimated"))
+        XCTAssertFalse(sauce.showsEstimatedBadge)
+
+        let water = FoodItem(name: "Water", grams: 200, kcalPer100g: 0, preparation: "Still", portionConfirmed: true)
+        XCTAssertEqual(water.calories, 0)
+        XCTAssertTrue(water.showsEstimatedBadge)
+        XCTAssertTrue(water.accessibilityDescription.contains("Confirmed portion"))
+        XCTAssertFalse(water.accessibilityDescription.contains("No estimate"))
+
+        let meal = Meal(items: [rice, sauce])
+        XCTAssertTrue(meal.spokenEnergy.localizedCaseInsensitiveContains("kilocalories"))
+        XCTAssertTrue(meal.historyAccessibilityLabel.hasPrefix("Rice, Sauce, \(meal.spokenEnergy), Incomplete estimate"))
+        XCTAssertEqual(Meal(items: [sauce]).spokenEnergy, "No estimate")
+    }
+
+    private func spokenParts(_ label: String) -> [String] {
+        label.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
 }

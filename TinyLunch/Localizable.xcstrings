@@ -493,6 +493,60 @@
     },
     "Estimated meal total. This is an estimate, not a measurement." : {
 
+    },
+    "Estimate ready." : {
+
+    },
+    "Estimate updated." : {
+
+    },
+    "Estimating on your iPhone." : {
+
+    },
+    "Importing photo." : {
+
+    },
+    "Photo ready to analyze." : {
+
+    },
+    "Meal saved. Tucked away in History." : {
+
+    },
+    "Meal saved. Tucked away in History. Just the details, never the photo." : {
+
+    },
+    "Meal deleted." : {
+
+    },
+    "No foods could be estimated." : {
+
+    },
+    "No estimate" : {
+
+    },
+    "Confirmed portion" : {
+
+    },
+    "Suggested portion" : {
+
+    },
+    "Options" : {
+
+    },
+    "Opens Settings so you can turn on Apple Intelligence." : {
+
+    },
+    "Checks whether on-device estimates are available." : {
+
+    },
+    "Shows saved meals." : {
+
+    },
+    "Closes this screen." : {
+
+    },
+    "Corrects this food and its portion. Use the actions to correct or remove it." : {
+
     }
   },
   "version" : "1.0"
