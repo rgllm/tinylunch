@@ -422,9 +422,9 @@ final class TinyLunchUITests: XCTestCase {
         let wordmark = wordmarkElement(in: app)
         XCTAssertTrue(wordmark.waitForExistence(timeout: 5))
         XCTAssertFalse(wordmark.frame.isEmpty)
-        // A held press is synthesized on iOS 27 but does not reach the title's gesture.
-        // UI tests tap; the app opens the toast on that tap only when launched with --ui-testing.
-        wordmark.tap()
+        // tap() scrolls this title and then reports a hit point of (-1, -1).
+        // UI tests tap the frame. The app opens the toast on that tap only when launched with --ui-testing.
+        wordmark.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
     @MainActor private func historyRow(_ app: XCUIApplication, title: String) -> XCUIElement {
