@@ -45,7 +45,7 @@ First release. Photograph a meal, correct the estimate, and save it on your iPho
 | Field | Suggested value |
 | --- | --- |
 | Privacy policy | https://tinylunch.engino.pt/privacy |
-| Support | https://engino.pt/privacidade#support |
+| Support | https://tinylunch.engino.pt/privacy |
 | Marketing | Optional |
 
 App Review expects a privacy-policy URL even when the privacy answers are “Data Not Collected”.
