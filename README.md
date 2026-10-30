@@ -6,7 +6,7 @@ TinyLunch is an iPhone app that estimates the calories in a meal from a photo. T
 
 TinyLunch does not collect data. Its privacy manifest sets tracking off and lists no collected data types. Food photos and meal details stay on the iPhone.
 
-Photo and text estimates use Apple’s on-device Foundation Models framework: `SystemLanguageModel(useCase: .general)`. A photo is sent with `Attachment` when that model reports the vision capability. The app calls this Apple Intelligence. Apple may download the model assets through the system before the first estimate. Choosing an iCloud photo may also need a system download before import.
+Photo and text estimates use Apple’s on-device Foundation Models framework, `SystemLanguageModel(useCase: .general)`. The interface calls this Apple Intelligence. A photo is attached with `Attachment` when that model reports the vision capability. Apple may download the model assets through the system before the first estimate. Choosing an iCloud photo may also need a system download before import.
 
 A meal is stored only when you tap Save. History is a JSON file under Application Support, written with complete file protection and excluded from backups. It keeps foods, portions, preparation assumptions, and estimates. It does not keep photos. Removing the app removes that history.
 
@@ -14,11 +14,11 @@ Privacy policy: https://tinylunch.engino.pt/privacy
 
 ## Requirements
 
-- Xcode 27.0. `project.yml` sets `xcodeVersion` to 27.0. The iOS test workflow runs on the `xcode-27` image and selects an Xcode whose iOS Simulator SDK is 27.0 or newer.
+- Xcode 27.0. `project.yml` sets `xcodeVersion` to 27.0. The iOS test workflow runs on the `xcode-27` runner and selects an Xcode whose iOS Simulator SDK is 27.0 or newer.
 - iOS 27.0. `project.yml` sets `deploymentTarget.iOS` to 27.0, and the Xcode project sets `IPHONEOS_DEPLOYMENT_TARGET` to 27.0.
 - iPhone. `TARGETED_DEVICE_FAMILY` is 1.
 
-New estimates need Apple Intelligence on that iPhone. The on-device model must be available and include vision. When the device is not eligible, Apple Intelligence is turned off, or the model is still preparing, TinyLunch explains the limitation and History stays available.
+Photo analysis needs Apple Intelligence on that iPhone. The on-device model must be available and include vision. When the device is not eligible, Apple Intelligence is turned off, the model is still preparing, or vision is unavailable, TinyLunch explains the limitation and History stays available.
 
 ## Build and run
 
