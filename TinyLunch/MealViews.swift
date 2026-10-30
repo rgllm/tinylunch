@@ -304,7 +304,8 @@ struct FoodEditor: View {
 
     private func portionButton(_ title: LocalizedStringKey, multiplier: Double, original: Double, hint: LocalizedStringKey) -> some View {
         Button(title) { grams = original * multiplier; portionChange += 1 }
-            .buttonStyle(ScaledTextButton())
+            .buttonStyle(.bordered)
+            .frame(minHeight: 44)
             .disabled(original * multiplier > 10_000)
             .accessibilityHint(hint)
     }

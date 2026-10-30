@@ -71,6 +71,8 @@ struct CaptureView: View {
                                         .frame(minWidth: 44, minHeight: 44)
                                 }
                             }
+                        } else {
+                            wordmark(resistsCompression: true)
                         }
                         if !model.modelAvailability.allowsPhotoAnalysis {
                             availabilityCard
@@ -91,12 +93,8 @@ struct CaptureView: View {
             }
             .background(TinyLunchStyle.paper)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(editing == nil ? .visible : .hidden, for: .tabBar)
             .toolbar {
-                if !typeSize.isAccessibilitySize {
-                    ToolbarItem(placement: .topBarLeading) {
-                        wordmark(resistsCompression: true)
-                    }.sharedBackgroundVisibility(.hidden)
-                }
                 if model.draft != nil || model.image != nil || !typeSize.isAccessibilitySize {
                     ToolbarItem(placement: .topBarTrailing) {
                         if model.draft != nil || model.image != nil {
@@ -546,7 +544,7 @@ struct CaptureView: View {
             .fixedSize(horizontal: resistsCompression, vertical: false)
             .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
-            .onLongPressGesture(minimumDuration: 1) { toast = true }
+            .highPriorityGesture(LongPressGesture(minimumDuration: 0.8).onEnded { _ in toast = true })
             .accessibilityLabel("TinyLunch")
             .accessibilityAddTraits(.isHeader)
             .accessibilityIdentifier("tinyLunchWordmark")

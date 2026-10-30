@@ -39,10 +39,10 @@ final class TinyLunchUITests: XCTestCase {
         let doubled = app.buttons["Double"]
         scrollUntilExists(doubled, in: app)
         XCTAssertTrue(app.buttons["Apply"].waitForExistence(timeout: 5))
-        doubled.tap()
+        doubled.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         let apply = app.buttons["Apply"]
         XCTAssertTrue(apply.waitForExistence(timeout: 5), "Editor closed after changing the portion")
-        apply.tap()
+        apply.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         let total = app.staticTexts["mealCalories"]
         XCTAssertTrue(total.waitForExistence(timeout: 5))
         XCTAssertTrue(total.label.contains("390"))
@@ -397,10 +397,20 @@ final class TinyLunchUITests: XCTestCase {
 
     /// iOS 27's `Tab` controls show up as buttons labeled "New meal" and "History".
     /// The simulator accessibility tree has no tab bar, so `tabBars` matches nothing.
+    /// `tap()` then tries to scroll that button and computes a hit point of (-1, -1).
     @MainActor private func openTab(_ title: String, in app: XCUIApplication) {
         let tab = app.buttons[title]
         XCTAssertTrue(tab.waitForExistence(timeout: 5), "Missing \(title) tab")
-        tab.tap()
+        let window = app.windows.firstMatch.frame
+        var frame = tab.frame
+        var spins = 0
+        while spins < 8 && (frame.isEmpty || frame.midY < window.minY || frame.midY > window.maxY) {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+            frame = tab.frame
+            spins += 1
+        }
+        XCTAssertFalse(frame.isEmpty, "\(title) tab has no frame")
+        tab.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
     /// `press(forDuration:)` scrolls a toolbar title on iOS 27 and then reports a hit point of (-1, -1).
