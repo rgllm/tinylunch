@@ -82,7 +82,7 @@ final class TinyLunchUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset-history", "-UIPreferredContentSizeCategoryName", sizeCategory]
         app.launch()
-        let title = app.staticTexts["tinyLunchWordmark"]
+        let title = wordmarkElement(in: app)
         XCTAssertTrue(title.waitForExistence(timeout: 10), "Missing TinyLunch title at \(sizeCategory)")
         XCTAssertEqual(title.label, "TinyLunch")
         let frame = title.frame
@@ -254,7 +254,7 @@ final class TinyLunchUITests: XCTestCase {
         app.launchArguments = ["--ui-testing", "--reset-history", size, category]
         app.launch()
         XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
-        let wordmark = app.staticTexts["tinyLunchWordmark"]
+        let wordmark = wordmarkElement(in: app)
         XCTAssertEqual(wordmark.label, "TinyLunch")
         assertHorizontallyInside(wordmark, of: app)
         let takePhoto = app.buttons["Take photo"]
@@ -412,10 +412,14 @@ final class TinyLunchUITests: XCTestCase {
         tab.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
+    @MainActor private func wordmarkElement(in app: XCUIApplication) -> XCUIElement {
+        app.descendants(matching: .any)["tinyLunchWordmark"]
+    }
+
     /// `press(forDuration:)` scrolls a toolbar title on iOS 27 and then reports a hit point of (-1, -1).
     /// The title's frame is on screen, so the long press uses that point directly.
     @MainActor private func longPressWordmark(in app: XCUIApplication) {
-        let wordmark = app.staticTexts["tinyLunchWordmark"]
+        let wordmark = wordmarkElement(in: app)
         XCTAssertTrue(wordmark.waitForExistence(timeout: 5))
         XCTAssertFalse(wordmark.frame.isEmpty)
         wordmark.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 1.2)

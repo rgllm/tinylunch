@@ -673,35 +673,33 @@ struct AnalysisAvailabilityCard: View {
     }
 }
 
-/// UIKit long-press. The simulator press is delivered to this accessibility element, not to a SwiftUI gesture.
+/// Holds on the title. A plain long-press recognizer does not see the simulator's press, so the hold is a control event.
 private struct WordmarkPressCatcher: UIViewRepresentable {
     var action: () -> Void
 
-    func makeUIView(context: Context) -> UIView {
-        let view = UIView()
-        view.backgroundColor = .clear
-        view.isAccessibilityElement = true
-        view.accessibilityLabel = "TinyLunch"
-        view.accessibilityIdentifier = "tinyLunchWordmark"
-        view.accessibilityTraits = [.staticText, .header]
-        view.accessibilityCustomActions = [
+    func makeUIView(context: Context) -> UIButton {
+        let button = UIButton(type: .custom)
+        button.backgroundColor = .clear
+        button.isAccessibilityElement = true
+        button.accessibilityLabel = "TinyLunch"
+        button.accessibilityIdentifier = "tinyLunchWordmark"
+        button.accessibilityTraits = [.staticText, .header]
+        button.accessibilityCustomActions = [
             UIAccessibilityCustomAction(name: "A little toast") { _ in
                 context.coordinator.action()
                 return true
             }
         ]
-        view.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
-        view.setContentHuggingPriority(.fittingSizeLevel, for: .vertical)
-        view.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
-        view.setContentCompressionResistancePriority(.fittingSizeLevel, for: .vertical)
-        let recognizer = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.fire(_:)))
-        recognizer.minimumPressDuration = 0.5
-        recognizer.allowableMovement = 24
-        view.addGestureRecognizer(recognizer)
-        return view
+        button.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
+        button.setContentHuggingPriority(.fittingSizeLevel, for: .vertical)
+        button.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
+        button.setContentCompressionResistancePriority(.fittingSizeLevel, for: .vertical)
+        button.addTarget(context.coordinator, action: #selector(Coordinator.down), for: .touchDown)
+        button.addTarget(context.coordinator, action: #selector(Coordinator.cancel), for: [.touchUpInside, .touchUpOutside, .touchCancel])
+        return button
     }
 
-    func updateUIView(_ uiView: UIView, context: Context) {
+    func updateUIView(_ uiView: UIButton, context: Context) {
         context.coordinator.action = action
     }
 
@@ -711,10 +709,18 @@ private struct WordmarkPressCatcher: UIViewRepresentable {
 
     final class Coordinator: NSObject {
         var action: () -> Void
+        private var generation = 0
         init(action: @escaping () -> Void) { self.action = action }
-        @objc func fire(_ recognizer: UILongPressGestureRecognizer) {
-            guard recognizer.state == .began else { return }
-            action()
+        @objc func down() {
+            generation += 1
+            let token = generation
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
+                guard let self, self.generation == token else { return }
+                self.action()
+            }
+        }
+        @objc func cancel() {
+            generation += 1
         }
     }
 }
