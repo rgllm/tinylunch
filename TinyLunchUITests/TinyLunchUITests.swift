@@ -322,15 +322,13 @@ final class TinyLunchUITests: XCTestCase {
         let rice = app.buttons["editFood-Rice"]
         XCTAssertTrue(rice.waitForExistence(timeout: 5))
         tapVisible(rice, in: app)
+        let half = app.buttons["Half"]
+        XCTAssertTrue(half.waitForExistence(timeout: 5))
+        let doubled = app.buttons["Double"]
+        XCTAssertTrue(doubled.waitForExistence(timeout: 5))
         let grams = app.textFields["portionGrams"]
         scrollUntilExists(grams, in: app)
         XCTAssertTrue(grams.exists || app.textFields["Portion in grams"].exists)
-        let half = app.buttons["Half"]
-        scrollUntilExists(half, in: app)
-        XCTAssertTrue(half.exists)
-        let doubled = app.buttons["Double"]
-        scrollUntilExists(doubled, in: app)
-        XCTAssertTrue(doubled.exists)
         let apply = app.buttons["Apply"]
         reveal(apply, in: app)
         XCTAssertTrue(apply.isHittable)

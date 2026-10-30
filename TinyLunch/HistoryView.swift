@@ -35,8 +35,12 @@ struct HistoryView: View {
                                 availabilityCard
                             }
                             Text(emptyHistoryMessage)
-                                .foregroundStyle(TinyLunchStyle.ink).multilineTextAlignment(.center)
+                                .font(.body)
+                                .foregroundStyle(TinyLunchStyle.ink)
+                                .multilineTextAlignment(.center)
+                                .lineLimit(nil)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity)
                             if model.historyLoaded {
                                 Button { startMeal() } label: {
                                     AccessibleActionLabel(title: "Start a meal", systemImage: "plus")
@@ -54,7 +58,7 @@ struct HistoryView: View {
                             }
                             IconLabel(title: "Just meal details. No photos.", systemImage: "lock")
                                 .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
-                        }.padding(.horizontal, 32).padding(.top, 52).padding(.bottom, 32)
+                        }.padding(.horizontal, 32).padding(.top, 52).padding(.bottom, 120)
                     }
                 } else {
                     List {
@@ -150,7 +154,7 @@ struct HistoryView: View {
         if !model.modelAvailability.allowsPhotoAnalysis {
             return String(localized: "Meals you save stay in this list, where you can open or delete them.")
         }
-        return String(localized: "A place for meals worth remembering.\nTap Save after an estimate to keep it here.")
+        return String(localized: "A place for meals worth remembering. Tap Save after an estimate to keep it here.")
     }
 
     private func openSystemSettings() {

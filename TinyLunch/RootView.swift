@@ -546,7 +546,7 @@ struct CaptureView: View {
             .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
             .accessibilityHidden(true)
-            .background {
+            .overlay {
                 WordmarkPressCatcher { toast = true }
             }
             .accessibilityFocused($wordmarkFocused)
