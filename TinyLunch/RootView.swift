@@ -545,15 +545,11 @@ struct CaptureView: View {
             .fixedSize(horizontal: resistsCompression, vertical: false)
             .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
-            .overlay {
+            .accessibilityHidden(true)
+            .background {
                 WordmarkPressCatcher { toast = true }
-                    .accessibilityHidden(true)
             }
-            .accessibilityLabel("TinyLunch")
-            .accessibilityAddTraits(.isHeader)
-            .accessibilityIdentifier("tinyLunchWordmark")
             .accessibilityFocused($wordmarkFocused)
-            .accessibilityAction(named: "A little toast") { toast = true }
     }
 
     private var activityRow: some View {
@@ -677,14 +673,27 @@ struct AnalysisAvailabilityCard: View {
     }
 }
 
-/// UIKit long-press. SwiftUI's gesture on this title does not receive the simulator's press.
+/// UIKit long-press. The simulator press is delivered to this accessibility element, not to a SwiftUI gesture.
 private struct WordmarkPressCatcher: UIViewRepresentable {
     var action: () -> Void
 
     func makeUIView(context: Context) -> UIView {
         let view = UIView()
         view.backgroundColor = .clear
-        view.isAccessibilityElement = false
+        view.isAccessibilityElement = true
+        view.accessibilityLabel = "TinyLunch"
+        view.accessibilityIdentifier = "tinyLunchWordmark"
+        view.accessibilityTraits = [.staticText, .header]
+        view.accessibilityCustomActions = [
+            UIAccessibilityCustomAction(name: "A little toast") { _ in
+                context.coordinator.action()
+                return true
+            }
+        ]
+        view.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
+        view.setContentHuggingPriority(.fittingSizeLevel, for: .vertical)
+        view.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
+        view.setContentCompressionResistancePriority(.fittingSizeLevel, for: .vertical)
         let recognizer = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.fire(_:)))
         recognizer.minimumPressDuration = 0.5
         recognizer.allowableMovement = 24

@@ -151,14 +151,6 @@ struct FoodEditor: View {
             Form {
                 Section {
                     editorBanner
-                    if let original = item.grams, original.isFinite, original > 0 {
-                        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
-                        layout {
-                            portionButton("Half", multiplier: 0.5, original: original, hint: "Sets the portion to half the original weight.")
-                            portionButton("Original", multiplier: 1, original: original, hint: "Restores the original portion.")
-                            portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
-                        }
-                    }
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
@@ -193,6 +185,14 @@ struct FoodEditor: View {
                             .accessibilityHidden(true)
                     }
                     .padding(.vertical, 6)
+                    if let original = item.grams, original.isFinite, original > 0 {
+                        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
+                        layout {
+                            portionButton("Half", multiplier: 0.5, original: original, hint: "Sets the portion to half the original weight.")
+                            portionButton("Original", multiplier: 1, original: original, hint: "Restores the original portion.")
+                            portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
+                        }
+                    }
                     Group {
                         if allowsIdentityEdit {
                             Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
