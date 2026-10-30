@@ -43,7 +43,7 @@ final class ScreenshotTests: XCTestCase {
         let directory = try output
         let app = launch(arguments: ["--ui-testing", "--reset-history", "--marketing-screenshots", "--marketing-history"])
         XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
-        app.tabBars.buttons["History"].tap()
+        app.buttons["History"].tap()
         XCTAssertTrue(app.descendants(matching: .any)["historyMeal-Grilled salmon, Jasmine rice, Broccoli"].waitForExistence(timeout: 10))
         save(app.screenshot(), as: "03-history.png", in: directory)
     }

@@ -228,6 +228,7 @@ struct FoodEditor: View {
                     Button("Apply") { apply() }
                         .buttonStyle(PrimaryAction())
                         .disabled(!valid)
+                        .accessibilityIdentifier("Apply")
                         .accessibilityHint("Applies the food, preparation, and portion.")
                     Button("Cancel") { cancel(); dismiss() }
                         .buttonStyle(.plain)
@@ -241,6 +242,7 @@ struct FoodEditor: View {
             }
             }
         }
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .sensoryFeedback(.selection, trigger: portionChange)
         .onAppear { Task { @MainActor in introFocused = true } }

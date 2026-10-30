@@ -64,7 +64,13 @@ struct CaptureView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         if typeSize.isAccessibilitySize {
-                            wordmark(resistsCompression: false)
+                            HStack(alignment: .center, spacing: 12) {
+                                wordmark(resistsCompression: false)
+                                if model.draft == nil && model.image == nil {
+                                    aboutPrivacyButton
+                                        .frame(minWidth: 44, minHeight: 44)
+                                }
+                            }
                         }
                         if !model.modelAvailability.allowsPhotoAnalysis {
                             availabilityCard
@@ -91,37 +97,24 @@ struct CaptureView: View {
                         wordmark(resistsCompression: true)
                     }.sharedBackgroundVisibility(.hidden)
                 }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if model.draft != nil || model.image != nil {
-                        Button { discard = true } label: {
-                            if typeSize.isAccessibilitySize {
-                                Image(systemName: "arrow.counterclockwise")
-                                    .frame(minWidth: 44, minHeight: 44)
-                                    .contentShape(Rectangle())
-                            } else {
-                                Label("Start over", systemImage: "arrow.counterclockwise")
+                if model.draft != nil || model.image != nil || !typeSize.isAccessibilitySize {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if model.draft != nil || model.image != nil {
+                            Button { discard = true } label: {
+                                if typeSize.isAccessibilitySize {
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .frame(minWidth: 44, minHeight: 44)
+                                        .contentShape(Rectangle())
+                                } else {
+                                    Label("Start over", systemImage: "arrow.counterclockwise")
+                                }
                             }
+                            .accessibilityLabel("Start over")
+                            .accessibilityHint("Discards this unsaved meal.")
+                            .disabled(model.saving)
+                        } else {
+                            aboutPrivacyButton
                         }
-                        .accessibilityLabel("Start over")
-                        .accessibilityHint("Discards this unsaved meal.")
-                        .disabled(model.saving)
-                    } else {
-                        Button {
-                            privacySource = .toolbar
-                            privacy = true
-                        } label: {
-                            if typeSize.isAccessibilitySize {
-                                Image(systemName: "lock.iphone")
-                                    .frame(minWidth: 44, minHeight: 44)
-                                    .contentShape(Rectangle())
-                            } else {
-                                Label("About privacy", systemImage: "lock.iphone")
-                            }
-                        }
-                        .accessibilityLabel("About privacy")
-                        .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
-                        .accessibilityIdentifier("aboutPrivacy")
-                        .accessibilityFocused($privacyReturnFocus, equals: .toolbar)
                     }
                 }
             }
@@ -136,7 +129,7 @@ struct CaptureView: View {
                     cancel: model.cancel
                 ) { name, preparation, grams in
                     model.update(item, name: name, preparation: preparation, grams: grams, onSuccess: { editing = nil })
-                }.interactiveDismissDisabled(model.busy)
+                }.interactiveDismissDisabled()
             }
             .sheet(isPresented: $privacy, onDismiss: {
                 let source = privacySource
@@ -522,6 +515,25 @@ struct CaptureView: View {
         }.padding(.horizontal, 24).padding(.top, 14).padding(.bottom, 10)
             .background(TinyLunchStyle.paper)
             .overlay(alignment: .top) { Divider() }
+    }
+
+    private var aboutPrivacyButton: some View {
+        Button {
+            privacySource = .toolbar
+            privacy = true
+        } label: {
+            if typeSize.isAccessibilitySize {
+                Image(systemName: "lock.iphone")
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            } else {
+                Label("About privacy", systemImage: "lock.iphone")
+            }
+        }
+        .accessibilityLabel("About privacy")
+        .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
+        .accessibilityIdentifier("aboutPrivacy")
+        .accessibilityFocused($privacyReturnFocus, equals: .toolbar)
     }
 
     private func wordmark(resistsCompression: Bool) -> some View {

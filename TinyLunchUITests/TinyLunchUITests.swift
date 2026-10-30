@@ -9,12 +9,12 @@ final class TinyLunchUITests: XCTestCase {
         let save = app.buttons["saveMeal"]
         XCTAssertTrue(save.waitForExistence(timeout: 5))
         save.tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(historyRow(app, title: "Rice, Unidentified sauce").waitForExistence(timeout: 5))
         app.terminate()
         app.launchArguments = ["--ui-testing"]
         app.launch()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(historyRow(app, title: "Rice, Unidentified sauce").waitForExistence(timeout: 5))
     }
 
@@ -25,7 +25,7 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
         XCTAssertFalse(app.buttons["saveMeal"].exists)
         XCTAssertFalse(app.buttons["editFood-Rice"].exists)
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
     }
 
@@ -38,14 +38,17 @@ final class TinyLunchUITests: XCTestCase {
         tapVisible(rice, in: app)
         let doubled = app.buttons["Double"]
         scrollUntilExists(doubled, in: app)
+        XCTAssertTrue(app.buttons["Apply"].waitForExistence(timeout: 5))
         doubled.tap()
-        app.buttons["Apply"].tap()
+        let apply = app.buttons["Apply"]
+        XCTAssertTrue(apply.waitForExistence(timeout: 5), "Editor closed after changing the portion")
+        apply.tap()
         let total = app.staticTexts["mealCalories"]
         XCTAssertTrue(total.waitForExistence(timeout: 5))
         XCTAssertTrue(total.label.contains("390"))
         XCTAssertTrue(total.label.localizedCaseInsensitiveContains("kilocalories"))
         app.buttons["saveMeal"].tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         let savedMeal = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(savedMeal.waitForExistence(timeout: 5))
         XCTAssertTrue(savedMeal.label.contains("390"))
@@ -63,7 +66,7 @@ final class TinyLunchUITests: XCTestCase {
         app.buttons["Surprise me"].tap()
         XCTAssertTrue(app.staticTexts["On the house."].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
-        app.staticTexts["tinyLunchWordmark"].press(forDuration: 1.2)
+        longPressWordmark(in: app)
         XCTAssertTrue(app.staticTexts["A little toast."].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
         XCTAssertTrue(plate.exists)
@@ -113,7 +116,7 @@ final class TinyLunchUITests: XCTestCase {
         }
         capture.tap()
         dismissCameraPath(in: app)
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
     }
 
@@ -161,7 +164,7 @@ final class TinyLunchUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
         app.buttons["saveMeal"].tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         let saved = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         saved.tap()
@@ -179,10 +182,10 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Not a medical device"].waitForExistence(timeout: 5))
         try audit(app)
         app.buttons["Done"].tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
         try audit(app)
-        app.tabBars.buttons["New meal"].tap()
+        openTab("New meal", in: app)
 
         app.terminate()
         app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
@@ -197,7 +200,7 @@ final class TinyLunchUITests: XCTestCase {
         try audit(app)
         app.buttons["Cancel"].tap()
         app.buttons["saveMeal"].tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         let saved = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         XCTAssertTrue(saved.label.localizedCaseInsensitiveContains("Incomplete estimate"))
@@ -217,7 +220,7 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.buttons["retryAnalysis"].exists)
         XCTAssertTrue(app.buttons["Take photo"].exists)
         try audit(app)
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
         XCTAssertTrue(unavailable.waitForExistence(timeout: 5))
         try audit(app)
@@ -233,7 +236,7 @@ final class TinyLunchUITests: XCTestCase {
         let save = app.buttons["saveMeal"]
         XCTAssertTrue(save.waitForExistence(timeout: 5))
         save.tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         let saved = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         try audit(app)
@@ -262,7 +265,7 @@ final class TinyLunchUITests: XCTestCase {
         assertMinimumHitTarget(choose)
         assertMinimumHitTarget(app.buttons["aboutPrivacy"])
         try audit(app)
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
         try audit(app)
 
@@ -291,7 +294,7 @@ final class TinyLunchUITests: XCTestCase {
         reveal(save, in: app)
         assertMinimumHitTarget(save)
         save.tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         let saved = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(saved.waitForExistence(timeout: 5))
         try audit(app)
@@ -334,7 +337,7 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Apply"].waitForNonExistence(timeout: 5))
         reveal(save, in: app)
         save.tap()
-        app.tabBars.buttons["History"].tap()
+        openTab("History", in: app)
         let title = historyRow(app, title: "Rice, Unidentified sauce")
         XCTAssertTrue(title.waitForExistence(timeout: 5))
         tapVisible(title, in: app)
@@ -390,6 +393,23 @@ final class TinyLunchUITests: XCTestCase {
 
     private func spokenParts(_ label: String) -> [String] {
         label.split(separator: ",").map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+    }
+
+    /// iOS 27's `Tab` controls show up as buttons labeled "New meal" and "History".
+    /// The simulator accessibility tree has no tab bar, so `tabBars` matches nothing.
+    @MainActor private func openTab(_ title: String, in app: XCUIApplication) {
+        let tab = app.buttons[title]
+        XCTAssertTrue(tab.waitForExistence(timeout: 5), "Missing \(title) tab")
+        tab.tap()
+    }
+
+    /// `press(forDuration:)` scrolls a toolbar title on iOS 27 and then reports a hit point of (-1, -1).
+    /// The title's frame is on screen, so the long press uses that point directly.
+    @MainActor private func longPressWordmark(in app: XCUIApplication) {
+        let wordmark = app.staticTexts["tinyLunchWordmark"]
+        XCTAssertTrue(wordmark.waitForExistence(timeout: 5))
+        XCTAssertFalse(wordmark.frame.isEmpty)
+        wordmark.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 1.2)
     }
 
     @MainActor private func historyRow(_ app: XCUIApplication, title: String) -> XCUIElement {
