@@ -13,7 +13,7 @@ settings:
     CODE_SIGN_STYLE: Automatic
     CODE_SIGN_IDENTITY: Apple Development
     MARKETING_VERSION: '1.0.0'
-    CURRENT_PROJECT_VERSION: '26'
+    CURRENT_PROJECT_VERSION: '27'
     SUPPORTS_MACCATALYST: NO
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
     SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
@@ -33,7 +33,7 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.rgllm.tinylunch
         TARGETED_DEVICE_FAMILY: '1'
         GENERATE_INFOPLIST_FILE: YES
-        CURRENT_PROJECT_VERSION: '26'
+        CURRENT_PROJECT_VERSION: '27'
         MARKETING_VERSION: '1.0.0'
         INFOPLIST_KEY_NSCameraUsageDescription: Take a food photo to estimate its calories on your iPhone.
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
