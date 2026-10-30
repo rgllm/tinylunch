@@ -707,7 +707,7 @@ private struct WordmarkPressCatcher: UIViewRepresentable {
         Coordinator(action: action)
     }
 
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, @unchecked Sendable {
         var action: () -> Void
         private var generation = 0
         init(action: @escaping () -> Void) { self.action = action }
