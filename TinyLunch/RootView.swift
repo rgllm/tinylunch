@@ -152,6 +152,9 @@ struct CaptureView: View {
             }
             .sensoryFeedback(.success, trigger: model.savedNotice) { _, saved in saved }
             .sensoryFeedback(.selection, trigger: toast)
+            .onAppear {
+                if ProcessInfo.processInfo.arguments.contains("--show-toast") { toast = true }
+            }
             .onChange(of: model.savedNotice) { _, saved in
                 guard saved else { return }
                 Task { @MainActor in savedFocused = true }
@@ -536,31 +539,21 @@ struct CaptureView: View {
     }
 
     private func wordmark(resistsCompression: Bool) -> some View {
-        Button {
-            // The iOS 27 simulator synthesizes a hold on this title and never delivers it to a gesture.
-            // UI tests tap. A normal tap does not open the toast.
-            if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
-                toast = true
-            }
-        } label: {
-            Text("TinyLunch")
-                .font(.system(.title, design: .rounded, weight: .bold))
-                .tracking(typeSize >= .xxxLarge ? 0 : -1.5)
-                .foregroundStyle(TinyLunchStyle.accent)
-                .lineLimit(1)
-                .minimumScaleFactor(typeSize.isAccessibilitySize ? 0.5 : 1)
-                .fixedSize(horizontal: resistsCompression, vertical: false)
-                .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .fixedSize(horizontal: resistsCompression, vertical: false)
-        .modifier(WordmarkHold(enabled: !ProcessInfo.processInfo.arguments.contains("--ui-testing")) { toast = true })
-        .accessibilityLabel("TinyLunch")
-        .accessibilityAddTraits(.isHeader)
-        .accessibilityIdentifier("tinyLunchWordmark")
-        .accessibilityFocused($wordmarkFocused)
-        .accessibilityAction(named: "A little toast") { toast = true }
+        Text("TinyLunch")
+            .font(.system(.title, design: .rounded, weight: .bold))
+            .tracking(typeSize >= .xxxLarge ? 0 : -1.5)
+            .foregroundStyle(TinyLunchStyle.accent)
+            .lineLimit(1)
+            .minimumScaleFactor(typeSize.isAccessibilitySize ? 0.5 : 1)
+            .fixedSize(horizontal: resistsCompression, vertical: false)
+            .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
+            .contentShape(Rectangle())
+            .onLongPressGesture(minimumDuration: 0.8) { toast = true }
+            .accessibilityLabel("TinyLunch")
+            .accessibilityAddTraits(.isHeader)
+            .accessibilityIdentifier("tinyLunchWordmark")
+            .accessibilityFocused($wordmarkFocused)
+            .accessibilityAction(named: "A little toast") { toast = true }
     }
 
     private var activityRow: some View {
@@ -681,18 +674,6 @@ struct AnalysisAvailabilityCard: View {
         .buttonStyle(ScaledTextButton())
         .accessibilityIdentifier(action.accessibilityIdentifier)
         .accessibilityHint(action.accessibilityHint)
-    }
-}
-
-private struct WordmarkHold: ViewModifier {
-    var enabled: Bool
-    var action: () -> Void
-    @ViewBuilder func body(content: Content) -> some View {
-        if enabled {
-            content.onLongPressGesture(minimumDuration: 0.8, perform: action)
-        } else {
-            content
-        }
     }
 }
 

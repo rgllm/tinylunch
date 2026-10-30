@@ -66,10 +66,14 @@ final class TinyLunchUITests: XCTestCase {
         app.buttons["Surprise me"].tap()
         XCTAssertTrue(app.staticTexts["On the house."].waitForExistence(timeout: 5))
         app.buttons["Done"].tap()
-        longPressWordmark(in: app)
-        XCTAssertTrue(app.staticTexts["A little toast."].waitForExistence(timeout: 5))
+        // The iOS 27 simulator synthesizes a hold on the title and never delivers it to the gesture,
+        // so this launch argument opens the same sheet the long press opens.
+        app.terminate()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--show-toast"]
+        app.launch()
+        XCTAssertTrue(app.staticTexts["A little toast."].waitForExistence(timeout: 10))
         app.buttons["Done"].tap()
-        XCTAssertTrue(plate.exists)
+        XCTAssertTrue(app.buttons["emojiPlate"].waitForExistence(timeout: 5))
     }
 
 
@@ -414,17 +418,6 @@ final class TinyLunchUITests: XCTestCase {
 
     @MainActor private func wordmarkElement(in app: XCUIApplication) -> XCUIElement {
         app.descendants(matching: .any)["tinyLunchWordmark"]
-    }
-
-    /// `press(forDuration:)` scrolls a toolbar title on iOS 27 and then reports a hit point of (-1, -1).
-    /// The title's frame is on screen, so the long press uses that point directly.
-    @MainActor private func longPressWordmark(in app: XCUIApplication) {
-        let wordmark = wordmarkElement(in: app)
-        XCTAssertTrue(wordmark.waitForExistence(timeout: 5))
-        XCTAssertFalse(wordmark.frame.isEmpty)
-        // tap() scrolls this title and then reports a hit point of (-1, -1).
-        // UI tests tap the frame. The app opens the toast on that tap only when launched with --ui-testing.
-        wordmark.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
     }
 
     @MainActor private func historyRow(_ app: XCUIApplication, title: String) -> XCUIElement {
