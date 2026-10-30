@@ -151,6 +151,14 @@ struct FoodEditor: View {
             Form {
                 Section {
                     editorBanner
+                    if let original = item.grams, original.isFinite, original > 0 {
+                        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
+                        layout {
+                            portionButton("Half", multiplier: 0.5, original: original, hint: "Sets the portion to half the original weight.")
+                            portionButton("Original", multiplier: 1, original: original, hint: "Restores the original portion.")
+                            portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
+                        }
+                    }
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
@@ -185,14 +193,6 @@ struct FoodEditor: View {
                             .accessibilityHidden(true)
                     }
                     .padding(.vertical, 6)
-                    if let original = item.grams, original.isFinite, original > 0 {
-                        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
-                        layout {
-                            portionButton("Half", multiplier: 0.5, original: original, hint: "Sets the portion to half the original weight.")
-                            portionButton("Original", multiplier: 1, original: original, hint: "Restores the original portion.")
-                            portionButton("Double", multiplier: 2, original: original, hint: "Sets the portion to double the original weight.")
-                        }.padding(.vertical, 4)
-                    }
                     Group {
                         if allowsIdentityEdit {
                             Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
@@ -244,7 +244,6 @@ struct FoodEditor: View {
         }
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
-        .sensoryFeedback(.selection, trigger: portionChange)
         .onAppear { Task { @MainActor in introFocused = true } }
         .onChange(of: busy) { _, isBusy in
             guard isBusy else { return }
@@ -304,8 +303,11 @@ struct FoodEditor: View {
 
     private func portionButton(_ title: LocalizedStringKey, multiplier: Double, original: Double, hint: LocalizedStringKey) -> some View {
         Button(title) { grams = original * multiplier; portionChange += 1 }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
+            .font(.headline)
+            .fixedSize(horizontal: true, vertical: false)
             .frame(minHeight: 44)
+            .contentShape(Rectangle())
             .disabled(original * multiplier > 10_000)
             .accessibilityHint(hint)
     }

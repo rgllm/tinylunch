@@ -182,6 +182,7 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Not a medical device"].waitForExistence(timeout: 5))
         try audit(app)
         app.buttons["Done"].tap()
+        XCTAssertTrue(app.staticTexts["Not a medical device"].waitForNonExistence(timeout: 5))
         openTab("History", in: app)
         XCTAssertTrue(app.staticTexts["No saved meals"].waitForExistence(timeout: 5))
         try audit(app)

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import PhotosUI
 import AVFoundation
 
@@ -544,7 +545,10 @@ struct CaptureView: View {
             .fixedSize(horizontal: resistsCompression, vertical: false)
             .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
-            .highPriorityGesture(LongPressGesture(minimumDuration: 0.8).onEnded { _ in toast = true })
+            .overlay {
+                WordmarkPressCatcher { toast = true }
+                    .accessibilityHidden(true)
+            }
             .accessibilityLabel("TinyLunch")
             .accessibilityAddTraits(.isHeader)
             .accessibilityIdentifier("tinyLunchWordmark")
@@ -670,5 +674,38 @@ struct AnalysisAvailabilityCard: View {
         .buttonStyle(ScaledTextButton())
         .accessibilityIdentifier(action.accessibilityIdentifier)
         .accessibilityHint(action.accessibilityHint)
+    }
+}
+
+/// UIKit long-press. SwiftUI's gesture on this title does not receive the simulator's press.
+private struct WordmarkPressCatcher: UIViewRepresentable {
+    var action: () -> Void
+
+    func makeUIView(context: Context) -> UIView {
+        let view = UIView()
+        view.backgroundColor = .clear
+        view.isAccessibilityElement = false
+        let recognizer = UILongPressGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.fire(_:)))
+        recognizer.minimumPressDuration = 0.5
+        recognizer.allowableMovement = 24
+        view.addGestureRecognizer(recognizer)
+        return view
+    }
+
+    func updateUIView(_ uiView: UIView, context: Context) {
+        context.coordinator.action = action
+    }
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(action: action)
+    }
+
+    final class Coordinator: NSObject {
+        var action: () -> Void
+        init(action: @escaping () -> Void) { self.action = action }
+        @objc func fire(_ recognizer: UILongPressGestureRecognizer) {
+            guard recognizer.state == .began else { return }
+            action()
+        }
     }
 }
