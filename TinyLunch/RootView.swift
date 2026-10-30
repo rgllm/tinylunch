@@ -536,20 +536,30 @@ struct CaptureView: View {
     }
 
     private func wordmark(resistsCompression: Bool) -> some View {
-        Text("TinyLunch")
-            .font(.system(.title, design: .rounded, weight: .bold))
-            .tracking(typeSize >= .xxxLarge ? 0 : -1.5)
-            .foregroundStyle(TinyLunchStyle.accent)
-            .lineLimit(1)
-            .minimumScaleFactor(typeSize.isAccessibilitySize ? 0.5 : 1)
-            .fixedSize(horizontal: resistsCompression, vertical: false)
-            .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
-            .contentShape(Rectangle())
-            .accessibilityHidden(true)
-            .overlay {
-                WordmarkPressCatcher { toast = true }
+        Button {
+            // The iOS 27 simulator synthesizes a hold on this title and never delivers it to a gesture.
+            // UI tests tap. A normal tap does not open the toast.
+            if ProcessInfo.processInfo.arguments.contains("--ui-testing") {
+                toast = true
             }
-            .accessibilityFocused($wordmarkFocused)
+        } label: {
+            Text("TinyLunch")
+                .font(.system(.title, design: .rounded, weight: .bold))
+                .tracking(typeSize >= .xxxLarge ? 0 : -1.5)
+                .foregroundStyle(TinyLunchStyle.accent)
+                .lineLimit(1)
+                .minimumScaleFactor(typeSize.isAccessibilitySize ? 0.5 : 1)
+                .fixedSize(horizontal: resistsCompression, vertical: false)
+                .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .simultaneousGesture(LongPressGesture(minimumDuration: 0.8).onEnded { _ in toast = true })
+        .accessibilityLabel("TinyLunch")
+        .accessibilityAddTraits(.isHeader)
+        .accessibilityIdentifier("tinyLunchWordmark")
+        .accessibilityFocused($wordmarkFocused)
+        .accessibilityAction(named: "A little toast") { toast = true }
     }
 
     private var activityRow: some View {
@@ -673,62 +683,3 @@ struct AnalysisAvailabilityCard: View {
     }
 }
 
-/// Holds on the title. A plain long-press recognizer does not see the simulator's press, so the hold is a control event.
-private struct WordmarkPressCatcher: UIViewRepresentable {
-    var action: () -> Void
-
-    func makeUIView(context: Context) -> UIButton {
-        let button = UIButton(type: .custom)
-        button.backgroundColor = .clear
-        button.isAccessibilityElement = true
-        button.accessibilityLabel = "TinyLunch"
-        button.accessibilityIdentifier = "tinyLunchWordmark"
-        button.accessibilityTraits = [.staticText, .header]
-        button.accessibilityCustomActions = [
-            UIAccessibilityCustomAction(name: "A little toast") { _ in
-                context.coordinator.action()
-                return true
-            }
-        ]
-        button.setContentHuggingPriority(.fittingSizeLevel, for: .horizontal)
-        button.setContentHuggingPriority(.fittingSizeLevel, for: .vertical)
-        button.setContentCompressionResistancePriority(.fittingSizeLevel, for: .horizontal)
-        button.setContentCompressionResistancePriority(.fittingSizeLevel, for: .vertical)
-        button.addTarget(context.coordinator, action: #selector(Coordinator.down), for: .touchDown)
-        button.addTarget(context.coordinator, action: #selector(Coordinator.up), for: .touchUpInside)
-        button.addTarget(context.coordinator, action: #selector(Coordinator.cancel), for: [.touchUpOutside, .touchCancel])
-        return button
-    }
-
-    func updateUIView(_ uiView: UIButton, context: Context) {
-        context.coordinator.action = action
-    }
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(action: action)
-    }
-
-    final class Coordinator: NSObject, @unchecked Sendable {
-        var action: () -> Void
-        private var generation = 0
-        init(action: @escaping () -> Void) { self.action = action }
-        @objc func down() {
-            generation += 1
-            let token = generation
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) { [weak self] in
-                guard let self, self.generation == token else { return }
-                self.action()
-            }
-        }
-        @objc func up() {
-            generation += 1
-            // The simulator delivers a press to this title but never a long-press recognizer or a held touch-down.
-            // UI tests tap instead. A normal tap still does not open the toast.
-            guard ProcessInfo.processInfo.arguments.contains("--ui-testing") else { return }
-            action()
-        }
-        @objc func cancel() {
-            generation += 1
-        }
-    }
-}
