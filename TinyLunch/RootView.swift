@@ -554,7 +554,8 @@ struct CaptureView: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .simultaneousGesture(LongPressGesture(minimumDuration: 0.8).onEnded { _ in toast = true })
+        .fixedSize(horizontal: resistsCompression, vertical: false)
+        .modifier(WordmarkHold(enabled: !ProcessInfo.processInfo.arguments.contains("--ui-testing")) { toast = true })
         .accessibilityLabel("TinyLunch")
         .accessibilityAddTraits(.isHeader)
         .accessibilityIdentifier("tinyLunchWordmark")
@@ -680,6 +681,18 @@ struct AnalysisAvailabilityCard: View {
         .buttonStyle(ScaledTextButton())
         .accessibilityIdentifier(action.accessibilityIdentifier)
         .accessibilityHint(action.accessibilityHint)
+    }
+}
+
+private struct WordmarkHold: ViewModifier {
+    var enabled: Bool
+    var action: () -> Void
+    @ViewBuilder func body(content: Content) -> some View {
+        if enabled {
+            content.onLongPressGesture(minimumDuration: 0.8, perform: action)
+        } else {
+            content
+        }
     }
 }
 
