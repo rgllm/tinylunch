@@ -2,7 +2,7 @@
 
 Effective date: 19 September 2026
 
-TinyLunch is a local iPhone app published by Rogério Moreira (me@rgllm.com). It estimates calories from a meal photo using Apple Intelligence on the device.
+TinyLunch is a local iPhone app published by Rogério Moreira (geral@engino.pt). It estimates calories from a meal photo using Apple Intelligence on the device.
 
 ## Data TinyLunch does not collect
 
@@ -35,4 +35,4 @@ TinyLunch does not request microphone, location, tracking, or HealthKit access.
 
 ## Contact
 
-Questions about this policy: me@rgllm.com
+Questions about this policy: geral@engino.pt

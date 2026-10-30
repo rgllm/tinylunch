@@ -1,6 +1,6 @@
 # TinyLunch App Store listing
 
-Listing preparation was performed in App Store Connect on 20 September 2026. Screenshots are in `docs/screenshots/`. The privacy policy and support page are live at https://engino.pt/privacidade. The app has not been submitted for review.
+Listing preparation was performed in App Store Connect on 20 September 2026. Screenshots are in `docs/screenshots/`. The privacy policy and support page are live at https://tinylunch.engino.pt/privacy. The app has not been submitted for review.
 
 ## Identity
 
@@ -44,7 +44,7 @@ First release. Photograph a meal, correct the estimate, and save it on your iPho
 
 | Field | Suggested value |
 | --- | --- |
-| Privacy policy | https://engino.pt/privacidade |
+| Privacy policy | https://tinylunch.engino.pt/privacy |
 | Support | https://engino.pt/privacidade#support |
 | Marketing | Optional |
 
@@ -105,7 +105,7 @@ Apple calculated 9+ on 20 September 2026, with regional exceptions. The question
 These cannot be done from the repo:
 
 1. App record exists: TinyLunch, Apple ID `6811014228`, bundle `com.rgllm.tinylunch`.
-2. Privacy and support are live at https://engino.pt/privacidade. App Privacy publication requires the publisher agreement.
+2. Privacy and support are live at https://tinylunch.engino.pt/privacy. App Privacy publication requires the publisher agreement.
 3. Four 6.9-inch screenshots are uploaded in home, review, history, dark-mode order.
 4. Upload 1.0.0 (26) by pushing the tag `testflight/1.0.0-26`. That runs `.github/workflows/testflight.yml` on `xcode-27` (`workflow_dispatch` is also defined). It selects the release Xcode 27.0 SDK, not the beta toolchains on that image, and targets iPhone only. Existing build 23 was uploaded on 12 September using a beta SDK and declares iPhone and iPad support. Apple rejected it during Add for Review validation. Build 24 was a local iPhone-only archive with Xcode 27.0 (27A266a) and was not the store upload.
 5. Fill all App Review contact fields together, including the phone number supplied by the publisher. The contact fields were not persisted while the phone number was absent.
