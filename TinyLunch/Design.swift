@@ -325,17 +325,11 @@ struct PrivacySheet: View {
             }
             .background(TinyLunchStyle.paper)
             .navigationTitle("Made to stay local").navigationBarTitleDisplayMode(.inline)
-            .safeAreaInset(edge: .bottom) {
-                Button("Done") { dismiss() }
-                    .buttonStyle(.plain)
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(TinyLunchStyle.accent)
-                    .frame(maxWidth: .infinity, minHeight: 44)
-                    .contentShape(Rectangle())
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(TinyLunchStyle.paper)
-                    .accessibilityHint("Closes About privacy.")
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { dismiss() }
+                        .accessibilityHint("Closes About privacy.")
+                }
             }
         }
         .onAppear { Task { @MainActor in noticeFocused = true } }

@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 import PhotosUI
 import AVFoundation
 
@@ -64,7 +65,15 @@ struct CaptureView: View {
                 ScrollView {
                     VStack(spacing: 24) {
                         if typeSize.isAccessibilitySize {
-                            wordmark(resistsCompression: false)
+                            HStack(alignment: .center, spacing: 12) {
+                                wordmark(resistsCompression: false)
+                                if model.draft == nil && model.image == nil {
+                                    aboutPrivacyButton
+                                        .frame(minWidth: 44, minHeight: 44)
+                                }
+                            }
+                        } else {
+                            wordmark(resistsCompression: true)
                         }
                         if !model.modelAvailability.allowsPhotoAnalysis {
                             availabilityCard
@@ -85,43 +94,26 @@ struct CaptureView: View {
             }
             .background(TinyLunchStyle.paper)
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar(editing == nil ? .visible : .hidden, for: .tabBar)
             .toolbar {
-                if !typeSize.isAccessibilitySize {
-                    ToolbarItem(placement: .topBarLeading) {
-                        wordmark(resistsCompression: true)
-                    }.sharedBackgroundVisibility(.hidden)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    if model.draft != nil || model.image != nil {
-                        Button { discard = true } label: {
-                            if typeSize.isAccessibilitySize {
-                                Image(systemName: "arrow.counterclockwise")
-                                    .frame(minWidth: 44, minHeight: 44)
-                                    .contentShape(Rectangle())
-                            } else {
-                                Label("Start over", systemImage: "arrow.counterclockwise")
+                if model.draft != nil || model.image != nil || !typeSize.isAccessibilitySize {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        if model.draft != nil || model.image != nil {
+                            Button { discard = true } label: {
+                                if typeSize.isAccessibilitySize {
+                                    Image(systemName: "arrow.counterclockwise")
+                                        .frame(minWidth: 44, minHeight: 44)
+                                        .contentShape(Rectangle())
+                                } else {
+                                    Label("Start over", systemImage: "arrow.counterclockwise")
+                                }
                             }
+                            .accessibilityLabel("Start over")
+                            .accessibilityHint("Discards this unsaved meal.")
+                            .disabled(model.saving)
+                        } else {
+                            aboutPrivacyButton
                         }
-                        .accessibilityLabel("Start over")
-                        .accessibilityHint("Discards this unsaved meal.")
-                        .disabled(model.saving)
-                    } else {
-                        Button {
-                            privacySource = .toolbar
-                            privacy = true
-                        } label: {
-                            if typeSize.isAccessibilitySize {
-                                Image(systemName: "lock.iphone")
-                                    .frame(minWidth: 44, minHeight: 44)
-                                    .contentShape(Rectangle())
-                            } else {
-                                Label("About privacy", systemImage: "lock.iphone")
-                            }
-                        }
-                        .accessibilityLabel("About privacy")
-                        .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
-                        .accessibilityIdentifier("aboutPrivacy")
-                        .accessibilityFocused($privacyReturnFocus, equals: .toolbar)
                     }
                 }
             }
@@ -136,7 +128,7 @@ struct CaptureView: View {
                     cancel: model.cancel
                 ) { name, preparation, grams in
                     model.update(item, name: name, preparation: preparation, grams: grams, onSuccess: { editing = nil })
-                }.interactiveDismissDisabled(model.busy)
+                }.interactiveDismissDisabled()
             }
             .sheet(isPresented: $privacy, onDismiss: {
                 let source = privacySource
@@ -160,6 +152,9 @@ struct CaptureView: View {
             }
             .sensoryFeedback(.success, trigger: model.savedNotice) { _, saved in saved }
             .sensoryFeedback(.selection, trigger: toast)
+            .onAppear {
+                if ProcessInfo.processInfo.arguments.contains("--show-toast") { toast = true }
+            }
             .onChange(of: model.savedNotice) { _, saved in
                 guard saved else { return }
                 Task { @MainActor in savedFocused = true }
@@ -524,6 +519,25 @@ struct CaptureView: View {
             .overlay(alignment: .top) { Divider() }
     }
 
+    private var aboutPrivacyButton: some View {
+        Button {
+            privacySource = .toolbar
+            privacy = true
+        } label: {
+            if typeSize.isAccessibilitySize {
+                Image(systemName: "lock.iphone")
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            } else {
+                Label("About privacy", systemImage: "lock.iphone")
+            }
+        }
+        .accessibilityLabel("About privacy")
+        .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
+        .accessibilityIdentifier("aboutPrivacy")
+        .accessibilityFocused($privacyReturnFocus, equals: .toolbar)
+    }
+
     private func wordmark(resistsCompression: Bool) -> some View {
         Text("TinyLunch")
             .font(.system(.title, design: .rounded, weight: .bold))
@@ -534,7 +548,7 @@ struct CaptureView: View {
             .fixedSize(horizontal: resistsCompression, vertical: false)
             .frame(maxWidth: resistsCompression ? nil : .infinity, minHeight: 44, alignment: .leading)
             .contentShape(Rectangle())
-            .onLongPressGesture(minimumDuration: 1) { toast = true }
+            .onLongPressGesture(minimumDuration: 0.8) { toast = true }
             .accessibilityLabel("TinyLunch")
             .accessibilityAddTraits(.isHeader)
             .accessibilityIdentifier("tinyLunchWordmark")
@@ -662,3 +676,4 @@ struct AnalysisAvailabilityCard: View {
         .accessibilityHint(action.accessibilityHint)
     }
 }
+

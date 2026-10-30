@@ -43,7 +43,9 @@ final class ScreenshotTests: XCTestCase {
         let directory = try output
         let app = launch(arguments: ["--ui-testing", "--reset-history", "--marketing-screenshots", "--marketing-history"])
         XCTAssertTrue(app.buttons["Take photo"].waitForExistence(timeout: 10))
-        app.tabBars.buttons["History"].tap()
+        let history = app.buttons["History"]
+        XCTAssertTrue(history.waitForExistence(timeout: 5))
+        history.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
         XCTAssertTrue(app.descendants(matching: .any)["historyMeal-Grilled salmon, Jasmine rice, Broccoli"].waitForExistence(timeout: 10))
         save(app.screenshot(), as: "03-history.png", in: directory)
     }
