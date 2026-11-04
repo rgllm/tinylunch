@@ -37,11 +37,15 @@ private struct HomeMetrics {
     var top: CGFloat
     var bottom: CGFloat
     var largeHero: Bool
+    var showsPlate: Bool = true
 
     static let regular = HomeMetrics(spacing: 24, plate: 250, plateGap: 12, subtitleGap: 8, top: 18, bottom: 20, largeHero: true)
     static let medium = HomeMetrics(spacing: 16, plate: 180, plateGap: 8, subtitleGap: 6, top: 12, bottom: 16, largeHero: true)
     static let compact = HomeMetrics(spacing: 10, plate: 120, plateGap: 4, subtitleGap: 4, top: 8, bottom: 12, largeHero: true)
     static let dense = HomeMetrics(spacing: 4, plate: 64, plateGap: 2, subtitleGap: 2, top: 4, bottom: 8, largeHero: false)
+    /// Used while the availability card is on screen. The plate would push the caption off a short phone.
+    static let card = HomeMetrics(spacing: 10, plate: 0, plateGap: 0, subtitleGap: 4, top: 8, bottom: 12, largeHero: true, showsPlate: false)
+    static let cardDense = HomeMetrics(spacing: 4, plate: 0, plateGap: 0, subtitleGap: 2, top: 4, bottom: 4, largeHero: false, showsPlate: false)
 }
 
 struct CaptureView: View {
@@ -84,20 +88,15 @@ struct CaptureView: View {
             VStack(spacing: 0) {
                 Group {
                     if fitsHomeAboveTabBar {
-                        // A scroll view draws its tail under the floating tab bar. Prefer a column
-                        // that fits in the safe area so the caption is on screen; scroll only when
-                        // even the shortest column is taller than the phone.
-                        ViewThatFits(in: .vertical) {
-                            homeColumn(.regular)
-                            homeColumn(.medium)
-                            homeColumn(.compact)
-                            homeColumn(.dense)
-                            ScrollView { homeColumn(.regular) }
-                                .clearsFloatingTabBar()
+                        // ViewThatFits only compacts when it is offered a real height. A max-height
+                        // frame proposes an unbounded ideal size, so the tall column was kept and
+                        // the caption stayed below the screen.
+                        GeometryReader { proxy in
+                            fittedHome
+                                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                         }
                     } else {
                         ScrollView { homeColumn(.regular) }
-                            .clearsFloatingTabBar()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -271,6 +270,25 @@ struct CaptureView: View {
         }
     }
 
+    @ViewBuilder
+    private var fittedHome: some View {
+        if model.modelAvailability.allowsPhotoAnalysis {
+            ViewThatFits(in: .vertical) {
+                homeColumn(.regular)
+                homeColumn(.medium)
+                homeColumn(.compact)
+                homeColumn(.dense)
+                ScrollView { homeColumn(.dense) }
+            }
+        } else {
+            ViewThatFits(in: .vertical) {
+                homeColumn(.card)
+                homeColumn(.cardDense)
+                ScrollView { homeColumn(.cardDense) }
+            }
+        }
+    }
+
     private func homeColumn(_ metrics: HomeMetrics) -> some View {
         VStack(spacing: metrics.spacing) {
             if typeSize.isAccessibilitySize {
@@ -365,7 +383,9 @@ struct CaptureView: View {
                         .font(.subheadline).foregroundStyle(TinyLunchStyle.ink).padding(.top, metrics.subtitleGap)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
-                    EmojiPlate(height: metrics.plate).padding(.top, metrics.plateGap)
+                    if metrics.showsPlate {
+                        EmojiPlate(height: metrics.plate).padding(.top, metrics.plateGap)
+                    }
                 }
             }
 

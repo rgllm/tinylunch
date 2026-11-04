@@ -11,14 +11,15 @@ struct HistoryView: View {
         NavigationStack {
             Group {
                 if model.meals.isEmpty {
-                    ViewThatFits(in: .vertical) {
-                        emptyHistory(scale: 1, top: 52, bottom: 24)
-                        emptyHistory(scale: 0.72, top: 28, bottom: 16)
-                        emptyHistory(scale: 0.5, top: 16, bottom: 12)
-                        ScrollView { emptyHistory(scale: 0.72, top: 28, bottom: 16) }
-                            .clearsFloatingTabBar()
+                    GeometryReader { proxy in
+                        ViewThatFits(in: .vertical) {
+                            emptyHistory(scale: 1, top: 52, bottom: 24)
+                            emptyHistory(scale: 0.72, top: 28, bottom: 16)
+                            emptyHistory(scale: 0.5, top: 16, bottom: 12)
+                            ScrollView { emptyHistory(scale: 0.72, top: 28, bottom: 16) }
+                        }
+                        .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 } else {
                     List {
                         Section {
@@ -78,7 +79,6 @@ struct HistoryView: View {
                         }.listRowBackground(Color.clear)
                     }
                     .scrollContentBackground(.hidden)
-                    .clearsFloatingTabBar()
                 }
             }
             .tinylunchPaper()
@@ -225,10 +225,9 @@ private struct SavedMealView: View {
                 .accessibilityIdentifier("deleteSavedMeal")
                 .accessibilityLabel("Delete meal")
                 .accessibilityHint("Asks you to confirm before deleting this meal.")
-            }.padding(24).padding(.bottom, 16)
+            }.padding(24).padding(.bottom, 24)
         }
-        .clearsFloatingTabBar()
-        .tinylunchPaper()
+        .background(TinyLunchStyle.paper)
         .navigationTitle("Saved meal").navigationBarTitleDisplayMode(.inline)
     }
 }

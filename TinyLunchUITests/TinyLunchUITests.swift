@@ -524,12 +524,16 @@ final class TinyLunchUITests: XCTestCase {
         let caption = labeled("onDeviceCaption", in: app, timeout: 10)
         let appearance = dark ? "dark" : "light"
         saveLayoutShot(app, name: "home-\(appearance)-\(sizeCategory)-rest")
-        if scroll { scrollUntilAboveTabBar(caption, in: app) }
-        if scroll { saveLayoutShot(app, name: "home-\(appearance)-\(sizeCategory)-settled") }
+        // The availability card is extra content while Apple Intelligence is still downloading.
+        // Default text must fit without it. With the card, scrolling is allowed on a short phone.
+        let modelCard = app.descendants(matching: .any)["analysisUnavailableCard"]
+        let allowScroll = scroll || modelCard.exists
+        if allowScroll { scrollUntilAboveTabBar(caption, in: app) }
+        if allowScroll { saveLayoutShot(app, name: "home-\(appearance)-\(sizeCategory)-settled") }
         assertRestsAboveTabBar(caption, in: app, label: "caption \(appearance) \(sizeCategory)")
         XCTAssertTrue(caption.isHittable, "Caption is not hittable at \(appearance) \(sizeCategory) frame \(caption.frame)")
         XCTAssertEqual(caption.label, "On your iPhone. Just for you.")
-        if !scroll {
+        if !allowScroll {
             let choose = app.buttons["Choose photo"]
             XCTAssertTrue(choose.waitForExistence(timeout: 5))
             assertRestsAboveTabBar(choose, in: app, label: "Choose photo \(appearance) \(sizeCategory)")
@@ -538,8 +542,8 @@ final class TinyLunchUITests: XCTestCase {
         openTab("History", in: app)
         let note = labeled("historyLocalNote", in: app, timeout: 5)
         saveLayoutShot(app, name: "history-\(appearance)-\(sizeCategory)-rest")
-        if scroll { scrollUntilAboveTabBar(note, in: app) }
-        if scroll { saveLayoutShot(app, name: "history-\(appearance)-\(sizeCategory)-settled") }
+        if allowScroll { scrollUntilAboveTabBar(note, in: app) }
+        if allowScroll { saveLayoutShot(app, name: "history-\(appearance)-\(sizeCategory)-settled") }
         assertRestsAboveTabBar(note, in: app, label: "history note \(sizeCategory)")
         XCTAssertTrue(note.isHittable, "History note is not hittable at \(sizeCategory) frame \(note.frame)")
     }
