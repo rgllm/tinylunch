@@ -390,6 +390,7 @@ struct CaptureView: View {
             .contentShape(Rectangle())
             .accessibilityLabel("On your iPhone. Just for you.")
             .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
+            .accessibilityIdentifier("onDeviceCaption")
             .accessibilityFocused($privacyReturnFocus, equals: .footer)
         }
     }

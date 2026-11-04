@@ -58,6 +58,7 @@ struct HistoryView: View {
                             }
                             IconLabel(title: "Just meal details. No photos.", systemImage: "lock")
                                 .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
+                                .accessibilityIdentifier("historyLocalNote")
                         }.padding(.horizontal, 32).padding(.top, 52).padding(.bottom, 120)
                     }
                 } else {
