@@ -12,12 +12,11 @@ struct HistoryView: View {
             Group {
                 if model.meals.isEmpty {
                     GeometryReader { proxy in
-                        ViewThatFits(in: .vertical) {
-                            emptyHistory(scale: 1, top: 52, bottom: 24)
-                            emptyHistory(scale: 0.72, top: 28, bottom: 16)
-                            emptyHistory(scale: 0.5, top: 16, bottom: 12)
-                            ScrollView { emptyHistory(scale: 0.72, top: 28, bottom: 16) }
+                        let short = proxy.size.height < 720
+                        ScrollView {
+                            emptyHistory(scale: short ? 0.72 : 1, top: short ? 28 : 52, bottom: 16)
                         }
+                        .scrollBounceBehavior(.basedOnSize)
                         .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                     }
                 } else {

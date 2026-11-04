@@ -88,11 +88,10 @@ struct CaptureView: View {
             VStack(spacing: 0) {
                 Group {
                     if fitsHomeAboveTabBar {
-                        // ViewThatFits only compacts when it is offered a real height. A max-height
-                        // frame proposes an unbounded ideal size, so the tall column was kept and
-                        // the caption stayed below the screen.
                         GeometryReader { proxy in
-                            fittedHome
+                            // One column sized to the safe area. Several copies time out the accessibility audit.
+                            ScrollView { homeColumn(homeMetrics(for: proxy.size.height)) }
+                                .scrollBounceBehavior(.basedOnSize)
                                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                         }
                     } else {
@@ -270,23 +269,15 @@ struct CaptureView: View {
         }
     }
 
-    @ViewBuilder
-    private var fittedHome: some View {
-        if model.modelAvailability.allowsPhotoAnalysis {
-            ViewThatFits(in: .vertical) {
-                homeColumn(.regular)
-                homeColumn(.medium)
-                homeColumn(.compact)
-                homeColumn(.dense)
-                ScrollView { homeColumn(.dense) }
-            }
-        } else {
-            ViewThatFits(in: .vertical) {
-                homeColumn(.card)
-                homeColumn(.cardDense)
-                ScrollView { homeColumn(.cardDense) }
-            }
+    private func homeMetrics(for height: CGFloat) -> HomeMetrics {
+        let blocked = !model.modelAvailability.allowsPhotoAnalysis
+        if blocked {
+            return height >= 820 ? .card : .cardDense
         }
+        if height >= 900 { return .regular }
+        if height >= 800 { return .medium }
+        if height >= 600 { return .compact }
+        return .dense
     }
 
     private func homeColumn(_ metrics: HomeMetrics) -> some View {
