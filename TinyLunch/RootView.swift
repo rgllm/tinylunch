@@ -28,6 +28,26 @@ struct RootView: View {
     }
 }
 
+/// Column sizes for the New meal screen. The first one that fits above the floating tab bar is used.
+private struct HomeMetrics {
+    var spacing: CGFloat
+    var plate: CGFloat
+    var plateGap: CGFloat
+    var subtitleGap: CGFloat
+    var top: CGFloat
+    var bottom: CGFloat
+    var largeHero: Bool
+    var showsPlate: Bool = true
+
+    static let regular = HomeMetrics(spacing: 24, plate: 250, plateGap: 12, subtitleGap: 8, top: 18, bottom: 20, largeHero: true)
+    static let medium = HomeMetrics(spacing: 16, plate: 180, plateGap: 8, subtitleGap: 6, top: 12, bottom: 16, largeHero: true)
+    static let compact = HomeMetrics(spacing: 10, plate: 120, plateGap: 4, subtitleGap: 4, top: 8, bottom: 12, largeHero: true)
+    static let dense = HomeMetrics(spacing: 4, plate: 64, plateGap: 2, subtitleGap: 2, top: 4, bottom: 8, largeHero: false)
+    /// Used while the availability card is on screen. The plate would push the caption off a short phone.
+    static let card = HomeMetrics(spacing: 10, plate: 0, plateGap: 0, subtitleGap: 4, top: 8, bottom: 12, largeHero: true, showsPlate: false)
+    static let cardDense = HomeMetrics(spacing: 4, plate: 0, plateGap: 0, subtitleGap: 2, top: 4, bottom: 4, largeHero: false, showsPlate: false)
+}
+
 struct CaptureView: View {
     @Bindable var model: AppModel
     var showHistory: () -> Void
@@ -59,40 +79,29 @@ struct CaptureView: View {
     private enum CaptureFocus: Hashable { case takePhoto, retake, analyze }
     private enum PrivacySource: Hashable { case toolbar, footer }
 
+    private var fitsHomeAboveTabBar: Bool {
+        model.draft == nil && !typeSize.isAccessibilitySize
+    }
+
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
-                ScrollView {
-                    VStack(spacing: 24) {
-                        if typeSize.isAccessibilitySize {
-                            HStack(alignment: .center, spacing: 12) {
-                                wordmark(resistsCompression: false)
-                                if model.draft == nil && model.image == nil {
-                                    aboutPrivacyButton
-                                        .frame(minWidth: 44, minHeight: 44)
-                                }
-                            }
-                        } else {
-                            wordmark(resistsCompression: true)
+                Group {
+                    if fitsHomeAboveTabBar {
+                        GeometryReader { proxy in
+                            // One column sized to the safe area. Several copies time out the accessibility audit.
+                            ScrollView { homeColumn(homeMetrics(for: proxy.size.height)) }
+                                .scrollBounceBehavior(.basedOnSize)
+                                .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                         }
-                        if !model.modelAvailability.allowsPhotoAnalysis {
-                            availabilityCard
-                        }
-                        if let meal = model.draft {
-                            review(meal)
-                        } else {
-                            captureContent
-                        }
-                        if model.busy || model.importing {
-                            activityRow
-                        }
+                    } else {
+                        ScrollView { homeColumn(.regular) }
                     }
-                    .padding(.horizontal, 24).padding(.top, 18).padding(.bottom, 28)
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
                 if let meal = model.draft { saveBar(meal) }
             }
-            .background(TinyLunchStyle.paper)
+            .tinylunchPaper()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(editing == nil ? .visible : .hidden, for: .tabBar)
             .toolbar {
@@ -260,9 +269,51 @@ struct CaptureView: View {
         }
     }
 
-    private var captureContent: some View {
+    private func homeMetrics(for height: CGFloat) -> HomeMetrics {
+        let blocked = !model.modelAvailability.allowsPhotoAnalysis
+        if blocked {
+            return height >= 820 ? .card : .cardDense
+        }
+        if height >= 900 { return .regular }
+        if height >= 800 { return .medium }
+        if height >= 600 { return .compact }
+        return .dense
+    }
+
+    private func homeColumn(_ metrics: HomeMetrics) -> some View {
+        VStack(spacing: metrics.spacing) {
+            if typeSize.isAccessibilitySize {
+                HStack(alignment: .center, spacing: 12) {
+                    wordmark(resistsCompression: false)
+                    if model.draft == nil && model.image == nil {
+                        aboutPrivacyButton
+                            .frame(minWidth: 44, minHeight: 44)
+                    }
+                }
+            } else {
+                wordmark(resistsCompression: true)
+            }
+            if !model.modelAvailability.allowsPhotoAnalysis {
+                availabilityCard
+            }
+            if let meal = model.draft {
+                review(meal)
+            } else {
+                captureContent(metrics)
+            }
+            if model.busy || model.importing {
+                activityRow
+            }
+        }
+        .padding(.horizontal, 24)
+        .padding(.top, metrics.top)
+        .padding(.bottom, metrics.bottom)
+        .frame(maxWidth: .infinity, alignment: .top)
+    }
+
+    private func captureContent(_ metrics: HomeMetrics) -> some View {
         let hasImage = model.image != nil
-        return VStack(spacing: 24) {
+        return VStack(spacing: metrics.spacing) {
             if let image = model.image {
                 VStack(alignment: .leading, spacing: 14) {
                     Text("Looking good.")
@@ -313,17 +364,19 @@ struct CaptureView: View {
             } else {
                 VStack(spacing: 4) {
                     Text("A little insight.\nEvery bite.")
-                        .font(.system(.largeTitle, design: .rounded, weight: .bold))
+                        .font(.system(metrics.largeHero ? .largeTitle : .title, design: .rounded, weight: .bold))
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
                         .frame(maxWidth: .infinity)
                         .accessibilityAddTraits(.isHeader)
                         .accessibilityFocused($heroFocused)
                     Text("Your plate, with a little perspective.")
-                        .font(.subheadline).foregroundStyle(TinyLunchStyle.ink).padding(.top, 8)
+                        .font(.subheadline).foregroundStyle(TinyLunchStyle.ink).padding(.top, metrics.subtitleGap)
                         .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
-                    EmojiPlate().padding(.top, 12)
+                    if metrics.showsPlate {
+                        EmojiPlate(height: metrics.plate).padding(.top, metrics.plateGap)
+                    }
                 }
             }
 
@@ -390,6 +443,7 @@ struct CaptureView: View {
             .contentShape(Rectangle())
             .accessibilityLabel("On your iPhone. Just for you.")
             .accessibilityHint("Shows how TinyLunch stays on your iPhone and that it is not a medical device.")
+            .accessibilityIdentifier("onDeviceCaption")
             .accessibilityFocused($privacyReturnFocus, equals: .footer)
         }
     }

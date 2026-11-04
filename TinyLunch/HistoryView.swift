@@ -11,54 +11,13 @@ struct HistoryView: View {
         NavigationStack {
             Group {
                 if model.meals.isEmpty {
-                    ScrollView {
-                        VStack(spacing: 22) {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 28).fill(TinyLunchStyle.soft)
-                                    .frame(width: 154, height: 174).rotationEffect(.degrees(-10)).offset(x: -12, y: 3)
-                                VStack(spacing: 16) {
-                                    Text("🥡").font(.system(size: 60))
-                                        .accessibilityHidden(true)
-                                        .accessibilityIdentifier("decorativeGlyph")
-                                    Capsule().fill(TinyLunchStyle.soft).frame(width: 70, height: 6)
-                                    Capsule().fill(TinyLunchStyle.soft.opacity(0.65)).frame(width: 44, height: 6)
-                                }.frame(width: 154, height: 174).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 28))
-                                    .rotationEffect(.degrees(6)).offset(x: 12)
-                            }.frame(height: 214).accessibilityHidden(true)
-                            Text(model.historyLoaded ? "No saved meals" : "History unavailable")
-                                .font(.system(.largeTitle, design: .rounded, weight: .bold))
-                                .multilineTextAlignment(.center)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .accessibilityAddTraits(.isHeader)
-                                .accessibilityFocused($emptyHistoryFocused)
-                            if model.historyLoaded && !model.modelAvailability.allowsPhotoAnalysis {
-                                availabilityCard
-                            }
-                            Text(emptyHistoryMessage)
-                                .font(.body)
-                                .foregroundStyle(TinyLunchStyle.ink)
-                                .multilineTextAlignment(.center)
-                                .lineLimit(nil)
-                                .fixedSize(horizontal: false, vertical: true)
-                                .frame(maxWidth: .infinity)
-                            if model.historyLoaded {
-                                Button { startMeal() } label: {
-                                    AccessibleActionLabel(title: "Start a meal", systemImage: "plus")
-                                }
-                                .buttonStyle(PrimaryAction())
-                                .accessibilityLabel("Start a meal")
-                                .accessibilityHint("Returns to the new meal screen.")
-                            } else {
-                                Button { Task { await model.refresh() } } label: {
-                                    AccessibleActionLabel(title: "Retry", systemImage: "arrow.clockwise")
-                                }
-                                .buttonStyle(PrimaryAction())
-                                .accessibilityLabel("Retry")
-                                .accessibilityHint("Loads saved meals again.")
-                            }
-                            IconLabel(title: "Just meal details. No photos.", systemImage: "lock")
-                                .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
-                        }.padding(.horizontal, 32).padding(.top, 52).padding(.bottom, 120)
+                    GeometryReader { proxy in
+                        let short = proxy.size.height < 720
+                        ScrollView {
+                            emptyHistory(scale: short ? 0.72 : 1, top: short ? 28 : 52, bottom: 16)
+                        }
+                        .scrollBounceBehavior(.basedOnSize)
+                        .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                     }
                 } else {
                     List {
@@ -117,10 +76,11 @@ struct HistoryView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }.listRowBackground(Color.clear)
-                    }.scrollContentBackground(.hidden)
+                    }
+                    .scrollContentBackground(.hidden)
                 }
             }
-            .background(TinyLunchStyle.paper)
+            .tinylunchPaper()
             .navigationTitle("History")
             .confirmationDialog("Delete this meal?", isPresented: Binding(get: { pendingDelete != nil }, set: { if !$0 { pendingDelete = nil } }), titleVisibility: .visible) {
                 Button("Delete meal", role: .destructive) {
@@ -135,6 +95,69 @@ struct HistoryView: View {
                 Task { @MainActor in emptyHistoryFocused = true }
             }
         }
+    }
+
+    private func emptyHistory(scale: CGFloat, top: CGFloat, bottom: CGFloat) -> some View {
+        VStack(spacing: 22 * max(scale, 0.7)) {
+            emptyBoard(scale: scale)
+            Text(model.historyLoaded ? "No saved meals" : "History unavailable")
+                .font(.system(scale < 0.7 ? .title : .largeTitle, design: .rounded, weight: .bold))
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityAddTraits(.isHeader)
+                .accessibilityFocused($emptyHistoryFocused)
+            if model.historyLoaded && !model.modelAvailability.allowsPhotoAnalysis {
+                availabilityCard
+            }
+            Text(emptyHistoryMessage)
+                .font(.body)
+                .foregroundStyle(TinyLunchStyle.ink)
+                .multilineTextAlignment(.center)
+                .lineLimit(nil)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+            if model.historyLoaded {
+                Button { startMeal() } label: {
+                    AccessibleActionLabel(title: "Start a meal", systemImage: "plus")
+                }
+                .buttonStyle(PrimaryAction())
+                .accessibilityLabel("Start a meal")
+                .accessibilityHint("Returns to the new meal screen.")
+            } else {
+                Button { Task { await model.refresh() } } label: {
+                    AccessibleActionLabel(title: "Retry", systemImage: "arrow.clockwise")
+                }
+                .buttonStyle(PrimaryAction())
+                .accessibilityLabel("Retry")
+                .accessibilityHint("Loads saved meals again.")
+            }
+            IconLabel(title: "Just meal details. No photos.", systemImage: "lock")
+                .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
+                .accessibilityIdentifier("historyLocalNote")
+        }
+        .padding(.horizontal, 32)
+        .padding(.top, top)
+        .padding(.bottom, bottom)
+        .frame(maxWidth: .infinity, alignment: .top)
+    }
+
+    private func emptyBoard(scale: CGFloat) -> some View {
+        let width = 154 * scale
+        let height = 174 * scale
+        return ZStack {
+            RoundedRectangle(cornerRadius: 28 * scale).fill(TinyLunchStyle.soft)
+                .frame(width: width, height: height).rotationEffect(.degrees(-10)).offset(x: -12 * scale, y: 3 * scale)
+            VStack(spacing: 16 * scale) {
+                Text("🥡").font(.system(size: 60 * scale))
+                    .accessibilityHidden(true)
+                    .accessibilityIdentifier("decorativeGlyph")
+                Capsule().fill(TinyLunchStyle.soft).frame(width: 70 * scale, height: 6 * scale)
+                Capsule().fill(TinyLunchStyle.soft.opacity(0.65)).frame(width: 44 * scale, height: 6 * scale)
+            }.frame(width: width, height: height).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 28 * scale))
+                .rotationEffect(.degrees(6)).offset(x: 12 * scale)
+        }
+        .frame(height: 214 * scale)
+        .accessibilityHidden(true)
     }
 
     private var availabilityCard: some View {

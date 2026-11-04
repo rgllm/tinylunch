@@ -37,6 +37,18 @@ struct TinyLunchCard: ViewModifier {
 
 extension View {
     func tinyLunchCard() -> some View { modifier(TinyLunchCard()) }
+
+    /// Paper that runs under the floating tab bar. The closure form keeps the
+    /// layout in the safe area; a ShapeStyle background would not.
+    func tinylunchPaper() -> some View {
+        background { TinyLunchStyle.paper.ignoresSafeArea() }
+    }
+
+    /// Extra room so the last line of a tab-root scroller can rest above the floating tab bar.
+    func clearsFloatingTabBar() -> some View {
+        contentMargins(.bottom, 32, for: .scrollContent)
+            .scrollBounceBehavior(.basedOnSize)
+    }
 }
 
 struct PrimaryAction: ButtonStyle {
@@ -174,46 +186,48 @@ struct FoodBadge: View {
 }
 
 struct EmojiPlate: View {
+    var height: CGFloat = 250
     @State private var taps = 0
     @State private var chef = false
     @AccessibilityFocusState private var plateFocused: Bool
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let foods = ["🥑", "🍋", "🥐", "🍓", "🍳"]
+    private var scale: CGFloat { height / 250 }
     var body: some View {
         Button {
             taps += 1
             if taps.isMultiple(of: 5) { chef = true }
         } label: {
             ZStack {
-                Ellipse().fill(TinyLunchStyle.soft).frame(width: 220, height: 108).offset(y: 18)
-                Circle().fill(TinyLunchStyle.card).frame(width: 188, height: 188)
-                    .shadow(color: .black.opacity(0.055), radius: 12, x: 0, y: 12)
-                Circle().strokeBorder(TinyLunchStyle.soft, lineWidth: 2).frame(width: 158, height: 158)
-                Circle().fill(TinyLunchStyle.paper.opacity(0.6)).frame(width: 136, height: 136)
+                Ellipse().fill(TinyLunchStyle.soft).frame(width: 220 * scale, height: 108 * scale).offset(y: 18 * scale)
+                Circle().fill(TinyLunchStyle.card).frame(width: 188 * scale, height: 188 * scale)
+                    .shadow(color: .black.opacity(0.055), radius: 12 * scale, x: 0, y: 12 * scale)
+                Circle().strokeBorder(TinyLunchStyle.soft, lineWidth: max(1.0, 2 * scale)).frame(width: 158 * scale, height: 158 * scale)
+                Circle().fill(TinyLunchStyle.paper.opacity(0.6)).frame(width: 136 * scale, height: 136 * scale)
                 Text(foods[taps % foods.count])
-                    .font(.system(size: 72))
-                    .padding(32)
+                    .font(.system(size: 72 * scale))
+                    .padding(32 * scale)
                     .rotationEffect(.degrees(taps.isMultiple(of: 2) ? -8 : 6))
                     .animation(reduceMotion ? nil : .spring(duration: 0.4, bounce: 0.35), value: taps)
                     .accessibilityHidden(true)
                     .accessibilityIdentifier("decorativeGlyph")
             }
             .frame(maxWidth: .infinity)
-            .frame(height: 250)
+            .frame(height: height)
             .clipped()
             .overlay(alignment: .topTrailing) {
-                Text("🍅").font(.title).padding(.top, 12).padding(.trailing, 28)
+                Text("🍅").font(.system(size: 28 * scale)).padding(.top, 12 * scale).padding(.trailing, 28 * scale)
                     .accessibilityHidden(true)
                     .accessibilityIdentifier("decorativeGlyph")
             }
             .overlay(alignment: .bottomLeading) {
-                Text("🌿").font(.title).padding(.leading, 24).padding(.bottom, 16)
+                Text("🌿").font(.system(size: 28 * scale)).padding(.leading, 24 * scale).padding(.bottom, 16 * scale)
                     .accessibilityHidden(true)
                     .accessibilityIdentifier("decorativeGlyph")
             }
             .overlay(alignment: .topLeading) {
-                Image(systemName: "sparkle").font(.body).foregroundStyle(TinyLunchStyle.accent)
-                    .padding(.leading, 36).padding(.top, 28)
+                Image(systemName: "sparkle").font(.system(size: 17 * scale)).foregroundStyle(TinyLunchStyle.accent)
+                    .padding(.leading, 36 * scale).padding(.top, 28 * scale)
                     .accessibilityHidden(true)
             }
             .contentShape(Rectangle())

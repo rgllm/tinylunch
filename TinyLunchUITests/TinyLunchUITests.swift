@@ -506,4 +506,137 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(intersectsWindow(element, of: app))
     }
 
+    /// The caption under Choose photo, and History's closing note, stay fully above the floating tab bar.
+    /// Large text may scroll. It must come to rest above the bar rather than stay clipped underneath it.
+    @MainActor func testCaptionAndHistoryNoteStayAboveTheTabBar() {
+        assertTabRootCopy(sizeCategory: "UICTContentSizeCategoryLarge", scroll: false, dark: false)
+        assertTabRootCopy(sizeCategory: "UICTContentSizeCategoryXXXL", scroll: true, dark: false)
+        assertTabRootCopy(sizeCategory: "UICTContentSizeCategoryAccessibilityXXXL", scroll: true, dark: false)
+        assertTabRootCopy(sizeCategory: "UICTContentSizeCategoryLarge", scroll: false, dark: true)
+    }
+
+    @MainActor private func assertTabRootCopy(sizeCategory: String, scroll: Bool, dark: Bool) {
+        let app = XCUIApplication()
+        var arguments = ["--ui-testing", "--reset-history", "-UIPreferredContentSizeCategoryName", sizeCategory]
+        if dark { arguments.append("--marketing-dark") }
+        app.launchArguments = arguments
+        app.launch()
+        let caption = labeled("onDeviceCaption", in: app, timeout: 10)
+        let appearance = dark ? "dark" : "light"
+        saveLayoutShot(app, name: "home-\(appearance)-\(sizeCategory)-rest")
+        // The availability card is extra content while Apple Intelligence is still downloading.
+        // Default text must fit without it. With the card, scrolling is allowed on a short phone.
+        let modelCard = app.descendants(matching: .any)["analysisUnavailableCard"]
+        let allowScroll = scroll || modelCard.exists
+        if allowScroll { scrollUntilAboveTabBar(caption, in: app) }
+        if allowScroll { saveLayoutShot(app, name: "home-\(appearance)-\(sizeCategory)-settled") }
+        assertRestsAboveTabBar(caption, in: app, label: "caption \(appearance) \(sizeCategory)")
+        XCTAssertTrue(caption.isHittable, "Caption is not hittable at \(appearance) \(sizeCategory) frame \(caption.frame)")
+        XCTAssertEqual(caption.label, "On your iPhone. Just for you.")
+        if !allowScroll {
+            let choose = app.buttons["Choose photo"]
+            XCTAssertTrue(choose.waitForExistence(timeout: 5))
+            assertRestsAboveTabBar(choose, in: app, label: "Choose photo \(appearance) \(sizeCategory)")
+        }
+        guard !dark else { return }
+        openTab("History", in: app)
+        let note = labeled("historyLocalNote", in: app, timeout: 5)
+        saveLayoutShot(app, name: "history-\(appearance)-\(sizeCategory)-rest")
+        if allowScroll { scrollUntilAboveTabBar(note, in: app) }
+        if allowScroll { saveLayoutShot(app, name: "history-\(appearance)-\(sizeCategory)-settled") }
+        assertRestsAboveTabBar(note, in: app, label: "history note \(sizeCategory)")
+        XCTAssertTrue(note.isHittable, "History note is not hittable at \(sizeCategory) frame \(note.frame)")
+    }
+
+    @MainActor private func labeled(_ identifier: String, in app: XCUIApplication, timeout: TimeInterval) -> XCUIElement {
+        let query = app.descendants(matching: .any).matching(identifier: identifier)
+        XCTAssertTrue(query.firstMatch.waitForExistence(timeout: timeout), "Missing \(identifier)")
+        var best = query.firstMatch
+        var bestArea = -1.0
+        for index in 0..<query.count {
+            let candidate = query.element(boundBy: index)
+            let frame = candidate.frame
+            let area = frame.width * frame.height
+            if area > bestArea {
+                best = candidate
+                bestArea = area
+            }
+        }
+        return best
+    }
+
+    @MainActor private func scrollUntilAboveTabBar(_ element: XCUIElement, in app: XCUIApplication) {
+        let window = app.windows.firstMatch.frame
+        var attempts = 0
+        while attempts < 20 && !restsAboveTabBar(element, in: app) {
+            let frame = element.frame
+            if attempts > 0, !frame.isEmpty, frame.maxY < window.minY + 24 {
+                break
+            }
+            nudgeContent(in: app)
+            attempts += 1
+        }
+    }
+
+    /// A short drag above the tab bar. The larger scroll helper can fling a one-line caption off screen.
+    @MainActor private func nudgeContent(in app: XCUIApplication) {
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.48))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.34))
+        start.press(forDuration: 0.05, thenDragTo: end)
+    }
+
+    @MainActor private func assertRestsAboveTabBar(_ element: XCUIElement, in app: XCUIApplication, label: String, file: StaticString = #filePath, line: UInt = #line) {
+        let tabs = tabFrames(in: app).map { "\($0)" }.joined(separator: ", ")
+        XCTAssertTrue(
+            restsAboveTabBar(element, in: app),
+            "\(label) frame \(element.frame) is clipped or covered by a tab \(tabs) in window \(app.windows.firstMatch.frame)",
+            file: file,
+            line: line
+        )
+    }
+
+    /// The floating tab bar is a bottom bar on some phones and a trailing pill on others.
+    /// The element has to sit fully on screen and clear both tab buttons, not merely above their top edge.
+    @MainActor private func restsAboveTabBar(_ element: XCUIElement, in app: XCUIApplication) -> Bool {
+        let frame = element.frame
+        guard element.exists, !frame.isEmpty, frame.width > 2, frame.height > 12 else { return false }
+        let window = app.windows.firstMatch.frame
+        let onScreen = frame.minY >= window.minY - 1
+            && frame.maxY <= window.maxY - 8
+            && frame.minX >= window.minX - 1
+            && frame.maxX <= window.maxX + 1
+        guard onScreen else { return false }
+        for tab in tabFrames(in: app) where frame.intersects(tab.insetBy(dx: -6, dy: -10)) {
+            return false
+        }
+        return true
+    }
+
+    @MainActor private func tabFrames(in app: XCUIApplication) -> [CGRect] {
+        ["New meal", "History"].compactMap { title in
+            let tab = app.buttons[title]
+            guard tab.exists, !tab.frame.isEmpty else { return nil }
+            return tab.frame
+        }
+    }
+
+    @MainActor private func saveLayoutShot(_ app: XCUIApplication, name: String) {
+        let height = Int(app.windows.firstMatch.frame.height.rounded())
+        let file = "\(name)-h\(height).png"
+        let shot = app.screenshot()
+        let attachment = XCTAttachment(screenshot: shot)
+        attachment.name = file
+        attachment.lifetime = .keepAlways
+        add(attachment)
+        let env = ProcessInfo.processInfo.environment
+        guard let path = env["SCREENSHOT_DIR"] ?? env["TEST_RUNNER_SCREENSHOT_DIR"], !path.isEmpty else { return }
+        let directory = URL(fileURLWithPath: path, isDirectory: true)
+        do {
+            try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+            try shot.pngRepresentation.write(to: directory.appendingPathComponent(file))
+        } catch {
+            XCTFail("Could not write \(file): \(error)")
+        }
+    }
+
 }
