@@ -582,32 +582,38 @@ final class TinyLunchUITests: XCTestCase {
     }
 
     @MainActor private func assertRestsAboveTabBar(_ element: XCUIElement, in app: XCUIApplication, label: String, file: StaticString = #filePath, line: UInt = #line) {
+        let tabs = tabFrames(in: app).map { "\($0)" }.joined(separator: ", ")
         XCTAssertTrue(
             restsAboveTabBar(element, in: app),
-            "\(label) frame \(element.frame) overlaps the tab bar at \(tabBarTop(in: app)) or leaves the window \(app.windows.firstMatch.frame)",
+            "\(label) frame \(element.frame) is clipped or covered by a tab \(tabs) in window \(app.windows.firstMatch.frame)",
             file: file,
             line: line
         )
     }
 
+    /// The floating tab bar is a bottom bar on some phones and a trailing pill on others.
+    /// The element has to sit fully on screen and clear both tab buttons, not merely above their top edge.
     @MainActor private func restsAboveTabBar(_ element: XCUIElement, in app: XCUIApplication) -> Bool {
         let frame = element.frame
         guard element.exists, !frame.isEmpty, frame.width > 2, frame.height > 12 else { return false }
         let window = app.windows.firstMatch.frame
-        let tabTop = tabBarTop(in: app)
-        return frame.minY >= window.minY - 1
-            && frame.maxY <= tabTop + 1
+        let onScreen = frame.minY >= window.minY - 1
+            && frame.maxY <= window.maxY - 8
             && frame.minX >= window.minX - 1
             && frame.maxX <= window.maxX + 1
+        guard onScreen else { return false }
+        for tab in tabFrames(in: app) where frame.intersects(tab.insetBy(dx: -6, dy: -10)) {
+            return false
+        }
+        return true
     }
 
-    @MainActor private func tabBarTop(in app: XCUIApplication) -> CGFloat {
-        let tops = ["New meal", "History"].compactMap { title -> CGFloat? in
+    @MainActor private func tabFrames(in app: XCUIApplication) -> [CGRect] {
+        ["New meal", "History"].compactMap { title in
             let tab = app.buttons[title]
             guard tab.exists, !tab.frame.isEmpty else { return nil }
-            return tab.frame.minY
+            return tab.frame
         }
-        return tops.min() ?? app.windows.firstMatch.frame.maxY
     }
 
     @MainActor private func saveLayoutShot(_ app: XCUIApplication, name: String) {

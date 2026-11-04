@@ -46,7 +46,7 @@ extension View {
 
     /// Extra room so the last line of a tab-root scroller can rest above the floating tab bar.
     func clearsFloatingTabBar() -> some View {
-        contentMargins(.bottom, 16, for: .scrollContent)
+        contentMargins(.bottom, 32, for: .scrollContent)
             .scrollBounceBehavior(.basedOnSize)
     }
 }
