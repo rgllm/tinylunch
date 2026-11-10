@@ -1,6 +1,236 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Suggested food" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suggested food"
+          }
+        }
+      }
+    },
+    "Confirmed food" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmed food"
+          }
+        }
+      }
+    },
+    "Other possible matches: %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other possible matches: %@"
+          }
+        }
+      }
+    },
+    "Possible food matches" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Possible food matches"
+          }
+        }
+      }
+    },
+    "Choose the closest match or type a correction. These are suggestions for the same food." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose the closest match or type a correction. These are suggestions for the same food."
+          }
+        }
+      }
+    },
+    "Model estimate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model estimate"
+          }
+        }
+      }
+    },
+    "USDA catalog estimate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "USDA catalog estimate"
+          }
+        }
+      }
+    },
+    "%@ · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ · %@"
+          }
+        }
+      }
+    },
+    "Local nutrition catalog" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Local nutrition catalog"
+          }
+        }
+      }
+    },
+    "Search bundled USDA foods" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search bundled USDA foods"
+          }
+        }
+      }
+    },
+    "Searches foods stored on this iPhone. No internet connection is used." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searches foods stored on this iPhone. No internet connection is used."
+          }
+        }
+      }
+    },
+    "Choose a food with the right preparation. Catalog energy still depends on the food match and portion." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a food with the right preparation. Catalog energy still depends on the food match and portion."
+          }
+        }
+      }
+    },
+    "Searching local foods…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searching local foods…"
+          }
+        }
+      }
+    },
+    "Selected catalog food" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selected catalog food"
+          }
+        }
+      }
+    },
+    "No local match. A valid model estimate can still be used. Missing energy is never zero." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No local match. A valid model estimate can still be used. Missing energy is never zero."
+          }
+        }
+      }
+    },
+    "The bundled catalog could not be read. You can still use a model estimate when Apple Intelligence is ready." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The bundled catalog could not be read. You can still use a model estimate when Apple Intelligence is ready."
+          }
+        }
+      }
+    },
+    "Choose a local catalog food while Apple Intelligence is unavailable." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choose a local catalog food while Apple Intelligence is unavailable."
+          }
+        }
+      }
+    },
+    "Changing grams adjusts the current estimate. A different food or preparation needs a new catalog match or model estimate." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changing grams adjusts the current estimate. A different food or preparation needs a new catalog match or model estimate."
+          }
+        }
+      }
+    },
+    "Portion changes and local catalog choices still work. Other corrections wait until Apple Intelligence is ready." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Portion changes and local catalog choices still work. Other corrections wait until Apple Intelligence is ready."
+          }
+        }
+      }
+    },
+    "Adds a food using the local catalog or an on-device model estimate." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adds a food using the local catalog or an on-device model estimate."
+          }
+        }
+      }
+    },
+    "The bundled food catalog could not be read. Model estimates are still available when Apple Intelligence is ready." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The bundled food catalog could not be read. Model estimates are still available when Apple Intelligence is ready."
+          }
+        }
+      }
+    },
+    "%@ The previous draft is unchanged. Try a local catalog match or retry the correction." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ The previous draft is unchanged. Try a local catalog match or retry the correction."
+          }
+        }
+      }
+    },
+    "%@ kcal per 100 g · %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ kcal per 100 g · %2$@"
+          }
+        }
+      }
+    },
     "%@ g · %@" : {
       "localizations" : {
         "en" : {

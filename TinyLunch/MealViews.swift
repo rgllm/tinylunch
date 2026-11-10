@@ -51,8 +51,22 @@ struct FoodRow: View {
                 Text(item.name).font(.headline).foregroundStyle(.primary)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                Text(item.identityConfirmed ? "Confirmed food" : "Suggested food")
+                    .font(.subheadline).foregroundStyle(.primary)
+                if !item.alternativeNames.isEmpty && !item.identityConfirmed {
+                    Text("Other possible matches: \(item.alternativeNames.joined(separator: ", "))")
+                        .font(.subheadline).fixedSize(horizontal: false, vertical: true)
+                }
+                if item.energyBasis == .database {
+                    Text("USDA catalog estimate")
+                        .font(.headline).foregroundStyle(.primary)
+                    if let catalogID = item.catalogID, let version = item.catalogVersion {
+                        Text("\(catalogID) · \(version)")
+                            .font(.caption).fixedSize(horizontal: false, vertical: true)
+                    }
+                }
                 if item.showsEstimatedBadge {
-                    Text("Estimated")
+                    Text("Model estimate")
                         .font(.headline)
                         .foregroundStyle(.primary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -77,50 +91,13 @@ struct FoodRow: View {
     }
 }
 
-extension FoodItem {
-    /// The badge is a model energy estimate. Unknown items stay unlabeled instead of reading as estimated.
-    var showsEstimatedBadge: Bool { energyBasis == .estimated && calories != nil }
-
-    var accessibilityDescription: String {
-        var parts = [name]
-        if showsEstimatedBadge { parts.append("Estimated") }
-        if let calories {
-            let amount = calories.formatted(.number.precision(.fractionLength(0)))
-            parts.append("\(amount) kilocalories")
-        } else {
-            parts.append("Not estimated")
-        }
-        if let grams {
-            let status = portionConfirmed ? "Confirmed portion" : "Suggested portion"
-            parts.append("\(grams.formatted()) grams, \(status)")
-        }
-        if !preparation.isEmpty { parts.append(preparation) }
-        return parts.joined(separator: ", ")
-    }
-}
-
-extension Meal {
-    var spokenEnergy: String {
-        guard let calories else { return "No estimate" }
-        let amount = calories.formatted(.number.precision(.fractionLength(0)))
-        return "\(amount) kilocalories"
-    }
-
-    /// One element for a history row: title, energy, incomplete status, and the save time.
-    var historyAccessibilityLabel: String {
-        var parts = [title, spokenEnergy]
-        if isIncomplete { parts.append("Incomplete estimate") }
-        parts.append(savedAt.formatted(.dateTime.day().month().hour().minute()))
-        return parts.joined(separator: ", ")
-    }
-}
-
 struct FoodEditor: View {
     let item: FoodItem
     let busy: Bool
     let allowsIdentityEdit: Bool
     var cancel: () -> Void
-    var commit: (String, String, Double?) -> Void
+    let catalog: NutritionCatalog
+    var commit: (FoodCorrection) -> Void
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
     @AccessibilityFocusState private var introFocused: Bool
@@ -130,15 +107,24 @@ struct FoodEditor: View {
     @State private var grams: Double?
     @FocusState private var portionFocused: Bool
     @State private var portionChange = 0
-    init(item: FoodItem, busy: Bool, allowsIdentityEdit: Bool = true, cancel: @escaping () -> Void, commit: @escaping (String, String, Double?) -> Void) {
+    @State private var catalogQuery: String
+    @State private var catalogResults: [CatalogRecord] = []
+    @State private var selectedCatalog: CatalogRecord?
+    @State private var chosenAlternative: String?
+    @State private var catalogSearching = false
+    @State private var catalogMessage: String?
+
+    init(item: FoodItem, busy: Bool, allowsIdentityEdit: Bool = true, catalog: NutritionCatalog, cancel: @escaping () -> Void, commit: @escaping (FoodCorrection) -> Void) {
         self.item = item
         self.busy = busy
         self.allowsIdentityEdit = allowsIdentityEdit
+        self.catalog = catalog
         self.cancel = cancel
         self.commit = commit
         _name = State(initialValue: item.name)
         _preparation = State(initialValue: item.preparation)
         _grams = State(initialValue: item.grams)
+        _catalogQuery = State(initialValue: item.name)
     }
     private var valid: Bool {
         let food = name.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -162,17 +148,31 @@ struct FoodEditor: View {
                 }.listRowBackground(TinyLunchStyle.card)
                 Section {
                     editorHeader("Food")
+                    if !item.alternativeNames.isEmpty {
+                        Text("Possible food matches")
+                            .font(.headline)
+                        Text("Choose the closest match or type a correction. These are suggestions for the same food.")
+                        ForEach([item.name] + item.alternativeNames, id: \.self) { candidate in
+                            Button(candidate) {
+                                if name != candidate { preparation = "" }
+                                name = candidate
+                                chosenAlternative = candidate
+                                catalogQuery = candidate
+                                selectedCatalog = nil
+                            }
+                            .accessibilityIdentifier("alternative-\(candidate)")
+                        }
+                    }
                     TextField("Food name", text: $name)
                         .accessibilityIdentifier("foodName")
                         .accessibilityLabel("Food name")
-                        .disabled(!allowsIdentityEdit)
-                        .accessibilityHint(allowsIdentityEdit ? "The food to estimate." : "Changing the food or preparation waits until on-device estimates are available again.")
+                        .accessibilityHint(allowsIdentityEdit ? "The food to estimate." : "Choose a local catalog food while Apple Intelligence is unavailable.")
                     TextField("Preparation and assumptions", text: $preparation, axis: .vertical)
                         .accessibilityIdentifier("foodPreparation")
                         .accessibilityLabel("Preparation and assumptions")
-                        .disabled(!allowsIdentityEdit)
-                        .accessibilityHint(allowsIdentityEdit ? "How the food was prepared. Changing this needs a new estimate." : "Changing the food or preparation waits until on-device estimates are available again.")
+                        .accessibilityHint(allowsIdentityEdit ? "How the food was prepared. Changing this needs a new estimate." : "Choose a local catalog food while Apple Intelligence is unavailable.")
                 }.listRowBackground(TinyLunchStyle.card)
+                catalogSection
                 Section {
                     editorHeader("Portion")
                     let unitStyle: Font.TextStyle = typeSize.isAccessibilitySize ? .title3 : .title2
@@ -195,9 +195,9 @@ struct FoodEditor: View {
                     .padding(.vertical, 6)
                     Group {
                         if allowsIdentityEdit {
-                            Text("Changing grams adjusts the current estimate. A different food or preparation needs a new estimate.")
+                            Text("Changing grams adjusts the current estimate. A different food or preparation needs a new catalog match or model estimate.")
                         } else {
-                            Text("Portion changes still apply. Changing the food or preparation waits until on-device estimates are available again.")
+                            Text("Portion changes and local catalog choices still work. Other corrections wait until Apple Intelligence is ready.")
                         }
                     }
                     .font(.headline)
@@ -245,6 +245,10 @@ struct FoodEditor: View {
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .onAppear { Task { @MainActor in introFocused = true } }
+        .task(id: catalogQuery) { await searchCatalog() }
+        .onChange(of: name) { _, _ in invalidateCatalogSelection() }
+        .onChange(of: preparation) { _, _ in invalidateCatalogSelection() }
+
         .onChange(of: busy) { _, isBusy in
             guard isBusy else { return }
             Task { @MainActor in updatingFocused = true }
@@ -294,11 +298,78 @@ struct FoodEditor: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    private var catalogSection: some View {
+        Section {
+            editorHeader("Local nutrition catalog")
+            TextField("Search bundled USDA foods", text: $catalogQuery)
+                .accessibilityIdentifier("catalogSearch")
+                .accessibilityHint("Searches foods stored on this iPhone. No internet connection is used.")
+            Text("Choose a food with the right preparation. Catalog energy still depends on the food match and portion.")
+                .font(.subheadline).fixedSize(horizontal: false, vertical: true)
+            if catalogSearching { ProgressView("Searching local foods…") }
+            ForEach(catalogResults) { record in
+                Button {
+                    name = String(record.name.prefix(200))
+                    preparation = record.preparation
+                    selectedCatalog = record
+                } label: {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(record.name).font(.body)
+                        Text("\(record.kcalPer100g.formatted()) kcal per 100 g · \(record.preparation)")
+                            .font(.subheadline)
+                        if selectedCatalog?.id == record.id { Text("Selected catalog food").font(.subheadline.weight(.semibold)) }
+                    }
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
+                }
+                .accessibilityIdentifier("catalog-\(record.id)")
+            }
+            if let catalogMessage { Text(catalogMessage).font(.subheadline) }
+        }.listRowBackground(TinyLunchStyle.card)
+    }
+
+    @MainActor private func searchCatalog() async {
+        let query = catalogQuery
+        catalogSearching = true
+        catalogMessage = nil
+        do {
+            try await Task.sleep(for: .milliseconds(150))
+            let result = try await catalog.search(name: query)
+            guard !Task.isCancelled, query == catalogQuery else { return }
+            catalogResults = result.candidates
+            if result.candidates.isEmpty, !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                catalogMessage = "No local match. A valid model estimate can still be used. Missing energy is never zero."
+            }
+        } catch is CancellationError {
+            return
+        } catch {
+            guard !Task.isCancelled, query == catalogQuery else { return }
+            catalogResults = []
+            catalogMessage = "The bundled catalog could not be read. You can still use a model estimate when Apple Intelligence is ready."
+        }
+        catalogSearching = false
+    }
+
+    private func invalidateCatalogSelection() {
+        guard let selectedCatalog else { return }
+        if name != String(selectedCatalog.name.prefix(200)) || preparation != selectedCatalog.preparation {
+            self.selectedCatalog = nil
+        }
+    }
+
     private func apply() {
         let singleLine = name
             .replacingOccurrences(of: "\n", with: " ")
             .replacingOccurrences(of: "\r", with: " ")
-        commit(singleLine.trimmingCharacters(in: .whitespacesAndNewlines), preparation, grams)
+        let food = singleLine.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let selectedCatalog, food == String(selectedCatalog.name.prefix(200)), preparation == selectedCatalog.preparation {
+            commit(.catalog(id: selectedCatalog.id, grams: grams))
+        } else if food == item.name, preparation == item.preparation, chosenAlternative != food {
+            commit(.portion(grams: grams))
+        } else {
+            commit(.description(name: food, preparation: preparation, grams: grams))
+        }
     }
 
     private func portionButton(_ title: LocalizedStringKey, multiplier: Double, original: Double, hint: LocalizedStringKey) -> some View {

@@ -41,6 +41,29 @@ final class TinyLunchTests: XCTestCase {
         ]).isEmpty)
     }
 
+    func testRecognitionAlternativesStayOnOneItemAndRoundTrip() throws {
+        let items = MealEstimateMapping.foods(containsFood: true, items: [
+            .init(name: "Cod fritters", canEstimate: true, grams: 100, kcalPer100g: 220,
+                  assumptions: "Breaded or battered; visual portion",
+                  alternativeNames: [" Fish cakes ", "COD FRITTERS", "Fish cakes", "Croquettes", "Potato fritters", "Extra"])
+        ])
+        XCTAssertEqual(items.count, 1)
+        XCTAssertEqual(items[0].alternativeNames, ["Fish cakes", "Croquettes", "Potato fritters"])
+        XCTAssertFalse(items[0].identityConfirmed)
+        XCTAssertEqual(Meal(items: items).calories, 220)
+        let reopened = try JSONDecoder().decode(FoodItem.self, from: JSONEncoder().encode(items[0]))
+        XCTAssertEqual(reopened, items[0])
+        XCTAssertTrue(reopened.accessibilityDescription.contains("Fish cakes"))
+    }
+
+    func testMappingValidatesMassAndEnergyIndependently() {
+        let item = MealEstimateMapping.item(from: .init(name: "Rice", canEstimate: true,
+            grams: 150, kcalPer100g: .nan, assumptions: "Cooked"), fallbackName: "Food")
+        XCTAssertEqual(item.grams, 150)
+        XCTAssertNil(item.kcalPer100g)
+        XCTAssertNil(item.calories)
+    }
+
     func testHistoryPersistenceDuplicatesDeletionAndCorruption() async throws {
         let directory = URL.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
@@ -161,13 +184,13 @@ final class TinyLunchTests: XCTestCase {
         let sauce = FoodItem(name: "Sauce", grams: nil, kcalPer100g: nil, preparation: "Unknown")
         let riceParts = spokenParts(rice.accessibilityDescription)
         XCTAssertEqual(riceParts.first, "Rice")
-        XCTAssertTrue(riceParts.contains("Estimated"))
+        XCTAssertTrue(riceParts.contains("Model estimate"))
         XCTAssertTrue(rice.accessibilityDescription.localizedCaseInsensitiveContains("kilocalories"))
         XCTAssertTrue(rice.accessibilityDescription.contains(195.formatted(.number.precision(.fractionLength(0)))))
         XCTAssertTrue(rice.accessibilityDescription.contains("Suggested portion"))
         XCTAssertTrue(rice.accessibilityDescription.contains("Cooked"))
         XCTAssertTrue(rice.showsEstimatedBadge)
-        XCTAssertFalse(spokenParts(sauce.accessibilityDescription).contains("Estimated"))
+        XCTAssertFalse(spokenParts(sauce.accessibilityDescription).contains("Model estimate"))
         XCTAssertTrue(spokenParts(sauce.accessibilityDescription).contains("Not estimated"))
         XCTAssertFalse(sauce.showsEstimatedBadge)
 

@@ -27,7 +27,12 @@ targets:
   TinyLunch:
     type: application
     platform: iOS
-    sources: [TinyLunch]
+    sources:
+      - path: TinyLunch
+        excludes: [Resources/NutritionCatalog]
+      - path: TinyLunch/Resources/NutritionCatalog
+        type: folder
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.rgllm.tinylunch

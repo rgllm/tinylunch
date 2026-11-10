@@ -15,13 +15,15 @@ final class AppModel {
     var historyLoaded = false
     var savedNotice = false
     private let estimator: any FoodEstimating
+    let catalog: NutritionCatalog
     private let store: MealStore
     private var operation: Task<Void, Never>?
     private var requestID = UUID()
 
-    init(estimator: any FoodEstimating, store: MealStore) {
+    init(estimator: any FoodEstimating, store: MealStore, catalog: NutritionCatalog = NutritionCatalog()) {
         self.estimator = estimator
         self.store = store
+        self.catalog = catalog
     }
 
     func refresh() async {
@@ -111,7 +113,12 @@ final class AppModel {
         let id = requestID
         operation = Task {
             do {
-                let items = try await estimator.analyze(data)
+                let recognized = try await estimator.analyze(data)
+                var items: [FoodItem] = []
+                for item in recognized {
+                    try Task.checkCancellation()
+                    items.append((try? await catalog.resolve(item)) ?? item)
+                }
                 guard id == requestID, !Task.isCancelled else { return }
                 if items.isEmpty {
                     error = "No food was identified. Try a clearer photo with the meal in view."
@@ -129,18 +136,14 @@ final class AppModel {
         }
     }
 
-    func update(_ item: FoodItem, name: String, preparation: String, grams: Double?, onSuccess: @escaping @MainActor () -> Void) {
+    func update(_ item: FoodItem, correction: FoodCorrection, onSuccess: @escaping @MainActor () -> Void) {
         guard !busy, !saving, var meal = draft else { return }
-        if item.name == name && item.preparation == preparation,
-           let index = meal.items.firstIndex(where: { $0.id == item.id }) {
+        if case .portion(let grams) = correction {
+            guard let index = meal.items.firstIndex(where: { $0.id == item.id }) else { return }
             meal.items[index].grams = grams
-            meal.items[index].portionConfirmed = true
+            meal.items[index].portionConfirmed = grams != nil
             draft = meal
             onSuccess()
-            return
-        }
-        guard modelAvailability.allowsTextEstimate else {
-            error = modelAvailability.explanation
             return
         }
         cancel()
@@ -148,10 +151,30 @@ final class AppModel {
         let id = requestID
         operation = Task {
             do {
-                var updated = try await estimator.estimate(name: name, preparation: preparation)
+                var updated: FoodItem
+                switch correction {
+                case .portion:
+                    return
+                case .catalog(let catalogID, let grams):
+                    let selection = try await catalog.record(id: catalogID)
+                    updated = item.usingCatalog(selection.record, version: selection.version)
+                    updated.grams = grams
+                    updated.portionConfirmed = grams != nil
+                case .description(let name, let preparation, let grams):
+                    let invalidated = item.changingDescription(name: name, preparation: preparation, grams: grams)
+                    updated = (try? await catalog.resolve(invalidated)) ?? invalidated
+                    if updated.energyBasis != .database {
+                        guard modelAvailability.allowsTextEstimate else {
+                            throw EstimateError.unavailable(modelAvailability.explanation)
+                        }
+                        updated = try await estimator.estimate(name: name, preparation: preparation)
+                        updated.identityConfirmed = true
+                        if let grams { updated.grams = grams; updated.portionConfirmed = true }
+                        updated = (try? await catalog.resolve(updated)) ?? updated
+                    }
+                }
                 guard id == requestID, !Task.isCancelled else { return }
                 updated.id = item.id
-                if let grams { updated.grams = grams; updated.portionConfirmed = true }
                 if let index = meal.items.firstIndex(where: { $0.id == item.id }) {
                     meal.items[index] = updated
                 } else { meal.items.append(updated) }
@@ -159,7 +182,8 @@ final class AppModel {
                 onSuccess()
             } catch {
                 guard id == requestID, !Task.isCancelled else { return }
-                self.error = "This correction could not be estimated. The previous draft is unchanged. Retry the correction when the model is available."
+                let reason = (error as? LocalizedError)?.errorDescription ?? "This correction could not be estimated."
+                self.error = "\(reason) The previous draft is unchanged. Try a local catalog match or retry the correction."
             }
             if id == requestID { busy = false }
         }
@@ -188,7 +212,7 @@ final class AppModel {
 
     #if DEBUG
     func loadExample() {
-        draft = Meal(items: [FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked; example data"),
+        draft = Meal(items: [FoodItem(name: "Rice", grams: 150, kcalPer100g: 130, preparation: "Cooked; example data", alternativeNames: ["Couscous", "Orzo"]),
                              FoodItem(name: "Unidentified sauce", grams: nil, kcalPer100g: nil, preparation: "Unknown; example data")], estimatorVersion: "ui-test-fixture")
     }
 

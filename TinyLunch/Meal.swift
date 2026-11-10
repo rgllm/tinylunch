@@ -1,7 +1,6 @@
 import Foundation
 
 /// Where an item's kcal per 100 g came from.
-/// v1 always stores `estimated` and leaves the catalog fields empty. `database` is reserved for a bundled table.
 enum EnergyBasis: String, Codable, Equatable, Sendable {
     case estimated
     case database
@@ -17,6 +16,8 @@ struct FoodItem: Identifiable, Equatable, Sendable {
     var energyBasis: EnergyBasis = .estimated
     var catalogID: String?
     var catalogVersion: String?
+    var alternativeNames: [String] = []
+    var identityConfirmed = false
 
     // Bounds are input sanity checks, not confidence in model accuracy.
     var calories: Double? {
@@ -31,7 +32,7 @@ struct FoodItem: Identifiable, Equatable, Sendable {
 extension FoodItem: Codable {
     private enum CodingKeys: String, CodingKey {
         case id, name, grams, kcalPer100g, preparation, portionConfirmed
-        case energyBasis, catalogID, catalogVersion
+        case energyBasis, catalogID, catalogVersion, alternativeNames, identityConfirmed
     }
 
     init(from decoder: Decoder) throws {
@@ -46,6 +47,8 @@ extension FoodItem: Codable {
         energyBasis = try container.decodeIfPresent(EnergyBasis.self, forKey: .energyBasis) ?? .estimated
         catalogID = try container.decodeIfPresent(String.self, forKey: .catalogID)
         catalogVersion = try container.decodeIfPresent(String.self, forKey: .catalogVersion)
+        alternativeNames = try container.decodeIfPresent([String].self, forKey: .alternativeNames) ?? []
+        identityConfirmed = try container.decodeIfPresent(Bool.self, forKey: .identityConfirmed) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -57,6 +60,8 @@ extension FoodItem: Codable {
         try container.encode(preparation, forKey: .preparation)
         try container.encode(portionConfirmed, forKey: .portionConfirmed)
         try container.encode(energyBasis, forKey: .energyBasis)
+        try container.encode(alternativeNames, forKey: .alternativeNames)
+        try container.encode(identityConfirmed, forKey: .identityConfirmed)
         if let catalogID {
             try container.encode(catalogID, forKey: .catalogID)
         } else {
@@ -129,4 +134,49 @@ actor MealStore {
     }
 
     enum StoreError: Error { case unsupportedVersion }
+}
+
+extension FoodItem {
+    var showsEstimatedBadge: Bool { energyBasis == .estimated && calories != nil }
+
+    var accessibilityDescription: String {
+        var parts = [name]
+        parts.append(identityConfirmed ? "Confirmed food" : "Suggested food")
+        if !alternativeNames.isEmpty && !identityConfirmed {
+            parts.append("Other possible matches: \(alternativeNames.joined(separator: ", "))")
+        }
+        if showsEstimatedBadge { parts.append("Model estimate") }
+        if energyBasis == .database {
+            parts.append("USDA catalog estimate")
+            if let catalogID { parts.append(catalogID) }
+            if let catalogVersion { parts.append(catalogVersion) }
+        }
+        if let calories {
+            let amount = calories.formatted(.number.precision(.fractionLength(0)))
+            parts.append("\(amount) kilocalories")
+        } else {
+            parts.append("Not estimated")
+        }
+        if let grams {
+            let status = portionConfirmed ? "Confirmed portion" : "Suggested portion"
+            parts.append("\(grams.formatted()) grams, \(status)")
+        }
+        if !preparation.isEmpty { parts.append(preparation) }
+        return parts.joined(separator: ", ")
+    }
+}
+
+extension Meal {
+    var spokenEnergy: String {
+        guard let calories else { return "No estimate" }
+        let amount = calories.formatted(.number.precision(.fractionLength(0)))
+        return "\(amount) kilocalories"
+    }
+
+    var historyAccessibilityLabel: String {
+        var parts = [title, spokenEnergy]
+        if isIncomplete { parts.append("Incomplete estimate") }
+        parts.append(savedAt.formatted(.dateTime.day().month().hour().minute()))
+        return parts.joined(separator: ", ")
+    }
 }

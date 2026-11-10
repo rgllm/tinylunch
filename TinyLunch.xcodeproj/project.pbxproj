@@ -24,6 +24,11 @@
 		BF4BBBD44035648FC0636DCA /* ScreenshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CCB47565D9881595F2FD272 /* ScreenshotTests.swift */; };
 		D156DF1ACED889B1AB5EDE46 /* Estimator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0727B9B884BB2C5F8293A67D /* Estimator.swift */; };
 		F67C9B74FCECDB0503E5951D /* TinyLunchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C5A08800B165E3194CBE27 /* TinyLunchApp.swift */; };
+		568CCB1A65518D0475DAB6AF /* MealEstimateMapping.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9428B4135963BFFD695B3790 /* MealEstimateMapping.swift */; };
+		D8AB850C2FB299CA679C308E /* NutritionCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A22EBB25C1568D093539DA2E /* NutritionCatalog.swift */; };
+		C02F5F1538E36F2B88D5A1E7 /* NutritionCatalog in Resources */ = {isa = PBXBuildFile; fileRef = E5C14F816456E2E30E7B70A2 /* NutritionCatalog */; };
+		2A0EC3AF1C065B282E7C3A9C /* NutritionCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 876F018B4428FDDFDAB1DA4D /* NutritionCatalogTests.swift */; };
+		24BDB1A50FD27E8B754028CD /* AppModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD08B17AEA7E3CA0A9F86D6A /* AppModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,12 +69,19 @@
 		9E59D0D1083096D1E5C01C65 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		BB9A18A489D99436E2441631 /* MealViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealViews.swift; sourceTree = "<group>"; };
 		EE78469864BF30B2B0F388E1 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		9428B4135963BFFD695B3790 /* MealEstimateMapping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MealEstimateMapping.swift"; sourceTree = "<group>"; };
+		A22EBB25C1568D093539DA2E /* NutritionCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NutritionCatalog.swift"; sourceTree = "<group>"; };
+		E5C14F816456E2E30E7B70A2 /* NutritionCatalog */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Resources/NutritionCatalog"; sourceTree = "<group>"; };
+		876F018B4428FDDFDAB1DA4D /* NutritionCatalogTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutritionCatalogTests.swift; sourceTree = "<group>"; };
+		CD08B17AEA7E3CA0A9F86D6A /* AppModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		12E1A4F3494EBC4979A72939 /* TinyLunchTests */ = {
 			isa = PBXGroup;
 			children = (
+				CD08B17AEA7E3CA0A9F86D6A /* AppModelTests.swift */,
+				876F018B4428FDDFDAB1DA4D /* NutritionCatalogTests.swift */,
 				A7C3E2F1D018675C93E45F32 /* AnalysisAvailabilityTests.swift */,
 				650350A2620F6983B1CBE47E /* TinyLunchTests.swift */,
 			);
@@ -99,6 +111,9 @@
 		B3EDFC037618EEE4BCD7D2AC /* TinyLunch */ = {
 			isa = PBXGroup;
 			children = (
+				9428B4135963BFFD695B3790 /* MealEstimateMapping.swift */,
+				A22EBB25C1568D093539DA2E /* NutritionCatalog.swift */,
+				E5C14F816456E2E30E7B70A2 /* NutritionCatalog */,
 				E4A1C0D9B8F7465A91C23D10 /* AnalysisAvailability.swift */,
 				362409DD09B5B3CD093931E7 /* AppModel.swift */,
 				190A89FE6EB7B9E0090D53C8 /* Assets.xcassets */,
@@ -232,6 +247,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C02F5F1538E36F2B88D5A1E7 /* NutritionCatalog in Resources */,
 				6518A1F9CB7B2CC1C0D3C9C0 /* Assets.xcassets in Resources */,
 				0D94D56A81CDB6BCBFD05186 /* Localizable.xcstrings in Resources */,
 				B7A96A7859E57FE0CE187FC7 /* PrivacyInfo.xcprivacy in Resources */,
@@ -254,6 +270,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D8AB850C2FB299CA679C308E /* NutritionCatalog.swift in Sources */,
+				568CCB1A65518D0475DAB6AF /* MealEstimateMapping.swift in Sources */,
 				F5B2D1E0C907564B82D34E21 /* AnalysisAvailability.swift in Sources */,
 				343E04F6EBAF9A4542AA5BB3 /* AppModel.swift in Sources */,
 				A21D86756F425C301B125599 /* CameraView.swift in Sources */,
@@ -271,6 +289,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				24BDB1A50FD27E8B754028CD /* AppModelTests.swift in Sources */,
+				2A0EC3AF1C065B282E7C3A9C /* NutritionCatalogTests.swift in Sources */,
 				B8D4F302E129786DA04F5643 /* AnalysisAvailabilityTests.swift in Sources */,
 				90C014E7BACD5D588D758EE6 /* TinyLunchTests.swift in Sources */,
 			);
