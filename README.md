@@ -1,6 +1,6 @@
 # TinyLunch
 
-TinyLunch is an iPhone app that estimates the calories in a meal from a photo. Take a picture or choose one from your library. The app suggests the foods it sees, a portion in grams, and an energy estimate you can correct before saving. Saved meals appear in History, where you can open or delete them. The interface is English.
+TinyLunch is an iPhone app that estimates the calories in a meal from a photo. Take a picture or choose one from your library. The app suggests the foods it sees, alternative names when uncertain, a portion in grams, and an energy estimate you can correct before saving. Energy comes from a bundled USDA catalog after a matching record is found or chosen, with clearly labelled model estimates as fallback. Saved meals appear in History, where you can open or delete them. The interface is English.
 
 ## Privacy
 
@@ -50,3 +50,9 @@ xcodebuild \
 ```
 
 If that simulator is not installed, use another iPhone simulator on iOS 27.0 or later. The workflow picks an available one.
+
+## Food identification and local energy catalog
+
+Review shows uncertain food alternatives. The food editor searches bundled USDA SR Legacy and Foundation Foods without an internet connection. Changing only grams rescales the current basis. Changing food or preparation requires a new match or model estimate. Saved meals keep their original values when the catalog changes.
+
+See [catalog sources and build instructions](docs/nutrition-catalog.md) and [verification results and remaining iOS checks](docs/verification-food-estimates.md).

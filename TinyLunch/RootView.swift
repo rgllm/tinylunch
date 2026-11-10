@@ -134,9 +134,10 @@ struct CaptureView: View {
                     item: item,
                     busy: model.busy,
                     allowsIdentityEdit: model.modelAvailability.allowsTextEstimate,
+                    catalog: model.catalog,
                     cancel: model.cancel
-                ) { name, preparation, grams in
-                    model.update(item, name: name, preparation: preparation, grams: grams, onSuccess: { editing = nil })
+                ) { correction in
+                    model.update(item, correction: correction, onSuccess: { editing = nil })
                 }.interactiveDismissDisabled()
             }
             .sheet(isPresented: $privacy, onDismiss: {
@@ -532,9 +533,9 @@ struct CaptureView: View {
                         .font(.headline)
                         .frame(maxWidth: .infinity, minHeight: 56, alignment: .leading)
                 }
-                .disabled(model.busy || model.saving || !model.modelAvailability.allowsTextEstimate)
+                .disabled(model.busy || model.saving)
                 .accessibilityLabel("Add food")
-                .accessibilityHint(model.modelAvailability.allowsTextEstimate ? "Adds a food by name for an on-device estimate." : model.modelAvailability.explanation)
+                .accessibilityHint("Adds a food using the local catalog or an on-device model estimate.")
                 .accessibilityFocused($addFoodFocused)
             }.padding(.horizontal, 18).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 26))
             Text("Tap a food to correct it. Portions are suggestions until you confirm them.")

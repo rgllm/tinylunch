@@ -150,7 +150,8 @@ final class AnalysisAvailabilityTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: directory) }
         let model = AppModel(
             estimator: ScriptedEstimator(modelAvailability: .modelNotReady),
-            store: MealStore(directory: directory)
+            store: MealStore(directory: directory),
+            catalog: NutritionCatalog(resource: nil)
         )
         await model.refresh()
         XCTAssertEqual(model.modelAvailability, .modelNotReady)
@@ -159,7 +160,7 @@ final class AnalysisAvailabilityTests: XCTestCase {
         model.draft = Meal(items: [rice])
 
         var applied = false
-        model.update(rice, name: rice.name, preparation: rice.preparation, grams: 300) { applied = true }
+        model.update(rice, correction: .portion(grams: 300)) { applied = true }
         XCTAssertTrue(applied)
         XCTAssertEqual(model.draft?.items.first?.grams, 300)
         XCTAssertEqual(model.draft?.items.first?.calories, 390)
@@ -167,11 +168,13 @@ final class AnalysisAvailabilityTests: XCTestCase {
         XCTAssertNil(model.error)
 
         applied = false
-        model.update(rice, name: "Bread", preparation: rice.preparation, grams: 80) { applied = true }
+        model.update(rice, correction: .description(name: "Bread", preparation: rice.preparation, grams: 80)) { applied = true }
+        let deadline = Date().addingTimeInterval(3)
+        while model.busy, Date() < deadline { try? await Task.sleep(for: .milliseconds(5)) }
         XCTAssertFalse(applied)
         XCTAssertEqual(model.draft?.items.first?.name, "Rice")
         XCTAssertEqual(model.draft?.items.first?.grams, 300)
-        XCTAssertEqual(model.error, AnalysisAvailabilityState.modelNotReady.explanation)
+        XCTAssertTrue(model.error?.contains(AnalysisAvailabilityState.modelNotReady.explanation) == true)
         XCTAssertFalse(model.busy)
     }
 }

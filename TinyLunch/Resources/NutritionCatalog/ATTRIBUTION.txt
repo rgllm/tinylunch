@@ -1,0 +1,21 @@
+USDA FoodData Central, Agricultural Research Service, U.S. Department of Agriculture.
+SR Legacy, April 2018, and Foundation Foods, October 29, 2026.
+Public domain under CC0 1.0 Universal. USDA requests source attribution.
+https://fdc.nal.usda.gov/api-guide
+https://creativecommons.org/publicdomain/zero/1.0/
+
+This is a derived identity-and-energy extract, not the full USDA datasets.
+The version directory includes the source archive URLs, SHA-256 checksums,
+record counts, and the checksum of catalog.json in manifest.json.
+
+Energy is kcal per 100 grams of edible food. SR Legacy uses nutrient 1008.
+Foundation Foods prefers 2048 (Atwater specific factors), then 2047
+(Atwater general factors), then 1008 when that is the only available value.
+Energy measures are never added together. Records without a valid energy
+value are excluded, not assigned zero. A true source zero is retained.
+Raw and cooked foods remain separate records. Source description words
+supply preparation labels. A missing preparation label is not inferred.
+
+TinyLunch uses this resource entirely offline. A food match and a portion
+remain estimates even when energy density comes from USDA. Many Portuguese
+mixed dishes are absent. INSA PortFIR is not included.

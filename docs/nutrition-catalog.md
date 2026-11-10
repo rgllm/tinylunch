@@ -1,100 +1,59 @@
 # Local nutrition catalog
 
-Status: exploration, not scheduled implementation. The on-device model remains the energy source until photo analysis is measured on a physical iPhone.
+TinyLunch recognizes food with Apple's on-device Foundation Model and searches a bundled USDA catalog for energy density. The catalog does not identify food in a photograph or measure portion weight. Food names, cooking methods, and grams still need review.
 
-## Verdict
+## Bundled data
 
-A bundled catalog is **worth building after** live photo analysis is evaluated. It is **not worth bundling now**.
+The initial resource combines FoodData Central SR Legacy, April 2018, and Foundation Foods, October 29, 2026. It includes 7,793 SR Legacy records and 374 Foundation records with valid energy values. Fifty Foundation records have no usable energy and are excluded rather than assigned zero. The resource is about 3 MB.
 
-TinyLunch already separates identity, grams, and kcal per 100 g. Swift, not the model, computes `grams * kcalPer100g / 100`. A catalog would replace only the energy-density number, and only after a food is mapped to a real record. It does not solve visual portion error, mixed-dish double counting, or model unavailability.
+The catalog contains identity, preparation words from the source description, kcal per 100 g, the energy nutrient ID, source release, source URL, and documented portion weights where present. It excludes other nutrients and the Branded, FNDDS, and Experimental data types. SR Legacy itself contains some historical brand-named descriptions.
 
-The hard part is matching a photo-derived name and preparation to one catalog row. Storage size is not the hard part.
+USDA publishes FoodData Central under CC0 1.0. The bundle includes attribution and a manifest with source archive URLs, SHA-256 checksums, record counts, and the generated resource checksum.
 
-## What it would improve
+- [Official downloads](https://fdc.nal.usda.gov/download-datasets/)
+- [USDA licensing and attribution](https://fdc.nal.usda.gov/api-guide)
+- [Foundation energy definitions](https://fdc.nal.usda.gov/Foundation_Foods_Documentation)
 
-- Repeatable energy density for common generic foods (rice, chicken breast, banana) instead of a new model guess each time.
-- Honest provenance: a FoodData Central ID and dataset version, rather than a model-invented kcal figure.
-- Portion edits stay local and deterministic once a catalog row is chosen.
-- Corrections can search the catalog by name without another model call.
+INSA PortFIR is not bundled. Redistribution requires permission that this project does not have. No other food dataset is bundled.
 
-## What it would not improve
+## Build the resource
 
-- Grams from a photo remain a visual guess.
-- Unfamiliar dishes, sauces, and restaurant plates often have no row.
-- Portuguese names and dishes are poorly covered by USDA tables.
-- History must stay a snapshot. Updating the catalog must not rewrite saved meals.
+Run this at development time from the repository root:
 
-## When to do it
+```sh
+python3 scripts/build_nutrition_catalog.py --download
+python3 scripts/test_nutrition_builder.py
+scripts/test-domain.sh
+```
 
-Do it after all of these are true:
+The script downloads only missing pinned archives to `.build/nutrition-sources`. It checks their SHA-256 hashes before conversion. Omit `--download` to rebuild entirely from cached archives. It emits `catalog.json` and `manifest.json` under `TinyLunch/Resources/NutritionCatalog/usda-sr-2018-04-foundation-2026-10-29-v1/`.
 
-1. Photo analysis runs on the physical iPhone, including airplane mode after model assets are installed.
-2. A small labeled set of meals exists (simple foods, mixed dishes, non-food).
-3. Model kcal-per-100 g error is large enough, or users correct food identity often enough, that a catalog would change the product.
+SR Legacy uses energy nutrient 1008. Foundation prefers 2048, the Atwater specific factor, then 2047, the general factor, then legacy 1008. The converter selects one finite value in kcal, between 0 and 1,000 per 100 g. It never adds energy measures or substitutes kJ. True zero values remain valid. Preparation labels come from source words and do not infer cooking when the description omits it.
 
-Until then, keep calling results estimates and do not attribute them to a database.
+To update the catalog, pin new archive URLs and checksums, change the version in the builder and `NutritionCatalog.bundledVersion`, regenerate, and run the checks. Retain the attribution file. Update this document's counts and release details. Do not recalculate history.
 
-## How it should work in TinyLunch
+## Local matching
 
-Keep the model as a **recognizer**, not as the nutrition table.
+`NutritionCatalog` loads and searches the JSON on its actor, away from the UI actor. Search normalizes English case, accents, punctuation, and a small set of common food plurals. All query words must occur in a candidate description. Preparation filtering separates raw and cooked foods and specific cooking methods. Results are limited to five choices.
 
-1. The photo (or a typed correction) yields a food name, preparation, and suggested grams.
-2. A local catalog search returns zero, one, or a few candidate records (same name family, raw vs cooked called out).
-3. Zero matches: keep the item, mark energy unknown or fall back to a model kcal value that is labeled as a model estimate. Never treat a miss as zero.
-4. One confident match, or a user pick from a short list: copy that row’s kcal per 100 g, record ID, dataset version, and preparation state into the draft.
-5. Changing grams only rescales. Changing the food or cooking method invalidates the catalog row until a new match is confirmed.
-6. Save stores the snapshot. Opening History does not look up the catalog again.
+Automatic matching requires exactly one record with the same normalized identity words and preparation state. A top-ranked result alone is insufficient. Duplicate exact descriptions stay ambiguous even if their energies agree. Unresolved recognition alternatives prevent automatic substitution. Negated or uncertain preparation notes prevent automatic substitution. Unexplained preparation words, including added ingredients such as butter, also prevent automatic substitution.
 
-Fields already stored on each food item, so adding a catalog does not require a migration:
+Review shows the suggested food and its plausible alternatives. Selecting an alternative replaces the same item after re-estimation or matching. It never adds another portion. The editor also searches bundled USDA foods and shows their descriptions, preparation, and kcal per 100 g. Selecting a catalog result and tapping Apply uses its source value without calling the model. Search and selection work while Apple Intelligence is unavailable.
 
-- `energyBasis`: `estimated` or `database`. This version always writes `estimated`.
-- `catalogID` (stable source ID, for example an FDC ID). Always nil in this version.
-- `catalogVersion` (dataset name + release date). Always nil in this version.
-- existing `kcalPer100g`, `grams`, `preparation`
+A missing or ambiguous match retains a valid model energy estimate, labelled **Model estimate**. A failed catalog load also retains model estimates and explains the catalog failure in the search section. Missing energy remains unknown. A catalog-derived estimate is labelled **USDA catalog estimate**, with the FDC ID and catalog version. These are still meal estimates because food identity and grams may be wrong.
 
-Archives saved before these fields decode as `estimated` with nil catalog values. Opening history does not rewrite them.
+## Corrections and history
 
-Runtime lookup stays on-device. Downloads and CSV transforms belong in a development script. Do not call the USDA API, Open Food Facts, or any other network from the app.
+Gram-only corrections preserve energy density and provenance. Swift computes `grams * kcalPer100g / 100` and sums unrounded item values.
 
-SQLite already ships on iOS. A kcal-only table of several thousand foods is a small read-only bundle resource. JSON plus an in-memory index is also enough at that size. Do not add a persistence framework until there is a concrete query need.
+Food or preparation changes invalidate energy density, catalog ID, and catalog version together. The editor holds pending changes until a replacement catalog match or model response succeeds. A failed correction leaves the previous draft intact. Cancellation and request IDs reject obsolete completions.
 
-## Dataset comparison
+Save copies the energy basis, kcal per 100 g, grams, preparation, catalog ID, catalog version, and recognition suggestions into the existing local snapshot. Legacy records default to model-estimated energy and empty recognition alternatives. History load never searches the catalog or invokes the model. Unknown items and incomplete subtotals remain intact.
 
-Use a **generic composition table**, not a supermarket barcode dump. TinyLunch estimates a plate, not a packaged SKU.
+Runtime lookup is entirely local. Download URLs in the resource document provenance; the app does not fetch them. No USDA API, remote nutrition service, INSA, or cloud model is called.
 
-| Source | Why it fits | Why it does not | License |
-| --- | --- | --- | --- |
-| USDA FoodData Central SR Legacy (7,793 foods, final 2018) plus Foundation Foods | English descriptions, kcal per 100 g, stable IDs, small enough to slim down and bundle. Full branded dump is gigabytes and is the wrong product. | US foods and cooking. Weak on Portuguese dishes. | Public domain, CC0 1.0. Attribution requested, not required. |
-| ANSES CIQUAL 2025 (3,484 foods) | European cooking, 74 components, Excel/XML of a few megabytes. | French-first names. Extra mapping work for an English UI. | Etalab 2.0 (open, attribution). |
-| INSA PortFIR TCA | Best coverage of foods eaten in Portugal; Excel download; values per 100 g edible portion. | Download dialog is copyright / citation, not a clear open license. Bundling in the App Store needs an explicit OK from INSA. Portuguese names vs English UI. | Cite INSA; confirm redistribution before shipping. |
-| Open Food Facts | Useful later for barcodes, which TinyLunch does not do. | ~0.9 GB gzip / ~9 GB CSV, ODbL share-alike, packaged products, crowd quality. | ODbL |
+## Verification limits
 
-**Preferred first catalog, if this work starts:** USDA SR Legacy + Foundation Foods, energy and identity only, built at development time into a versioned SQLite or JSON resource. Keep PortFIR as a possible second table after written redistribution terms. Do not bundle Open Food Facts for plated-meal estimates.
+The new prompt and local catalog do not establish measured recognition or calorie accuracy. Portuguese mixed dishes have limited USDA coverage. Visual portions remain assumptions. Physical-iPhone evaluation, including airplane mode, is still required.
 
-Links:
-
-- https://fdc.nal.usda.gov/download-datasets/
-- https://fdc.nal.usda.gov/api-guide/
-- https://ciqual.anses.fr/cms/en/2025-anses-ciqual-table
-- https://entrepot.recherche.data.gouv.fr/dataset.xhtml?persistentId=doi:10.57745/RDMHWY
-- https://portfir.insa.min-saude.pt/
-- https://world.openfoodfacts.org/data
-- https://opendatacommons.org/licenses/odbl/1-0/index.html
-
-## Build pipeline (when approved)
-
-1. Download the chosen release (not the live API).
-2. Keep source ID, English name, preparation/state, kcal per 100 g, documented serving weight if present, dataset version, and source URL.
-3. Drop branded products, refuse non-finite energy, keep raw vs cooked as separate rows.
-4. Emit `TinyLunch/Resources/NutritionCatalog/<version>/` and a human-readable attribution file.
-5. Unit-test search, ambiguous matches, missing energy, and that saved meals do not change when the catalog file is replaced.
-
-## Fallback policy (draft)
-
-When the catalog is present:
-
-- Catalog hit after user confirmation or a single unambiguous match: `energyBasis = database`, with `catalogID` and `catalogVersion` copied from the row.
-- No hit: keep the model kcal if it passed validation, with `energyBasis = estimated`; otherwise unknown.
-- Never invent a catalog ID or source URL for a model value.
-
-This policy can change once measurement exists. It must be explicit in the UI.
+See [verification for this change](verification-food-estimates.md) for actual checks and environment blockers.

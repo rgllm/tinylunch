@@ -55,6 +55,44 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(savedMeal.label.localizedCaseInsensitiveContains("kilocalories"))
     }
 
+    @MainActor func testRecognitionAlternativesAreVisibleAndReplaceOneFood() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
+        app.launch()
+        let rice = app.buttons["editFood-Rice"]
+        XCTAssertTrue(rice.waitForExistence(timeout: 10))
+        XCTAssertTrue(rice.label.contains("Couscous"))
+        tapVisible(rice, in: app)
+        let alternative = app.buttons["alternative-Couscous"]
+        reveal(alternative, in: app)
+        alternative.tap()
+        app.buttons["Apply"].tap()
+        XCTAssertTrue(app.buttons["editFood-Couscous"].waitForExistence(timeout: 10))
+        XCTAssertFalse(app.buttons["editFood-Rice"].exists)
+        XCTAssertTrue(app.buttons["editFood-Unidentified sauce"].exists)
+    }
+
+    @MainActor func testCatalogChoiceWorksWhileAppleIntelligenceIsOff() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal", "--analysis-unavailable"]
+        app.launch()
+        tapVisible(app.buttons["editFood-Rice"], in: app)
+        let search = app.textFields["catalogSearch"]
+        reveal(search, in: app)
+        search.tap()
+        search.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 4) + "Bananas, raw")
+        let banana = app.buttons["catalog-fdc-173944"]
+        XCTAssertTrue(banana.waitForExistence(timeout: 10))
+        reveal(banana, in: app)
+        banana.tap()
+        app.buttons["Apply"].tap()
+        let corrected = app.buttons["editFood-Bananas, raw"]
+        XCTAssertTrue(corrected.waitForExistence(timeout: 10))
+        XCTAssertTrue(corrected.label.contains("USDA catalog estimate"))
+        XCTAssertTrue(corrected.label.contains("fdc-173944"))
+        XCTAssertFalse(app.buttons["editFood-Rice"].exists)
+    }
+
     @MainActor func testHiddenPlateAndWordmarkSurprises() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset-history"]
@@ -384,14 +422,14 @@ final class TinyLunchUITests: XCTestCase {
         XCTAssertTrue(rice.waitForExistence(timeout: 10))
         let riceParts = spokenParts(rice.label)
         XCTAssertEqual(riceParts.first, "Rice")
-        XCTAssertTrue(riceParts.contains("Estimated"))
+        XCTAssertTrue(riceParts.contains("Model estimate"))
         XCTAssertTrue(rice.label.localizedCaseInsensitiveContains("kilocalories"))
         XCTAssertFalse(riceParts.contains("Not estimated"))
         let sauce = app.buttons["editFood-Unidentified sauce"]
         XCTAssertTrue(sauce.waitForExistence(timeout: 5))
         let sauceParts = spokenParts(sauce.label)
         XCTAssertTrue(sauceParts.contains("Not estimated"))
-        XCTAssertFalse(sauceParts.contains("Estimated"))
+        XCTAssertFalse(sauceParts.contains("Model estimate"))
     }
 
     private func spokenParts(_ label: String) -> [String] {
