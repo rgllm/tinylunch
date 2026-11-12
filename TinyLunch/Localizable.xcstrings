@@ -589,10 +589,10 @@
     "Turn it on in Settings, under Apple Intelligence & Siri, then return to TinyLunch. Estimates stay on this iPhone. History stays available while it’s off." : {
 
     },
-    "The on-device model isn’t ready" : {
+    "Apple Intelligence is getting ready" : {
 
     },
-    "Apple is still downloading or preparing Apple Intelligence. That download is handled by the system. Try again when it finishes. History stays available." : {
+    "The system handles the download and preparation. Try again when it finishes. History stays available." : {
 
     },
     "Photo analysis isn’t available" : {

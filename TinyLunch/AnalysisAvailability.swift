@@ -96,8 +96,8 @@ struct AnalysisAvailabilityState: Equatable, Sendable {
 
     static let modelNotReady = AnalysisAvailabilityState(
         status: .modelNotReady,
-        title: String(localized: "The on-device model isn’t ready"),
-        explanation: String(localized: "Apple is still downloading or preparing Apple Intelligence. That download is handled by the system. Try again when it finishes. History stays available."),
+        title: String(localized: "Apple Intelligence is getting ready"),
+        explanation: String(localized: "The system handles the download and preparation. Try again when it finishes. History stays available."),
         symbol: "arrow.down.circle",
         primaryAction: .retry,
         secondaryAction: .openHistory
