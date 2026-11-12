@@ -8,7 +8,9 @@ final class AppModel {
     var draft: Meal?
     var image: UIImage?
     var modelAvailability = AnalysisAvailabilityState.ready
-    var error: String?
+    var issue: PresentationIssue?
+    var error: String? { issue?.message }
+    var savedMeal: Meal?
     var busy = false
     var saving = false
     var importing = false
@@ -27,6 +29,7 @@ final class AppModel {
     }
 
     func refresh() async {
+        if issue?.cause == .history { issue = nil }
         modelAvailability = await estimator.availability()
         do {
             #if DEBUG
@@ -41,7 +44,7 @@ final class AppModel {
             meals = try await store.load()
             historyLoaded = true
         } catch {
-            self.error = "Saved meals could not be read. Your existing history has not been replaced. Try again after unlocking your iPhone."
+            self.issue = PresentationIssue(cause: .history, message: String(localized: "Saved meals could not be read. Your existing history has not been replaced. Try again after unlocking your iPhone."), recovery: .refresh)
         }
     }
 
@@ -58,10 +61,13 @@ final class AppModel {
         image = nil
         draft = nil
         savedNotice = false
+        savedMeal = nil
+        issue = nil
     }
 
     func importPhoto(_ item: PhotosPickerItem) {
         cancel()
+        issue = nil
         importing = true
         let id = requestID
         operation = Task {
@@ -74,7 +80,7 @@ final class AppModel {
                 savedNotice = false
             } catch {
                 guard id == requestID, !Task.isCancelled else { return }
-                self.error = "This photo could not be imported. An iCloud photo may need a connection. Try another photo or take one with the camera."
+                self.issue = PresentationIssue(cause: .photoImport, message: String(localized: "This photo could not be imported. An iCloud photo may need a connection. Try another photo or take one with the camera."))
             }
             if id == requestID { importing = false }
         }
@@ -93,6 +99,7 @@ final class AppModel {
 
     func receiveCapture(_ captured: UIImage) {
         cancel()
+        issue = nil
         let maxDimension = max(captured.size.width, captured.size.height)
         let scale = min(1, 2048 / maxDimension)
         let size = CGSize(width: captured.size.width * scale, height: captured.size.height * scale)
@@ -109,6 +116,7 @@ final class AppModel {
         guard !busy, !importing, modelAvailability.allowsPhotoAnalysis,
               let data = image?.jpegData(compressionQuality: 0.85) else { return }
         cancel()
+        issue = nil
         busy = true
         let id = requestID
         operation = Task {
@@ -121,7 +129,7 @@ final class AppModel {
                 }
                 guard id == requestID, !Task.isCancelled else { return }
                 if items.isEmpty {
-                    error = "No food was identified. Try a clearer photo with the meal in view."
+                    issue = PresentationIssue(cause: .noFood, message: String(localized: "No food was identified. Try a clearer photo with the meal in view."))
                 } else {
                     image = nil
                     draft = Meal(items: items, estimatorVersion: MealEstimateMapping.promptVersion)
@@ -129,8 +137,8 @@ final class AppModel {
             } catch is CancellationError {
             } catch {
                 guard id == requestID, !Task.isCancelled else { return }
-                self.error = (error as? LocalizedError)?.errorDescription
-                    ?? "The meal could not be estimated. Your photo is still here so you can retry."
+                self.issue = PresentationIssue(cause: .analysis, message: (error as? LocalizedError)?.errorDescription
+                    ?? String(localized: "The meal could not be estimated. Your photo is still here so you can retry."), recovery: error is EstimateError ? nil : .analyze)
             }
             if id == requestID { busy = false }
         }
@@ -138,6 +146,7 @@ final class AppModel {
 
     func update(_ item: FoodItem, correction: FoodCorrection, onSuccess: @escaping @MainActor () -> Void) {
         guard !busy, !saving, var meal = draft else { return }
+        issue = nil
         if case .portion(let grams) = correction {
             guard let index = meal.items.firstIndex(where: { $0.id == item.id }) else { return }
             meal.items[index].grams = grams
@@ -182,8 +191,8 @@ final class AppModel {
                 onSuccess()
             } catch {
                 guard id == requestID, !Task.isCancelled else { return }
-                let reason = (error as? LocalizedError)?.errorDescription ?? "This correction could not be estimated."
-                self.error = "\(reason) The previous draft is unchanged. Try a local catalog match or retry the correction."
+                let reason = (error as? LocalizedError)?.errorDescription ?? String(localized: "This correction could not be estimated.")
+                self.issue = PresentationIssue(cause: .correction, message: String(localized: "\(reason) The previous draft is unchanged. Your entries are still here. Choose a local catalog match or update the food to try again."))
             }
             if id == requestID { busy = false }
         }
@@ -191,6 +200,7 @@ final class AppModel {
 
     func save() async {
         guard !saving, !busy, historyLoaded, var meal = draft, !meal.items.isEmpty else { return }
+        issue = nil
         saving = true
         defer { saving = false }
         meal.savedAt = Date()
@@ -198,16 +208,33 @@ final class AppModel {
             meals = try await store.save(meal)
             draft = nil
             image = nil
+            savedMeal = meals.first(where: { $0.id == meal.id }) ?? meal
             savedNotice = true
-        } catch { self.error = "The meal could not be saved. Your draft is still here. Please retry." }
+        } catch { self.issue = PresentationIssue(cause: .save, message: String(localized: "The meal could not be saved. Your draft is still here. Please retry."), recovery: .save) }
     }
 
     func delete(_ meal: Meal) async {
         guard !saving else { return }
+        issue = nil
         saving = true
         defer { saving = false }
-        do { meals = try await store.delete(meal.id) }
-        catch { self.error = "The meal could not be deleted. Please retry." }
+        do {
+            meals = try await store.delete(meal.id)
+            if savedMeal?.id == meal.id { savedMeal = nil; savedNotice = false }
+        }
+        catch { self.issue = PresentationIssue(cause: .delete, message: String(localized: "The meal could not be deleted. It is still in History."), recovery: .delete(meal)) }
+    }
+
+    func recoverIssue(_ recovery: PresentationIssue.Recovery? = nil) async {
+        let recovery = recovery ?? issue?.recovery
+        issue = nil
+        switch recovery {
+        case .refresh: await refresh()
+        case .analyze: analyze()
+        case .save: await save()
+        case .delete(let meal): await delete(meal)
+        case nil: break
+        }
     }
 
     #if DEBUG
@@ -253,4 +280,51 @@ final class AppModel {
     }
     #endif
     private enum ImportError: Error { case invalid }
+}
+
+struct PresentationIssue {
+    enum Cause {
+        case history, photoImport, camera, noFood, analysis, correction, save, delete
+
+        var title: String {
+            switch self {
+            case .history: String(localized: "History could not be loaded")
+            case .photoImport: String(localized: "Photo could not be imported")
+            case .camera: String(localized: "Camera unavailable")
+            case .noFood: String(localized: "No food identified")
+            case .analysis: String(localized: "Meal could not be estimated")
+            case .correction: String(localized: "Food could not be updated")
+            case .save: String(localized: "Meal could not be saved")
+            case .delete: String(localized: "Meal could not be deleted")
+            }
+        }
+
+        var dismissal: String {
+            switch self {
+            case .history: String(localized: "Close message")
+            case .delete: String(localized: "Keep meal")
+            case .photoImport, .camera: String(localized: "Back to photo options")
+            case .noFood, .analysis: String(localized: "Review photo")
+            case .correction: String(localized: "Keep editing")
+            case .save: String(localized: "Keep reviewing")
+            }
+        }
+    }
+
+    enum Recovery {
+        case refresh, analyze, save, delete(Meal)
+
+        var title: String {
+            switch self {
+            case .refresh: String(localized: "Reload History")
+            case .analyze: String(localized: "Retry estimate")
+            case .save: String(localized: "Retry save")
+            case .delete: String(localized: "Retry delete")
+            }
+        }
+    }
+
+    var cause: Cause
+    var message: String
+    var recovery: Recovery? = nil
 }

@@ -1,6 +1,91 @@
 import XCTest
 
 final class TinyLunchUITests: XCTestCase {
+    @MainActor func testBlockedHomeExplainsPhotoPreparation() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--analysis-unavailable"]
+        app.launch()
+        XCTAssertTrue(app.buttons["openAnalysisSettings"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["preparePhotoExplanation"].exists)
+        XCTAssertTrue(app.buttons["Take photo"].exists)
+        XCTAssertTrue(app.buttons["Choose photo"].exists)
+        XCTAssertFalse(app.staticTexts["Estimate your meal"].exists)
+    }
+
+    @MainActor func testMalformedPortionCannotCommitThePreviousGrams() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
+        app.launch()
+        tapVisible(app.buttons["editFood-Rice"], in: app)
+        let portion = app.textFields["portionGrams"]
+        reveal(portion, in: app)
+        replaceText(portion, with: "1.5.2")
+        app.buttons["Done"].tap()
+        XCTAssertTrue(app.staticTexts["portionValidation"].waitForExistence(timeout: 5))
+        XCTAssertEqual(portion.value as? String, "1.5.2")
+        XCTAssertFalse(app.buttons["Apply"].isEnabled)
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.staticTexts["mealCalories"].label.contains("195"))
+    }
+
+    @MainActor func testBlankPortionStaysSaveableAsIncomplete() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
+        app.launch()
+        tapVisible(app.buttons["editFood-Rice"], in: app)
+        let portion = app.textFields["portionGrams"]
+        reveal(portion, in: app)
+        replaceText(portion, with: "")
+        app.buttons["Done"].tap()
+        XCTAssertTrue(app.staticTexts["missingPortionHelp"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Apply"].isEnabled)
+        app.buttons["Apply"].tap()
+        XCTAssertTrue(app.buttons["saveMeal"].isEnabled)
+        XCTAssertTrue(app.staticTexts["Incomplete estimate"].firstMatch.exists)
+        app.buttons["saveMeal"].tap()
+        XCTAssertTrue(app.buttons["viewSavedMeal"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor func testFailedCorrectionKeepsEnteredFieldsInTheEditor() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal", "--analysis-unavailable"]
+        app.launch()
+        tapVisible(app.buttons["editFood-Rice"], in: app)
+        let name = app.textFields["foodName"]
+        reveal(name, in: app)
+        replaceText(name, with: "Unlisted dish xyz")
+        app.buttons["Apply"].tap()
+        let failure = app.staticTexts["Food could not be updated"]
+        XCTAssertTrue(failure.waitForExistence(timeout: 10))
+        tapVisible(app.buttons["dismissIssue"], in: app)
+        XCTAssertEqual(name.value as? String, "Unlisted dish xyz")
+        XCTAssertTrue(app.buttons["Apply"].exists)
+        app.buttons["Cancel"].tap()
+        XCTAssertTrue(app.buttons["editFood-Rice"].exists)
+    }
+
+    @MainActor func testSavedConfirmationOpensTheReadOnlySnapshot() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--reset-history", "--marketing-screenshots", "--marketing-review"]
+        app.launch()
+        XCTAssertTrue(app.buttons["saveMeal"].waitForExistence(timeout: 10))
+        app.buttons["saveMeal"].tap()
+        XCTAssertTrue(app.staticTexts["savedMealTitle"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["savedMealTitle"].label.contains("Grilled salmon"))
+        let viewSaved = app.buttons["viewSavedMeal"]
+        XCTAssertTrue(viewSaved.waitForExistence(timeout: 5))
+        tapVisible(viewSaved, in: app)
+        XCTAssertTrue(app.staticTexts["Saved as estimated, using the portions and preparation shown below."].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["An estimate based on portions and preparation. Adjust either to make it more useful."].exists)
+        XCTAssertFalse(app.buttons["editFood-Grilled salmon"].exists)
+    }
+
+    @MainActor private func replaceText(_ field: XCUIElement, with text: String) {
+        field.tap()
+        let current = field.value as? String ?? ""
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: current.count) + text)
+    }
+
     @MainActor func testExplicitSavePartialHistoryAndRelaunch() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--reset-history", "--example-meal"]
@@ -172,8 +257,8 @@ final class TinyLunchUITests: XCTestCase {
         } else if dontAllowPlain.waitForExistence(timeout: 1) {
             dontAllowPlain.tap()
         }
-        if app.alerts["Something needs attention"].waitForExistence(timeout: 2) {
-            app.alerts.buttons["OK"].tap()
+        if app.alerts["Camera unavailable"].waitForExistence(timeout: 2) {
+            app.alerts.buttons["Back to photo options"].tap()
             return
         }
         if app.alerts["Camera access is off"].waitForExistence(timeout: 2) {

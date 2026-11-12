@@ -52,16 +52,46 @@ extension View {
 }
 
 struct PrimaryAction: ButtonStyle {
+    var prominent = true
     @Environment(\.isEnabled) private var enabled
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     func makeBody(configuration: Configuration) -> some View {
         configuration.label.font(.headline)
             .multilineTextAlignment(.center)
             .frame(maxWidth: .infinity, minHeight: 26).padding(.vertical, 16).padding(.horizontal, 20)
-            .foregroundStyle(enabled ? .white : TinyLunchStyle.ink)
-            .background(enabled ? TinyLunchStyle.button : TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 22))
+            .foregroundStyle(enabled && prominent ? .white : TinyLunchStyle.ink)
+            .background(enabled && prominent ? TinyLunchStyle.button : TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 22))
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.98 : 1)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)
+    }
+}
+
+struct PresentationIssueCard: View {
+    let issue: PresentationIssue
+    var recover: (() -> Void)? = nil
+    var dismiss: () -> Void
+    @AccessibilityFocusState private var issueFocused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(issue.cause.title).font(.headline).accessibilityAddTraits(.isHeader)
+                .accessibilityFocused($issueFocused)
+            Text(issue.message).font(.subheadline).fixedSize(horizontal: false, vertical: true)
+            if let recovery = issue.recovery, let recover {
+                Button(recovery.title, action: recover)
+                    .buttonStyle(ScaledTextButton())
+                    .accessibilityIdentifier("recoverIssue")
+            }
+            Button(issue.cause.dismissal, action: dismiss)
+                .buttonStyle(ScaledTextButton())
+                .accessibilityIdentifier("dismissIssue")
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(TinyLunchStyle.soft.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("presentationIssue")
+        .onAppear { Task { @MainActor in issueFocused = true } }
     }
 }
 
@@ -305,13 +335,8 @@ struct PrivacySheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    Text("Not a medical device")
-                        .font(.headline)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .accessibilityAddTraits(.isHeader)
-                        .accessibilityFocused($noticeFocused)
-                    MedicalDisclaimer(prominent: false)
                     privacyHeading
+                        .accessibilityFocused($noticeFocused)
                     Text("TinyLunch is built for on-device estimates. Your food photos and meal details aren’t sent to a server.")
                         .font(.body)
                         .fixedSize(horizontal: false, vertical: true)
@@ -333,6 +358,11 @@ struct PrivacySheet: View {
                         .font(.body)
                         .foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
+                    Text("Not a medical device")
+                        .font(.headline)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityAddTraits(.isHeader)
+                    MedicalDisclaimer(prominent: false)
                 }
                 .padding(24)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -354,7 +384,7 @@ struct PrivacySheet: View {
         let icon = Image(systemName: "lock.iphone")
             .font(.title2)
             .accessibilityHidden(true)
-        let title = Text("Your plate. Your business.")
+        let title = Text("Processed on this iPhone")
             .font(.title2.weight(.bold))
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)

@@ -7,10 +7,11 @@ struct RootView: View {
     @Bindable var model: AppModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var tab = 0
+    @State private var editorPresented = false
     var body: some View {
         TabView(selection: $tab) {
             Tab("New meal", systemImage: "camera", value: 0) {
-                CaptureView(model: model, showHistory: { tab = 1 })
+                CaptureView(model: model, showHistory: { tab = 1 }, editorPresented: $editorPresented)
             }
             Tab("History", systemImage: "clock", value: 1) { HistoryView(model: model, startMeal: { tab = 0 }) }
         }
@@ -19,9 +20,14 @@ struct RootView: View {
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { Task { await model.refresh() } }
         }
-        .alert("Something needs attention", isPresented: Binding(get: { model.error != nil }, set: { if !$0 { model.error = nil } })) {
-            Button("OK") { model.error = nil }
-        } message: { Text(model.error ?? "") }
+        .alert(model.issue?.cause.title ?? "", isPresented: Binding(get: {
+            model.issue != nil && model.issue?.cause != .correction && !editorPresented
+        }, set: { if !$0 { model.issue = nil } })) {
+            if let recovery = model.issue?.recovery {
+                Button(recovery.title) { Task { await model.recoverIssue(recovery) } }
+            }
+            Button(model.issue?.cause.dismissal ?? String(localized: "Keep reviewing"), role: .cancel) { model.issue = nil }
+        } message: { Text(model.issue?.message ?? "") }
         #if DEBUG
         .preferredColorScheme(ProcessInfo.processInfo.arguments.contains("--marketing-dark") ? .dark : nil)
         #endif
@@ -51,6 +57,7 @@ private struct HomeMetrics {
 struct CaptureView: View {
     @Bindable var model: AppModel
     var showHistory: () -> Void
+    @Binding var editorPresented: Bool
     @State private var selection: PhotosPickerItem?
     @State private var camera = false
     @State private var cameraDidCapture = false
@@ -59,6 +66,7 @@ struct CaptureView: View {
     @State private var editorReturnID: UUID?
     @State private var editorWasNewFood = false
     @State private var discard = false
+    @State private var pendingSavedDelete: Meal?
     @State private var privacy = false
     @State private var privacySource = PrivacySource.toolbar
     @State private var toast = false
@@ -130,16 +138,29 @@ struct CaptureView: View {
             .confirmationDialog("Discard this unsaved meal?", isPresented: $discard, titleVisibility: .visible) {
                 Button("Discard", role: .destructive) { model.reset() }
             }
-            .sheet(item: $editing, onDismiss: restoreFoodFocus) { item in
+            .confirmationDialog("Delete this meal?", isPresented: Binding(get: { pendingSavedDelete != nil }, set: { if !$0 { pendingSavedDelete = nil } }), titleVisibility: .visible) {
+                Button("Delete meal", role: .destructive) {
+                    if let meal = pendingSavedDelete { Task { await model.delete(meal) } }
+                    pendingSavedDelete = nil
+                }
+            }
+            .sheet(item: $editing, onDismiss: {
+                editorPresented = false
+                restoreFoodFocus()
+            }) { item in
                 FoodEditor(
                     item: item,
                     busy: model.busy,
                     allowsIdentityEdit: model.modelAvailability.allowsTextEstimate,
                     catalog: model.catalog,
+                    issue: model.issue,
+                    dismissIssue: { model.issue = nil },
+                    recoverIssue: { recovery in Task { await model.recoverIssue(recovery) } },
                     cancel: model.cancel
                 ) { correction in
                     model.update(item, correction: correction, onSuccess: { editing = nil })
                 }.interactiveDismissDisabled()
+                    .onAppear { editorPresented = true }
             }
             .sheet(isPresented: $privacy, onDismiss: {
                 let source = privacySource
@@ -303,9 +324,6 @@ struct CaptureView: View {
             } else {
                 captureContent(metrics)
             }
-            if model.busy || model.importing {
-                activityRow
-            }
         }
         .padding(.horizontal, 24)
         .padding(.top, metrics.top)
@@ -318,7 +336,7 @@ struct CaptureView: View {
         return VStack(spacing: metrics.spacing) {
             if let image = model.image {
                 VStack(alignment: .leading, spacing: 14) {
-                    Text("Looking good.")
+                    Text("Check your photo")
                         .font(.system(.largeTitle, design: .rounded, weight: .bold))
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityAddTraits(.isHeader)
@@ -332,64 +350,62 @@ struct CaptureView: View {
                         .accessibilityHint("Preview of the meal you can analyze.")
                         .accessibilityAddTraits(.isImage)
                 }
-            } else if model.savedNotice {
-                VStack(spacing: 18) {
-                    Text("🥡").font(.largeTitle).accessibilityHidden(true).accessibilityIdentifier("decorativeGlyph").padding(.top, 28)
-                    HStack(spacing: 8) {
-                        Image(systemName: "checkmark.circle.fill").font(.largeTitle).accessibilityHidden(true)
-                        Text("Meal saved")
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
-                    VStack(spacing: 4) {
-                        Text("Tucked away in History.")
-                        Text("Just the details, never the photo.")
-                    }
-                    .font(.body)
-                    .foregroundStyle(TinyLunchStyle.ink)
-                    .multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity)
-                }
-                .frame(maxWidth: .infinity).padding(.bottom, 22)
-                .accessibilityElement(children: .combine)
-                .accessibilityAddTraits(.isHeader)
-                .accessibilityLabel("Meal saved. Tucked away in History. Just the details, never the photo.")
-                .accessibilityFocused($savedFocused)
-            } else if typeSize.isAccessibilitySize {
-                Text("Your next meal.")
-                    .font(.system(.title, design: .rounded, weight: .bold))
-                    .fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityAddTraits(.isHeader)
-                    .accessibilityFocused($heroFocused)
-            } else {
-                VStack(spacing: 4) {
-                    Text("A little insight.\nEvery bite.")
-                        .font(.system(metrics.largeHero ? .largeTitle : .title, design: .rounded, weight: .bold))
-                        .multilineTextAlignment(.center)
+            } else if model.savedNotice, let saved = model.savedMeal {
+                VStack(alignment: .leading, spacing: 12) {
+                    Label("Meal saved", systemImage: "checkmark.circle.fill")
+                        .font(.title2.weight(.semibold))
+                        .accessibilityAddTraits(.isHeader)
+                        .accessibilityFocused($savedFocused)
+                    Text(saved.title).font(.headline)
                         .fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity)
+                        .accessibilityIdentifier("savedMealTitle")
+                    Text(saved.isIncomplete ? "Known foods subtotal" : "Estimated meal total")
+                        .font(.subheadline).foregroundStyle(.secondary)
+                    Text(saved.calorieLabel).font(.title2.weight(.semibold)).monospacedDigit()
+                        .accessibilityLabel(saved.spokenEnergy)
+                    if saved.isIncomplete { Text("Incomplete estimate").font(.subheadline) }
+                    Text("Just the details, never the photo.").font(.subheadline).foregroundStyle(.secondary)
+                    NavigationLink {
+                        SavedMealView(meal: saved) { pendingSavedDelete = saved }
+                    } label: {
+                        AccessibleActionLabel(title: "View saved meal", systemImage: "list.bullet.rectangle")
+                    }
+                    .buttonStyle(PrimaryAction())
+                    .accessibilityIdentifier("viewSavedMeal")
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            } else if model.modelAvailability.allowsPhotoAnalysis {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Estimate your meal")
+                        .font(.system(metrics.largeHero ? .largeTitle : .title, design: .rounded, weight: .bold))
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityAddTraits(.isHeader)
                         .accessibilityFocused($heroFocused)
-                    Text("Your plate, with a little perspective.")
+                    Text("Take or choose a food photo, then check the foods and portions before saving.")
                         .font(.subheadline).foregroundStyle(TinyLunchStyle.ink).padding(.top, metrics.subtitleGap)
-                        .multilineTextAlignment(.center)
                         .fixedSize(horizontal: false, vertical: true)
-                    if metrics.showsPlate {
-                        EmojiPlate(height: metrics.plate).padding(.top, metrics.plateGap)
+                    if metrics.showsPlate && !typeSize.isAccessibilitySize {
+                        EmojiPlate(height: metrics.plate).padding(.top, metrics.plateGap).frame(maxWidth: .infinity)
                     }
                 }
             }
 
-            if !typeSize.isAccessibilitySize { MedicalDisclaimer(prominent: false) }
+            if !model.modelAvailability.allowsPhotoAnalysis {
+                Text(preparationExplanation)
+                    .font(.subheadline).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("preparePhotoExplanation")
+            }
 
             VStack(spacing: 12) {
+                if model.busy || model.importing { activityRow }
                 if model.image != nil {
                     Button { model.analyze() } label: {
                         AccessibleActionLabel(title: "Analyze meal", systemImage: "sparkles")
                     }
-                    .buttonStyle(PrimaryAction())
+                    .buttonStyle(PrimaryAction(prominent: model.modelAvailability.allowsPhotoAnalysis))
                     .disabled(!model.modelAvailability.allowsPhotoAnalysis || model.busy || model.importing)
                     .accessibilityLabel("Analyze meal")
                     .accessibilityHint(model.modelAvailability.allowsPhotoAnalysis ? "Estimates this meal on your iPhone." : model.modelAvailability.explanation)
@@ -398,7 +414,7 @@ struct CaptureView: View {
                     Button { Task { await openCamera() } } label: {
                         AccessibleActionLabel(title: "Take photo", systemImage: "camera.fill")
                     }
-                    .buttonStyle(PrimaryAction())
+                    .buttonStyle(PrimaryAction(prominent: model.modelAvailability.allowsPhotoAnalysis && !model.savedNotice))
                     .disabled(model.busy || model.importing)
                     .accessibilityLabel("Take photo")
                     .accessibilityHint("Opens the camera to photograph a meal.")
@@ -427,9 +443,9 @@ struct CaptureView: View {
                 }
             }
 
-            if typeSize.isAccessibilitySize { MedicalDisclaimer(prominent: false) }
+            MedicalDisclaimer(prominent: false)
 
-            if typeSize.isAccessibilitySize && model.image == nil && !model.savedNotice { EmojiPlate() }
+            if typeSize.isAccessibilitySize && model.modelAvailability.allowsPhotoAnalysis && model.image == nil && !model.savedNotice { EmojiPlate() }
             Button {
                 privacySource = .footer
                 privacy = true
@@ -463,7 +479,7 @@ struct CaptureView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             MealSummary(meal: meal)
-            MedicalDisclaimer()
+            MedicalDisclaimer(prominent: false)
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("On your plate")
@@ -540,14 +556,18 @@ struct CaptureView: View {
                 .accessibilityFocused($addFoodFocused)
             }.padding(.horizontal, 18).background(TinyLunchStyle.card, in: RoundedRectangle(cornerRadius: 26))
             Text("Tap a food to correct it. Portions are suggestions until you confirm them.")
-                .font(.headline)
-                .foregroundStyle(.primary)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     private func saveBar(_ meal: Meal) -> some View {
         VStack(spacing: 8) {
+            ViewThatFits(in: .horizontal) {
+                HStack { saveEstimateLabel(meal); Spacer(); Text(meal.calorieLabel).monospacedDigit().font(.headline) }
+                VStack(alignment: .leading, spacing: 4) { saveEstimateLabel(meal); Text(meal.calorieLabel).monospacedDigit().font(.headline) }.frame(maxWidth: .infinity, alignment: .leading)
+            }
             Button { Task { await model.save() } } label: {
                 HStack(alignment: .center, spacing: 8) {
                     if model.saving {
@@ -573,6 +593,12 @@ struct CaptureView: View {
         }.padding(.horizontal, 24).padding(.top, 14).padding(.bottom, 10)
             .background(TinyLunchStyle.paper)
             .overlay(alignment: .top) { Divider() }
+    }
+
+    private func saveEstimateLabel(_ meal: Meal) -> some View {
+        Text(meal.isIncomplete ? "Known foods subtotal · Incomplete estimate" : "Estimated meal total")
+            .font(.caption).foregroundStyle(.secondary)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var aboutPrivacyButton: some View {
@@ -634,10 +660,20 @@ struct CaptureView: View {
     private var availabilityCard: some View {
         AnalysisAvailabilityCard(
             state: model.modelAvailability,
+            emphasizesRecovery: model.draft == nil && !model.savedNotice,
             retry: { Task { await model.refresh() } },
             openSettings: openSystemSettings,
             openHistory: showHistory
         )
+    }
+
+    private var preparationExplanation: LocalizedStringKey {
+        switch model.modelAvailability.status {
+        case .deviceNotEligible, .visionUnavailable:
+            "Photo analysis is unavailable on this iPhone. You can still view and delete saved meals in History."
+        case .ready, .appleIntelligenceNotEnabled, .modelNotReady, .unavailable:
+            "You can prepare a photo for later. Analysis waits until the on-device model is ready. Keep TinyLunch open to retain your unsaved photo."
+        }
     }
 
     private func openSystemSettings() {
@@ -647,7 +683,7 @@ struct CaptureView: View {
 
     private func openCamera() async {
         guard UIImagePickerController.isSourceTypeAvailable(.camera) else {
-            model.error = "A camera is not available on this device. Choose a photo instead."
+            model.issue = PresentationIssue(cause: .camera, message: String(localized: "A camera is not available on this device. Choose a photo instead."))
             return
         }
         switch AVCaptureDevice.authorizationStatus(for: .video) {
@@ -662,6 +698,7 @@ struct CaptureView: View {
 
 struct AnalysisAvailabilityCard: View {
     let state: AnalysisAvailabilityState
+    var emphasizesRecovery = true
     var showsHistoryAction = true
     var retry: () -> Void
     var openSettings: () -> Void
@@ -705,10 +742,17 @@ struct AnalysisAvailabilityCard: View {
     @ViewBuilder
     private var actionButtons: some View {
         if let action = state.primaryAction, includes(action) {
-            button(action)
+            if emphasizesRecovery {
+                button(action).buttonStyle(.borderedProminent)
+            } else {
+                button(action).buttonStyle(.borderless)
+            }
         }
         if let action = state.secondaryAction, includes(action) {
-            button(action)
+            button(action).buttonStyle(.borderless)
+        }
+        if showsHistoryAction, state.primaryAction != .openHistory, state.secondaryAction != .openHistory {
+            button(.openHistory).buttonStyle(.borderless)
         }
     }
 
@@ -726,9 +770,9 @@ struct AnalysisAvailabilityCard: View {
         } label: {
             Text(action.title)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(TinyLunchStyle.accent)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(minHeight: 44)
         }
-        .buttonStyle(ScaledTextButton())
         .accessibilityIdentifier(action.accessibilityIdentifier)
         .accessibilityHint(action.accessibilityHint)
     }

@@ -777,6 +777,536 @@
     },
     "Corrects this food and its portion. Use the actions to correct or remove it." : {
 
+    },
+    "Check your photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your photo"
+          }
+        }
+      }
+    },
+    "Estimate your meal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimate your meal"
+          }
+        }
+      }
+    },
+    "Known foods subtotal · Incomplete estimate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Known foods subtotal · Incomplete estimate"
+          }
+        }
+      }
+    },
+    "Take or choose a food photo, then check the foods and portions before saving." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Take or choose a food photo, then check the foods and portions before saving."
+          }
+        }
+      }
+    },
+    "View saved meal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View saved meal"
+          }
+        }
+      }
+    },
+    "You can prepare a photo for later. Analysis waits until the on-device model is ready. Keep TinyLunch open to retain your unsaved photo." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You can prepare a photo for later. Analysis waits until the on-device model is ready. Keep TinyLunch open to retain your unsaved photo."
+          }
+        }
+      }
+    },
+    "Enter a food name to update this item." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a food name to update this item."
+          }
+        }
+      }
+    },
+    "Enter a number in grams, without units or grouping separators, or leave it blank." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enter a number in grams, without units or grouping separators, or leave it blank."
+          }
+        }
+      }
+    },
+    "Estimated %@ kcal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Estimated %@ kcal"
+          }
+        }
+      }
+    },
+    "For example, 150" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For example, 150"
+          }
+        }
+      }
+    },
+    "For example, cooked rice" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For example, cooked rice"
+          }
+        }
+      }
+    },
+    "For example, cooked with oil" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For example, cooked with oil"
+          }
+        }
+      }
+    },
+    "Keep editing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep editing"
+          }
+        }
+      }
+    },
+    "No local match. Try a simpler food name or another preparation. You can update the food using an on-device model estimate when Apple Intelligence is ready." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No local match. Try a simpler food name or another preparation. You can update the food using an on-device model estimate when Apple Intelligence is ready."
+          }
+        }
+      }
+    },
+    "Saved as estimated, using the portions and preparation shown below." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved as estimated, using the portions and preparation shown below."
+          }
+        }
+      }
+    },
+    "Shorten the food name to 200 characters or fewer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shorten the food name to 200 characters or fewer."
+          }
+        }
+      }
+    },
+    "Shorten the preparation to 400 characters or fewer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Shorten the preparation to 400 characters or fewer."
+          }
+        }
+      }
+    },
+    "Update food" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Update food"
+          }
+        }
+      }
+    },
+    "Use more than 0 and up to 10,000 grams, or leave it blank." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use more than 0 and up to 10,000 grams, or leave it blank."
+          }
+        }
+      }
+    },
+    "Without grams, this food has no calorie estimate. You can still save an incomplete meal." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Without grams, this food has no calorie estimate. You can still save an incomplete meal."
+          }
+        }
+      }
+    },
+    "%lld of 200 characters" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld of 200 characters"
+          }
+        }
+      }
+    },
+    "%lld of 400 characters" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld of 400 characters"
+          }
+        }
+      }
+    },
+    "Tap Save after reviewing an estimate to keep the meal here." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap Save after reviewing an estimate to keep the meal here."
+          }
+        }
+      }
+    },
+    "Processed on this iPhone" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processed on this iPhone"
+          }
+        }
+      }
+    },
+    "Back to History" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to History"
+          }
+        }
+      }
+    },
+    "Back to photo options" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Back to photo options"
+          }
+        }
+      }
+    },
+    "Camera unavailable" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera unavailable"
+          }
+        }
+      }
+    },
+    "Food could not be updated" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Food could not be updated"
+          }
+        }
+      }
+    },
+    "History could not be loaded" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "History could not be loaded"
+          }
+        }
+      }
+    },
+    "Keep reviewing" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep reviewing"
+          }
+        }
+      }
+    },
+    "Meal could not be deleted" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meal could not be deleted"
+          }
+        }
+      }
+    },
+    "Meal could not be estimated" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meal could not be estimated"
+          }
+        }
+      }
+    },
+    "Meal could not be saved" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meal could not be saved"
+          }
+        }
+      }
+    },
+    "No food identified" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No food identified"
+          }
+        }
+      }
+    },
+    "Photo could not be imported" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo could not be imported"
+          }
+        }
+      }
+    },
+    "Reload History" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reload History"
+          }
+        }
+      }
+    },
+    "Retry delete" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry delete"
+          }
+        }
+      }
+    },
+    "Retry estimate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry estimate"
+          }
+        }
+      }
+    },
+    "Retry save" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry save"
+          }
+        }
+      }
+    },
+    "Review photo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review photo"
+          }
+        }
+      }
+    },
+    "The meal could not be deleted. It is still in History." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The meal could not be deleted. It is still in History."
+          }
+        }
+      }
+    },
+    "%@ The previous draft is unchanged. Your entries are still here. Choose a local catalog match or update the food to try again." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ The previous draft is unchanged. Your entries are still here. Choose a local catalog match or update the food to try again."
+          }
+        }
+      }
+    },
+    "Saved meals could not be read. Your existing history has not been replaced. Try again after unlocking your iPhone." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Saved meals could not be read. Your existing history has not been replaced. Try again after unlocking your iPhone."
+          }
+        }
+      }
+    },
+    "This photo could not be imported. An iCloud photo may need a connection. Try another photo or take one with the camera." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This photo could not be imported. An iCloud photo may need a connection. Try another photo or take one with the camera."
+          }
+        }
+      }
+    },
+    "No food was identified. Try a clearer photo with the meal in view." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No food was identified. Try a clearer photo with the meal in view."
+          }
+        }
+      }
+    },
+    "The meal could not be estimated. Your photo is still here so you can retry." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The meal could not be estimated. Your photo is still here so you can retry."
+          }
+        }
+      }
+    },
+    "This correction could not be estimated." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This correction could not be estimated."
+          }
+        }
+      }
+    },
+    "The meal could not be saved. Your draft is still here. Please retry." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The meal could not be saved. Your draft is still here. Please retry."
+          }
+        }
+      }
+    },
+    "A camera is not available on this device. Choose a photo instead." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A camera is not available on this device. Choose a photo instead."
+          }
+        }
+      }
+    },
+    "Close message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Close message"
+          }
+        }
+      }
+    },
+    "Keep meal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keep meal"
+          }
+        }
+      }
+    },
+    "No portion entered. A new model estimate may suggest grams; otherwise this food stays incomplete." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No portion entered. A new model estimate may suggest grams; otherwise this food stays incomplete."
+          }
+        }
+      }
+    },
+    "Photo analysis is unavailable on this iPhone. You can still view and delete saved meals in History." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Photo analysis is unavailable on this iPhone. You can still view and delete saved meals in History."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

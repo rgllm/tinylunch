@@ -23,16 +23,9 @@ struct HistoryView: View {
                     List {
                         Section {
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("Good food,\nremembered.")
-                                    .font(.system(.largeTitle, design: .rounded, weight: .bold))
-                                    .fixedSize(horizontal: false, vertical: true)
-                                    .accessibilityAddTraits(.isHeader)
                                 Text("Your saved meals, just as you left them.")
                                     .font(.subheadline).foregroundStyle(TinyLunchStyle.ink)
                                     .fixedSize(horizontal: false, vertical: true)
-                                if !model.modelAvailability.allowsPhotoAnalysis {
-                                    availabilityCard.buttonStyle(.borderless).padding(.top, 8)
-                                }
                             }.padding(.vertical, 12)
                         }.listRowBackground(Color.clear).listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 10, trailing: 0))
                         Section {
@@ -45,7 +38,7 @@ struct HistoryView: View {
                                         VStack(alignment: .leading, spacing: 6) {
                                             Text(meal.title).font(.headline)
                                                 .fixedSize(horizontal: false, vertical: true)
-                                            Text(meal.calorieLabel).font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
+                                            Text(meal.calorieLabel).monospacedDigit().font(.subheadline.weight(.medium)).foregroundStyle(TinyLunchStyle.accent)
                                                 .fixedSize(horizontal: false, vertical: true)
                                             if meal.isIncomplete {
                                                 Text("Incomplete estimate").font(.caption).foregroundStyle(TinyLunchStyle.ink)
@@ -98,11 +91,10 @@ struct HistoryView: View {
     }
 
     private func emptyHistory(scale: CGFloat, top: CGFloat, bottom: CGFloat) -> some View {
-        VStack(spacing: 22 * max(scale, 0.7)) {
-            emptyBoard(scale: scale)
+        VStack(alignment: .leading, spacing: 22 * max(scale, 0.7)) {
             Text(model.historyLoaded ? "No saved meals" : "History unavailable")
                 .font(.system(scale < 0.7 ? .title : .largeTitle, design: .rounded, weight: .bold))
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityAddTraits(.isHeader)
                 .accessibilityFocused($emptyHistoryFocused)
@@ -112,15 +104,15 @@ struct HistoryView: View {
             Text(emptyHistoryMessage)
                 .font(.body)
                 .foregroundStyle(TinyLunchStyle.ink)
-                .multilineTextAlignment(.center)
+                .multilineTextAlignment(.leading)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity)
+                .frame(maxWidth: .infinity, alignment: .leading)
             if model.historyLoaded {
                 Button { startMeal() } label: {
                     AccessibleActionLabel(title: "Start a meal", systemImage: "plus")
                 }
-                .buttonStyle(PrimaryAction())
+                .buttonStyle(PrimaryAction(prominent: model.modelAvailability.allowsPhotoAnalysis))
                 .accessibilityLabel("Start a meal")
                 .accessibilityHint("Returns to the new meal screen.")
             } else {
@@ -131,6 +123,7 @@ struct HistoryView: View {
                 .accessibilityLabel("Retry")
                 .accessibilityHint("Loads saved meals again.")
             }
+            if model.historyLoaded && model.modelAvailability.allowsPhotoAnalysis { emptyBoard(scale: scale) }
             IconLabel(title: "Just meal details. No photos.", systemImage: "lock")
                 .font(.footnote).foregroundStyle(TinyLunchStyle.ink)
                 .accessibilityIdentifier("historyLocalNote")
@@ -177,7 +170,7 @@ struct HistoryView: View {
         if !model.modelAvailability.allowsPhotoAnalysis {
             return String(localized: "Meals you save stay in this list, where you can open or delete them.")
         }
-        return String(localized: "A place for meals worth remembering. Tap Save after an estimate to keep it here.")
+        return String(localized: "Tap Save after reviewing an estimate to keep the meal here.")
     }
 
     private func openSystemSettings() {
@@ -186,7 +179,7 @@ struct HistoryView: View {
     }
 }
 
-private struct SavedMealView: View {
+struct SavedMealView: View {
     let meal: Meal
     var delete: () -> Void
     var body: some View {
@@ -200,8 +193,8 @@ private struct SavedMealView: View {
                         .foregroundStyle(TinyLunchStyle.ink)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                MealSummary(meal: meal)
-                MedicalDisclaimer()
+                MealSummary(meal: meal, context: .saved)
+                MedicalDisclaimer(prominent: false)
                 Text("On your plate").font(.system(.title3, design: .rounded, weight: .bold))
                     .accessibilityAddTraits(.isHeader)
                 VStack(spacing: 18) {
