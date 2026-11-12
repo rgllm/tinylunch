@@ -93,12 +93,12 @@ struct MedicalDisclaimer: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     private var message: some View {
         let icon = Image(systemName: "cross.case")
-            .font(.subheadline)
+            .font(prominent ? .subheadline : .caption)
             .foregroundStyle(TinyLunchStyle.accent)
             .accessibilityHidden(true)
         let copy = Text("TinyLunch is not a medical device. These are estimates only, not medical or dietary advice. Consult a qualified professional for guidance about your health.")
-            .font(.headline)
-            .foregroundStyle(.primary)
+            .font(prominent ? .headline : .footnote)
+            .foregroundStyle(prominent ? Color.primary : TinyLunchStyle.ink)
             .fixedSize(horizontal: false, vertical: true)
             .frame(maxWidth: .infinity, alignment: .leading)
         return Group {

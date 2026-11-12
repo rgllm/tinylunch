@@ -91,11 +91,12 @@ struct CaptureView: View {
                         GeometryReader { proxy in
                             // One column sized to the safe area. Several copies time out the accessibility audit.
                             ScrollView { homeColumn(homeMetrics(for: proxy.size.height)) }
-                                .scrollBounceBehavior(.basedOnSize)
+                                .clearsFloatingTabBar()
                                 .frame(width: proxy.size.width, height: proxy.size.height, alignment: .top)
                         }
                     } else {
                         ScrollView { homeColumn(.regular) }
+                            .clearsFloatingTabBar()
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -381,7 +382,7 @@ struct CaptureView: View {
                 }
             }
 
-            if !typeSize.isAccessibilitySize { MedicalDisclaimer() }
+            if !typeSize.isAccessibilitySize { MedicalDisclaimer(prominent: false) }
 
             VStack(spacing: 12) {
                 if model.image != nil {
@@ -426,7 +427,7 @@ struct CaptureView: View {
                 }
             }
 
-            if typeSize.isAccessibilitySize { MedicalDisclaimer() }
+            if typeSize.isAccessibilitySize { MedicalDisclaimer(prominent: false) }
 
             if typeSize.isAccessibilitySize && model.image == nil && !model.savedNotice { EmojiPlate() }
             Button {
@@ -667,7 +668,7 @@ struct AnalysisAvailabilityCard: View {
     var openHistory: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Image(systemName: state.symbol)
                     .font(.subheadline.weight(.semibold))
@@ -681,15 +682,15 @@ struct AnalysisAvailabilityCard: View {
             .accessibilityAddTraits(.isHeader)
             .accessibilityIdentifier("photoAnalysisUnavailable")
             Text(state.explanation)
-                .font(.subheadline)
+                .font(.footnote)
                 .foregroundStyle(TinyLunchStyle.ink)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("analysisAvailabilityExplanation")
             actions
         }
-        .padding(16)
+        .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(TinyLunchStyle.soft.opacity(0.65), in: RoundedRectangle(cornerRadius: 20))
+        .background(TinyLunchStyle.soft.opacity(0.3), in: RoundedRectangle(cornerRadius: 16))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("analysisUnavailableCard")
     }
@@ -724,6 +725,7 @@ struct AnalysisAvailabilityCard: View {
             }
         } label: {
             Text(action.title)
+                .font(.subheadline.weight(.semibold))
                 .foregroundStyle(TinyLunchStyle.accent)
         }
         .buttonStyle(ScaledTextButton())
